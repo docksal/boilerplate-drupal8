@@ -1,0 +1,25 @@
+# Docker and Docker Compose based environment for Drupal.
+# See https://github.com/docksal/docksal for more information and documentation.
+
+version: "2"
+
+services:
+  # Web node
+  web:
+    extends:
+      file: .docksal/docksal-services.yml
+      service: web
+    environment:
+      - VIRTUAL_HOST=drupal8.docksal
+
+  # CLI node
+  cli:
+    extends:
+      file: .docksal/docksal-services.yml
+      service: cli
+
+  # DB node
+  db:
+    extends:
+      file: .docksal/docksal-services.yml
+      service: db

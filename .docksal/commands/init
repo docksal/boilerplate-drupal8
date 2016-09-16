@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+
+## Initialize Docksal powered Drupal 8 site
+##
+## Usage: fin init
+
+# Abort if anything fails
+set -e
+
+#-------------------------- Settings --------------------------------
+
+# $PROJECT_ROOT is passed down from fin to any custom command
+DOCROOT='docroot'
+DOCROOT_PATH="$PROJECT_ROOT/$DOCROOT"
+# Set to the appropriate site directory
+SITE_DIRECTORY='default'
+SITEDIR_PATH="${DOCROOT_PATH}/sites/${SITE_DIRECTORY}"
+# Set to the appropriate site domain
+SITE_DOMAIN='drupal8.docksal'
+
+#-------------------------- END: Settings --------------------------------
+
+
+#-------------------------- Helper functions --------------------------------
+
+# Console colors
+red='\033[0;31m'
+green='\033[0;32m'
+green_bg='\033[42m'
+yellow='\033[1;33m'
+NC='\033[0m'
+
+echo-red () { echo -e "${red}$1${NC}"; }
+echo-green () { echo -e "${green}$1${NC}"; }
+echo-green-bg () { echo -e "${green_bg}$1${NC}"; }
+echo-yellow () { echo -e "${yellow}$1${NC}"; }
+
+if_failed ()
+{
+	if [ ! $? -eq 0 ]; then
+		if [[ "$1" == "" ]]; then msg="an error occurred"; else msg="$1"; fi
+		echo-red "$msg";
+		exit 1;
+	fi
+}
+
+is_windows ()
+{
+	local res=$(uname | grep 'CYGWIN_NT')
+	if [[ "$res" != "" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+# Copy a settings file.
+# Skips if the destination file already exists.
+# @param $1 source file
+# @param $2 destination file
+copy_settings_file()
+{
+    local source="$1"
+    local dest="$2"
+
+    if [[ ! -f $dest ]]; then
+        echo "Copying ${dest}..."
+        cp $source $dest
+    else
+        echo-yellow "${dest} already in place."
+    fi
+}
+
+#-------------------------- END: Helper functions --------------------------------
+
+
+#-------------------------- Functions --------------------------------
+
+# Initialize local settings files
+init_settings ()
+{
+    # Copy from settings templates
+    copy_settings_file "${PROJECT_ROOT}/.docksal/docksal-local.yml" "${PROJECT_ROOT}/docker-compose.yml"
+    copy_settings_file "${SITEDIR_PATH}/default.settings.local.php" "${SITEDIR_PATH}/settings.local.php"
+}
+
+# Set file/folder permissions
+file_permissions ()
+{
+    mkdir -p "$DOCROOT_PATH/sites/$SITE_DIRECTORY/files"
+    chmod 777 "$DOCROOT_PATH/sites/$SITE_DIRECTORY/files"
+}
+
+# Install site
+site_install ()
+{
+    fin drush si -y --site-name='My Drupal 8 Site' --root=/var/www/docroot
+}
+
+#-------------------------- END: Functions --------------------------------
+
+
+#-------------------------- Execution --------------------------------
+
+if [[ "$PROJECT_ROOT" == "" ]]; then
+	echo-red "\$PROJECT_ROOT is not set"
+	exit 1
+fi
+
+echo -e "${green_bg} Step 1 ${NC}${green} Initializing local project configuration...${NC}"
+init_settings
+
+#echo-green "Setting file/folder permissions..."
+#file_permissions
+
+if [[ $DOCKER_RUNNING == "true" ]]; then
+	echo -e "${green_bg} Step 2 ${NC}${green} Recreating services...${NC}"
+	fin reset -f
+else
+	echo -e "${green_bg} Step 2 ${NC}${green} Creating services...${NC}"
+	fin up
+fi
+echo "Waiting 10s for MySQL to start...";
+sleep 10
+
+echo -e "${green_bg} Step 3 ${NC}${green} Installing site...${NC}"
+time site_install
+
+if is_windows; then
+	echo-green "Add ${SITE_DOMAIN} to your hosts file (/etc/hosts), e.g.:"
+	echo-green "192.168.10.10  ${SITE_DOMAIN}"
+	echo-green "Alternatively configure wildcard DNS resolution and never edit the hosts file again! Instructions:"
+	echo-green "https://github.com/blinkreaction/boot2docker-vagrant/blob/develop/docs/networking.md#dns-resolution"
+	echo
+fi
+
+echo -en "${green_bg} DONE! ${NC} "
+echo -e "Open ${yellow}http://${SITE_DOMAIN}${NC} in your browser to verify the setup."
+
+#-------------------------- END: Execution --------------------------------
