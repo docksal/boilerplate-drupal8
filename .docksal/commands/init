@@ -87,6 +87,7 @@ init_settings ()
 # Set file/folder permissions
 file_permissions ()
 {
+    chmod ug+w "$DOCROOT_PATH/sites/$SITE_DIRECTORY"
     mkdir -p "$DOCROOT_PATH/sites/$SITE_DIRECTORY/files"
     chmod 777 "$DOCROOT_PATH/sites/$SITE_DIRECTORY/files"
 }
@@ -107,11 +108,12 @@ if [[ "$PROJECT_ROOT" == "" ]]; then
 	exit 1
 fi
 
+#echo-green "Setting file/folder permissions..."
+file_permissions
+
 echo -e "${green_bg} Step 1 ${NC}${green} Initializing local project configuration...${NC}"
 init_settings
 
-#echo-green "Setting file/folder permissions..."
-file_permissions
 
 if [[ $DOCKER_RUNNING == "true" ]]; then
 	echo -e "${green_bg} Step 2 ${NC}${green} Recreating services...${NC}"
