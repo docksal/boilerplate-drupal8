@@ -26,7 +26,7 @@ Follow [Docksal environment setup instructions](https://github.com/docksal/docks
 
 2. Initialize the site
 
-    This will initialize local settings and install the site via Composer and drush
+    This will initialize local settings and install the site via drush
 
     ```
     fin init

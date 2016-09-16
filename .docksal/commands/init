@@ -111,7 +111,7 @@ echo -e "${green_bg} Step 1 ${NC}${green} Initializing local project configurati
 init_settings
 
 #echo-green "Setting file/folder permissions..."
-#file_permissions
+file_permissions
 
 if [[ $DOCKER_RUNNING == "true" ]]; then
 	echo -e "${green_bg} Step 2 ${NC}${green} Recreating services...${NC}"
