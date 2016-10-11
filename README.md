@@ -32,7 +32,7 @@ Follow [Docksal environment setup instructions](https://github.com/docksal/docks
     fin init
     ```
 
-3. **On Windows** add `192.168.10.10  drupal8.docksal` to your hosts file
+3. **On Windows** add `192.168.64.100  drupal8.docksal` to your hosts file
 
 4. Point your browser to
 
