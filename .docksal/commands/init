@@ -9,14 +9,11 @@ set -e
 
 #-------------------------- Settings --------------------------------
 
-# $PROJECT_ROOT is passed down from fin to any custom command
-DOCROOT='docroot'
-DOCROOT_PATH="$PROJECT_ROOT/$DOCROOT"
-# Set to the appropriate site directory
-SITE_DIRECTORY='default'
+# PROJECT_ROOT is passed from fin.
+# The following variables are configured in the '.env' file: DOCROOT, SITE_DIRECTORY, SOURCE_ALIAS and others.
+
+DOCROOT_PATH="${PROJECT_ROOT}/${DOCROOT}"
 SITEDIR_PATH="${DOCROOT_PATH}/sites/${SITE_DIRECTORY}"
-# Set to the appropriate site domain
-SITE_DOMAIN='drupal8.docksal'
 
 #-------------------------- END: Settings --------------------------------
 
@@ -80,21 +77,25 @@ copy_settings_file()
 init_settings ()
 {
     # Copy from settings templates
-    copy_settings_file "${PROJECT_ROOT}/.docksal/docksal-local.yml" "${PROJECT_ROOT}/docker-compose.yml"
     copy_settings_file "${SITEDIR_PATH}/default.settings.local.php" "${SITEDIR_PATH}/settings.local.php"
 }
 
 # Set file/folder permissions
 file_permissions ()
 {
-    mkdir -p "$DOCROOT_PATH/sites/$SITE_DIRECTORY/files"
-    chmod 777 "$DOCROOT_PATH/sites/$SITE_DIRECTORY/files"
+    echo-green "Resetting files directory permissions..."
+    mkdir -p "${SITEDIR_PATH}/files"
+    chmod -R 777 "${SITEDIR_PATH}/files"
 }
 
 # Install site
 site_install ()
 {
+    cd ${DOCROOT_PATH}
     fin drush si -y --site-name='My Drupal 8 Site' --root=/var/www/docroot
+
+    # Revert site dir permissions.
+    chmod 755 "${SITEDIR_PATH}"
 }
 
 #-------------------------- END: Functions --------------------------------
@@ -128,14 +129,12 @@ echo -e "${green_bg} Step 3 ${NC}${green} Installing site...${NC}"
 time site_install
 
 if is_windows; then
-	echo-green "Add ${SITE_DOMAIN} to your hosts file (/etc/hosts), e.g.:"
-	echo-green "192.168.10.10  ${SITE_DOMAIN}"
-	echo-green "Alternatively configure wildcard DNS resolution and never edit the hosts file again! Instructions:"
-	echo-green "https://github.com/blinkreaction/boot2docker-vagrant/blob/develop/docs/networking.md#dns-resolution"
+	echo-green "Add ${VIRTUAL_HOST} to your hosts file (/etc/hosts), e.g.:"
+	echo-green "192.168.10.10  ${VIRTUAL_HOST}"
 	echo
 fi
 
 echo -en "${green_bg} DONE! ${NC} "
-echo -e "Open ${yellow}http://${SITE_DOMAIN}${NC} in your browser to verify the setup."
+echo -e "Open ${yellow}http://${VIRTUAL_HOST}${NC} in your browser to verify the setup."
 
 #-------------------------- END: Execution --------------------------------
