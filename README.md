@@ -4,7 +4,7 @@ This is a sample vanilla Drupal 8 installation pre-configured for use with Docks
 
 Features:
 
-- Vanila Drupal 8
+- Vanilla Drupal 8
 - `fin init` example
 
 ## Setup instructions
@@ -13,8 +13,8 @@ Features:
 
 **This is a one time setup - skip this if you already have a working Docksal environment.**  
 
-Follow [Docksal environment setup instructions](https://github.com/docksal/docksal/blob/develop/docs/env-setup.md)
-   
+Follow [Docksal environment setup instructions](https://https://github.com/docksal/docksal/blob/develop/docs/env-setup.md)
+
 ### Step #2: Project setup
 
 1. Clone this repo into your Projects directory

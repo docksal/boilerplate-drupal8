@@ -15,10 +15,10 @@ services:
     image: docksal/apache:2.2-stable
     volumes:
       # Project root folder mapping
-      - &project_root "../:/var/www"
+      - "${PROJECT_ROOT}/:/var/www"
     labels:
       - io.docksal.virtual-host=${VIRTUAL_HOST}
-      - io.docksal.project-root=${PWD}
+      - io.docksal.project-root=${PROJECT_ROOT}
     environment:
       - VIRTUAL_HOST=${VIRTUAL_HOST}
     depends_on:
@@ -43,11 +43,9 @@ services:
     image: docksal/cli:stable
     volumes:
       # Project root folder mapping
-      - *project_root
+      - "${PROJECT_ROOT}/:/var/www"
       # Host home directory mapping (for SSH keys and ther credentials).
-      # We try to map both options (b2d and Linux). The startup.sh script in cli container will decide which one to use.
-      - /.home:/.home-b2d  # boot2docker
-      - ~/:/.home-linux   # Linux
+      - "${HOME}/:/.home"
     # Mount shared ssh-agent socket
     volumes_from:
       - container:ssh-agent

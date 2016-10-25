@@ -113,9 +113,9 @@ error_reporting(E_ALL); // Report all errors
 
 # Docker DB connection settings.
 $databases['default']['default'] = array (
-  'database' => 'drupal',
-  'username' => 'drupal',
-  'password' => '123',
+  'database' => 'default',
+  'username' => 'user',
+  'password' => 'user',
   'host' => 'db',
   'driver' => 'mysql',
 );
