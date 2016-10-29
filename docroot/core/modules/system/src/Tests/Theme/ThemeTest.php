@@ -298,7 +298,7 @@ class ThemeTest extends WebTestBase {
    * when needed.
    */
   public function testSuggestionPreprocessForDefaults() {
-    $this->config('system.theme')->set('default', 'test_theme')->save();
+    \Drupal::service('theme_handler')->setDefault('test_theme');
     // Test with both an unprimed and primed theme registry.
     drupal_theme_rebuild();
     for ($i = 0; $i < 2; $i++) {

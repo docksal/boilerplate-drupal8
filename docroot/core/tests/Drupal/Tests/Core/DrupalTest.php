@@ -102,23 +102,13 @@ class DrupalTest extends UnitTestCase {
   }
 
   /**
-   * Tests the cache() method.
+   * Tests the service() method.
    *
    * @covers ::cache
    */
   public function testCache() {
     $this->setMockContainerService('cache.test');
     $this->assertNotNull(\Drupal::cache('test'));
-  }
-
-  /**
-   * Tests the classResolver method.
-   *
-   * @covers ::classResolver
-   */
-  public function testClassResolver() {
-    $this->setMockContainerService('class_resolver');
-    $this->assertNotNull(\Drupal::classResolver());
   }
 
   /**

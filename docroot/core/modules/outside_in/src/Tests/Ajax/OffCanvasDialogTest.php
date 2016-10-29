@@ -9,7 +9,7 @@ use Drupal\system\Tests\Ajax\AjaxTestBase;
 /**
  * Performs tests on opening and manipulating dialogs via AJAX commands.
  *
- * @group Outside-In
+ * @group outside_in
  */
 class OffCanvasDialogTest extends AjaxTestBase {
 
@@ -45,7 +45,10 @@ class OffCanvasDialogTest extends AjaxTestBase {
           'resizable' => 'w',
           'draggable' => FALSE,
           'drupalAutoButtons' => FALSE,
+          'buttons' => [],
         ],
+      'effect' => 'fade',
+      'speed' => 1000,
     ];
 
     // Emulate going to the JS version of the page and check the JSON response.

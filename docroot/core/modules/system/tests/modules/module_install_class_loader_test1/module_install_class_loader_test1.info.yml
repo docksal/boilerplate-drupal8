@@ -1,0 +1,12 @@
+name: 'Module install class loader test1'
+description: 'Support module for tests that the class loader behaves as expected during module install.'
+type: module
+package: Testing
+# core: 8.x
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2016-10-11
+version: '8.2.1'
+core: '8.x'
+project: 'drupal'
+datestamp: 1476181717

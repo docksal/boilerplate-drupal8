@@ -876,12 +876,8 @@ abstract class EntityDisplayFormBase extends EntityForm {
   protected function saveDisplayStatuses($display_statuses) {
     $displays = $this->getDisplays();
     foreach ($displays as $display) {
-      // Only update the display if the status is changing.
-      $new_status = $display_statuses[$display->get('mode')];
-      if ($new_status !== $display->status()) {
-        $display->set('status', $new_status);
-        $display->save();
-      }
+      $display->set('status', $display_statuses[$display->get('mode')]);
+      $display->save();
     }
   }
 

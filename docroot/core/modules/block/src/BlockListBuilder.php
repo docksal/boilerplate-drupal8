@@ -156,7 +156,6 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
         'weight' => $entity->getWeight(),
         'entity' => $entity,
         'category' => $definition['category'],
-        'status' => $entity->status(),
       );
     }
 
@@ -187,7 +186,8 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
 
     // Loop over each region and build blocks.
     $regions = $this->systemRegionList($this->getThemeName(), REGIONS_VISIBLE);
-    foreach ($regions as $region => $title) {
+    $block_regions_with_disabled = $regions + array(BlockInterface::BLOCK_REGION_NONE => $this->t('Disabled', array(), array('context' => 'Plural')));
+    foreach ($block_regions_with_disabled as $region => $title) {
       $form['#tabledrag'][] = array(
         'action' => 'match',
         'relationship' => 'sibling',
@@ -214,9 +214,9 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
             '#attributes' => array('class' => 'region-title__action'),
           )
         ),
-        '#prefix' => $title,
+        '#prefix' => $region != BlockInterface::BLOCK_REGION_NONE ? $title : $block_regions_with_disabled[$region],
         '#type' => 'link',
-        '#title' => $this->t('Place block <span class="visually-hidden">in the %region region</span>', ['%region' => $title]),
+        '#title' => $this->t('Place block <span class="visually-hidden">in the %region region</span>', ['%region' => $block_regions_with_disabled[$region]]),
         '#url' => Url::fromRoute('block.admin_library', ['theme' => $this->getThemeName()], ['query' => ['region' => $region]]),
         '#wrapper_attributes' => array(
           'colspan' => 5,
@@ -255,13 +255,12 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
               'class' => array('draggable'),
             ),
           );
-          $form[$entity_id]['#attributes']['class'][] = $info['status'] ? 'block-enabled' : 'block-disabled';
           if ($placement && $placement == Html::getClass($entity_id)) {
             $form[$entity_id]['#attributes']['class'][] = 'color-success';
             $form[$entity_id]['#attributes']['class'][] = 'js-block-placed';
           }
           $form[$entity_id]['info'] = array(
-            '#plain_text' => $info['status'] ? $info['label'] : $this->t('@label (disabled)', ['@label' => $info['label']]),
+            '#plain_text' => $info['label'],
             '#wrapper_attributes' => array(
               'class' => array('block'),
             ),
@@ -272,7 +271,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
           $form[$entity_id]['region-theme']['region'] = array(
             '#type' => 'select',
             '#default_value' => $region,
-            '#required' => TRUE,
+            '#empty_value' => BlockInterface::BLOCK_REGION_NONE,
             '#title' => $this->t('Region for @block block', array('@block' => $info['label'])),
             '#title_display' => 'invisible',
             '#options' => $regions,
@@ -362,6 +361,12 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
       $entity_values = $form_state->getValue(array('blocks', $entity_id));
       $entity->setWeight($entity_values['weight']);
       $entity->setRegion($entity_values['region']);
+      if ($entity->getRegion() == BlockInterface::BLOCK_REGION_NONE) {
+        $entity->disable();
+      }
+      else {
+        $entity->enable();
+      }
       $entity->save();
     }
     drupal_set_message(t('The block settings have been updated.'));

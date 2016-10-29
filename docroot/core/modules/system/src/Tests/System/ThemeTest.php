@@ -305,7 +305,7 @@ class ThemeTest extends WebTestBase {
     $theme_handler = \Drupal::service('theme_handler');
     // First, install Stark and set it as the default theme programmatically.
     $theme_handler->install(array('stark'));
-    $this->config('system.theme')->set('default', 'stark')->save();
+    $theme_handler->setDefault('stark');
 
     // Install Bartik and set it as the default theme.
     $theme_handler->install(array('bartik'));

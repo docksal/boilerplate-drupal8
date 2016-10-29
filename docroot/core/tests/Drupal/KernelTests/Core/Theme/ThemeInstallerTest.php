@@ -145,7 +145,7 @@ class ThemeInstallerTest extends KernelTestBase {
     $name = 'stark';
     $other_name = 'bartik';
     $this->themeInstaller()->install(array($name, $other_name));
-    $this->config('system.theme')->set('default', $name)->save();
+    $this->themeHandler()->setDefault($name);
 
     $themes = $this->themeHandler()->listInfo();
     $this->assertTrue(isset($themes[$name]));

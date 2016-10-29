@@ -257,8 +257,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     // Unset the session cookies.
     $session_name = $this->getName();
     $cookies = $this->requestStack->getCurrentRequest()->cookies;
-    // setcookie() can only be called when headers are not yet sent.
-    if ($cookies->has($session_name) && !headers_sent()) {
+    if ($cookies->has($session_name)) {
       $params = session_get_cookie_params();
       setcookie($session_name, '', REQUEST_TIME - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
       $cookies->remove($session_name);

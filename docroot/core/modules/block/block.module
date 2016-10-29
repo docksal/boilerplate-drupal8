@@ -5,6 +5,7 @@
  * Controls the visual building blocks a page is constructed with.
  */
 
+use Drupal\block\BlockInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
@@ -143,14 +144,17 @@ function block_rebuild() {
       $blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['theme' => $theme]);
       foreach ($blocks as $block_id => $block) {
         // Disable blocks in invalid regions.
-        if (!isset($regions[$block->getRegion()])) {
-          if ($block->status()) {
-            drupal_set_message(t('The block %info was assigned to the invalid region %region and has been disabled.', ['%info' => $block_id, '%region' => $block->getRegion()]), 'warning');
+        $region = $block->getRegion();
+        if ($region !== BlockInterface::BLOCK_REGION_NONE) {
+          if (!empty($region) && !isset($regions[$region]) && $block->status()) {
+            drupal_set_message(t('The block %info was assigned to the invalid region %region and has been disabled.', ['%info' => $block_id, '%region' => $region]), 'warning');
+            $block->disable();
           }
-          $block
-            ->setRegion(system_default_region($theme))
-            ->disable()
-            ->save();
+          // Set region to none if not enabled.
+          if (!$block->status()) {
+            $block->setRegion(BlockInterface::BLOCK_REGION_NONE);
+            $block->save();
+          }
         }
       }
     }

@@ -70,9 +70,7 @@ class BlockContentRevisionsTest extends BlockContentTestBase {
     foreach ($blocks as $delta => $revision_id) {
       // Confirm the correct revision text appears.
       /** @var \Drupal\block_content\BlockContentInterface  $loaded */
-      $loaded = $this->container->get('entity_type.manager')
-        ->getStorage('block_content')
-        ->loadRevision($revision_id);
+      $loaded = entity_revision_load('block_content', $revision_id);
       // Verify revision log is the same.
       $this->assertEqual($loaded->getRevisionLogMessage(), $logs[$delta], format_string('Correct log message found for revision @revision', array(
         '@revision' => $loaded->getRevisionId(),

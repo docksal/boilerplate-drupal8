@@ -141,20 +141,6 @@ abstract class Connection {
   protected $unprefixedTablesMap = [];
 
   /**
-   * List of escaped database, table, and field names, keyed by unescaped names.
-   *
-   * @var array
-   */
-  protected $escapedNames = [];
-
-  /**
-   * List of escaped aliases names, keyed by unescaped aliases.
-   *
-   * @var array
-   */
-  protected $escapedAliases = [];
-
-  /**
    * Constructs a Connection object.
    *
    * @param \PDO $connection
@@ -939,10 +925,7 @@ abstract class Connection {
    *   The sanitized database name.
    */
   public function escapeDatabase($database) {
-    if (!isset($this->escapedNames[$database])) {
-      $this->escapedNames[$database] = preg_replace('/[^A-Za-z0-9_.]+/', '', $database);
-    }
-    return $this->escapedNames[$database];
+    return preg_replace('/[^A-Za-z0-9_.]+/', '', $database);
   }
 
   /**
@@ -959,10 +942,7 @@ abstract class Connection {
    *   The sanitized table name.
    */
   public function escapeTable($table) {
-    if (!isset($this->escapedNames[$table])) {
-      $this->escapedNames[$table] = preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
-    }
-    return $this->escapedNames[$table];
+    return preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
   }
 
   /**
@@ -979,10 +959,7 @@ abstract class Connection {
    *   The sanitized field name.
    */
   public function escapeField($field) {
-    if (!isset($this->escapedNames[$field])) {
-      $this->escapedNames[$field] = preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
-    }
-    return $this->escapedNames[$field];
+    return preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
   }
 
   /**
@@ -1000,10 +977,7 @@ abstract class Connection {
    *   The sanitized alias name.
    */
   public function escapeAlias($field) {
-    if (!isset($this->escapedAliases[$field])) {
-      $this->escapedAliases[$field] = preg_replace('/[^A-Za-z0-9_]+/', '', $field);
-    }
-    return $this->escapedAliases[$field];
+    return preg_replace('/[^A-Za-z0-9_]+/', '', $field);
   }
 
   /**

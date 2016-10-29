@@ -1,7 +1,13 @@
 name: 'Content Moderation'
 type: module
 description: 'Provides moderation states for content'
-version: VERSION
-core: 8.x
+# version: VERSION
+# core: 8.x
 package: Core (Experimental)
 configure: content_moderation.overview
+
+# Information added by Drupal.org packaging script on 2016-10-11
+version: '8.2.1'
+core: '8.x'
+project: 'drupal'
+datestamp: 1476181717

@@ -81,7 +81,7 @@ class Drupal {
   /**
    * The current system version.
    */
-  const VERSION = '8.3.0-dev';
+  const VERSION = '8.2.1';
 
   /**
    * Core API compatibility.
@@ -297,23 +297,6 @@ class Drupal {
    */
   public static function cache($bin = 'default') {
     return static::getContainer()->get('cache.' . $bin);
-  }
-
-  /**
-   * Retrieves the class resolver.
-   *
-   * This is to be used in procedural code such as module files to instantiate
-   * an object of a class that implements
-   * \Drupal\Core\DependencyInjection\ContainerInjectionInterface.
-   *
-   * One common usecase is to provide a class which contains the actual code
-   * of a hook implementation, without having to create a service.
-   *
-   * @return \Drupal\Core\DependencyInjection\ClassResolverInterface
-   *   The class resolver.
-   */
-  public static function classResolver() {
-    return static::getContainer()->get('class_resolver');
   }
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core;
 
+use Composer\Autoload\ClassLoader;
 use Drupal\Component\Assertion\Handle;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\Unicode;
@@ -18,6 +19,7 @@ use Drupal\Core\File\MimeType\MimeTypeGuesser;
 use Drupal\Core\Http\TrustedHostsRequestFactory;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Test\TestDatabase;
 use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -365,7 +367,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Check for a simpletest override.
     if ($test_prefix = drupal_valid_test_ua()) {
-      return 'sites/simpletest/' . substr($test_prefix, 10);
+      $test_db = new TestDatabase($test_prefix);
+      return $test_db->getTestSitePath();
     }
 
     // Determine whether multi-site functionality is enabled.
@@ -754,6 +757,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   needed.
    */
   public function updateModules(array $module_list, array $module_filenames = array()) {
+    $pre_existing_module_namespaces = [];
+    if ($this->booted && is_array($this->moduleList)) {
+      $pre_existing_module_namespaces = $this->getModuleNamespacesPsr4($this->getModuleFileNames());
+    }
     $this->moduleList = $module_list;
     foreach ($module_filenames as $name => $extension) {
       $this->moduleData[$name] = $extension;
@@ -766,6 +773,20 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // container in order to refresh the serviceProvider list and container.
     $this->containerNeedsRebuild = TRUE;
     if ($this->booted) {
+      // We need to register any new namespaces to a new class loader because
+      // the current class loader might have stored a negative result for a
+      // class that is now available.
+      // @see \Composer\Autoload\ClassLoader::findFile()
+      $new_namespaces = array_diff_key(
+        $this->getModuleNamespacesPsr4($this->getModuleFileNames()),
+        $pre_existing_module_namespaces
+      );
+      if (!empty($new_namespaces)) {
+        $additional_class_loader = new ClassLoader();
+        $this->classLoaderAddMultiplePsr4($new_namespaces, $additional_class_loader);
+        $additional_class_loader->register();
+      }
+
       $this->initializeContainer();
     }
   }
@@ -944,6 +965,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Indicate that code is operating in a test child site.
     if (!defined('DRUPAL_TEST_IN_CHILD_SITE')) {
       if ($test_prefix = drupal_valid_test_ua()) {
+        $test_db = new TestDatabase($test_prefix);
         // Only code that interfaces directly with tests should rely on this
         // constant; e.g., the error/exception handler conditionally adds further
         // error information into HTTP response headers that are consumed by
@@ -958,7 +980,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
         // Log fatal errors to the test site directory.
         ini_set('log_errors', 1);
-        ini_set('error_log', $app_root . '/sites/simpletest/' . substr($test_prefix, 10) . '/error.log');
+        ini_set('error_log', $app_root . '/' . $test_db->getTestSitePath() . '/error.log');
 
         // Ensure that a rewritten settings.php is used if opcache is on.
         ini_set('opcache.validate_timestamps', 'on');
@@ -1379,8 +1401,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   Array where each key is a namespace like 'Drupal\system', and each value
    *   is either a PSR-4 base directory, or an array of PSR-4 base directories
    *   associated with this namespace.
+   * @param object $class_loader
+   *   The class loader. Normally \Composer\Autoload\ClassLoader, as included by
+   *   the front controller, but may also be decorated; e.g.,
+   *   \Symfony\Component\ClassLoader\ApcClassLoader.
    */
-  protected function classLoaderAddMultiplePsr4(array $namespaces = array()) {
+  protected function classLoaderAddMultiplePsr4(array $namespaces = array(), $class_loader = NULL) {
+    if ($class_loader === NULL) {
+      $class_loader = $this->classLoader;
+    }
     foreach ($namespaces as $prefix => $paths) {
       if (is_array($paths)) {
         foreach ($paths as $key => $value) {
@@ -1390,7 +1419,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       elseif (is_string($paths)) {
         $paths = $this->root . '/' . $paths;
       }
-      $this->classLoader->addPsr4($prefix . '\\', $paths);
+      $class_loader->addPsr4($prefix . '\\', $paths);
     }
   }
 

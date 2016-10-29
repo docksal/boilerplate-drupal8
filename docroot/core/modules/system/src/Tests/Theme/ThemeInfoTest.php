@@ -84,7 +84,7 @@ class ThemeInfoTest extends WebTestBase {
    */
   public function testChanges() {
     $this->themeHandler->install(array('test_theme'));
-    $this->config('system.theme')->set('default', 'test_theme')->save();
+    $this->themeHandler->setDefault('test_theme');
     $this->themeManager->resetActiveTheme();
 
     $active_theme = $this->themeManager->getActiveTheme();

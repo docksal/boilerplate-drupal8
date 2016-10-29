@@ -36,9 +36,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class EntityResource extends ResourceBase implements DependentPluginInterface {
 
-  use EntityResourceValidationTrait;
-  use EntityResourceAccessTrait;
-
   /**
    * The entity type targeted by this resource.
    *
@@ -98,7 +95,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity object.
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return \Drupal\rest\ResourceResponse
    *   The response containing the entity with its accessible fields.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -134,7 +131,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    *   The HTTP response object.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -159,7 +156,14 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
       throw new BadRequestHttpException('Only new entities can be created');
     }
 
-    $this->checkEditFieldAccess($entity);
+    // Only check 'edit' permissions for fields that were actually
+    // submitted by the user. Field access makes no difference between 'create'
+    // and 'update', so the 'edit' operation is used here.
+    foreach ($entity->_restSubmittedFields as $key => $field_name) {
+      if (!$entity->get($field_name)->access('edit')) {
+        throw new AccessDeniedHttpException("Access denied on creating field '$field_name'");
+      }
+    }
 
     // Validate the received data before saving.
     $this->validate($entity);
@@ -171,7 +175,8 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
       // body. These responses are not cacheable, so we add no cacheability
       // metadata here.
       $url = $entity->urlInfo('canonical', ['absolute' => TRUE])->toString(TRUE);
-      return new ModifiedResourceResponse($entity, 201, ['Location' => $url->getGeneratedUrl()]);
+      $response = new ModifiedResourceResponse($entity, 201, ['Location' => $url->getGeneratedUrl()]);
+      return $response;
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, 'Internal Server Error', $e);
@@ -186,7 +191,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    *   The HTTP response object.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -250,7 +255,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity object.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\rest\ModifiedResourceResponse
    *   The HTTP response object.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -268,6 +273,39 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
     }
     catch (EntityStorageException $e) {
       throw new HttpException(500, 'Internal Server Error', $e);
+    }
+  }
+
+  /**
+   * Verifies that the whole entity does not violate any validation constraints.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity object.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   *   If validation errors are found.
+   */
+  protected function validate(EntityInterface $entity) {
+    // @todo Remove when https://www.drupal.org/node/2164373 is committed.
+    if (!$entity instanceof FieldableEntityInterface) {
+      return;
+    }
+    $violations = $entity->validate();
+
+    // Remove violations of inaccessible fields as they cannot stem from our
+    // changes.
+    $violations->filterByFieldAccess();
+
+    if (count($violations) > 0) {
+      $message = "Unprocessable Entity: validation failed.\n";
+      foreach ($violations as $violation) {
+        $message .= $violation->getPropertyPath() . ': ' . $violation->getMessage() . "\n";
+      }
+      // Instead of returning a generic 400 response we use the more specific
+      // 422 Unprocessable Entity code from RFC 4918. That way clients can
+      // distinguish between general syntax errors in bad serializations (code
+      // 400) and semantic errors in well-formed requests (code 422).
+      throw new HttpException(422, $message);
     }
   }
 

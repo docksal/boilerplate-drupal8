@@ -165,6 +165,19 @@ abstract class BrowserTestBase extends \PHPUnit_Framework_TestCase {
   protected $strictConfigSchema = TRUE;
 
   /**
+   * Modules to enable.
+   *
+   * The test runner will merge the $modules lists from this class, the class
+   * it extends, and so on up the class hierarchy. It is not necessary to
+   * include modules in your list that a parent class has already declared.
+   *
+   * @var string[]
+   *
+   * @see \Drupal\Tests\BrowserTestBase::installDrupal()
+   */
+  public static $modules = [];
+
+  /**
    * An array of config object names that are excluded from schema checking.
    *
    * @var string[]
@@ -1201,14 +1214,9 @@ abstract class BrowserTestBase extends \PHPUnit_Framework_TestCase {
    * @see BrowserTestBase::prepareEnvironment()
    */
   private function prepareDatabasePrefix() {
-    // Ensure that the generated test site directory does not exist already,
-    // which may happen with a large amount of concurrent threads and
-    // long-running tests.
-    do {
-      $suffix = mt_rand(100000, 999999);
-      $this->siteDirectory = 'sites/simpletest/' . $suffix;
-      $this->databasePrefix = 'simpletest' . $suffix;
-    } while (is_dir(DRUPAL_ROOT . '/' . $this->siteDirectory));
+    $test_db = new TestDatabase();
+    $this->siteDirectory = $test_db->getTestSitePath();
+    $this->databasePrefix = $test_db->getDatabasePrefix();
   }
 
   /**

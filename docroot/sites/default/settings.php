@@ -86,7 +86,7 @@
  * );
  * @endcode
  */
- $databases = array();
+$databases = array();
 
 /**
  * Customizing database settings.
@@ -290,7 +290,7 @@ $config_directories = array();
  *   $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = '7Sm4BIi58DI4io95ZcV4MhgsgkKW5qp5_FVh5GpVI8scG6nais4aYXopDwafdfQmqWQyV82kJQ';
+$settings['hash_salt'] = 'ts3MpgAEZcYSm0_tCkJgrYiEMg1rRSHPzyrXRHLGTg7uBOHXRojaOnIfu1sQJO4hWxZVGJSqTA';
 
 /**
  * Deployment identifier.
@@ -744,6 +744,9 @@ $settings['file_scan_ignore_directories'] = [
   'bower_components',
 ];
 
+$settings['install_profile'] = 'standard';
+$config_directories['sync'] = 'sites/default/files/config_fli35hsYFcfGIvtRwtFrRK3pFkjSABlZ6GNesh3NT2q7yDLT-YfmJpDp0RR6setE6XoAtSfeSg/sync';
+
 /**
  * Load local development override configuration, if available.
  *
@@ -757,4 +760,3 @@ $settings['file_scan_ignore_directories'] = [
 if (file_exists(__DIR__ . '/settings.local.php')) {
   include __DIR__ . '/settings.local.php';
 }
-$settings['install_profile'] = 'standard';

@@ -89,30 +89,34 @@ class ViewListBuilder extends ConfigEntityListBuilder {
       'data' => array(
         'view_name' => array(
           'data' => array(
-            '#plain_text' => $view->label(),
-          ),
-        ),
-        'machine_name' => array(
-          'data' => array(
-            '#plain_text' => $view->id(),
+            '#theme' => 'views_ui_view_info',
+            '#view' => $view,
+            '#displays' => $this->getDisplaysList($view)
           ),
         ),
         'description' => array(
           'data' => array(
             '#plain_text' => $view->get('description'),
           ),
+          'data-drupal-selector' => 'views-table-filter-text-source',
         ),
-        'displays' => array(
+        'tag' => array(
           'data' => array(
-            '#theme' => 'views_ui_view_displays_list',
-            '#displays' => $this->getDisplaysList($view),
+            '#plain_text' => $view->get('tag'),
+          ),
+          'data-drupal-selector' => 'views-table-filter-text-source',
+        ),
+        'path' => array(
+          'data' => array(
+            '#theme' => 'item_list',
+            '#items' => $this->getDisplayPaths($view),
+            '#context' => ['list_style' => 'comma-list'],
           ),
         ),
         'operations' => $row['operations'],
       ),
-      '#attributes' => array(
-        'class' => array($view->status() ? 'views-ui-list-enabled' : 'views-ui-list-disabled'),
-      ),
+      'title' => $this->t('Machine name: @name', array('@name' => $view->id())),
+      'class' => array($view->status() ? 'views-ui-list-enabled' : 'views-ui-list-disabled'),
     );
   }
 
@@ -123,33 +127,23 @@ class ViewListBuilder extends ConfigEntityListBuilder {
     return array(
       'view_name' => array(
         'data' => $this->t('View name'),
-        '#attributes' => array(
-          'class' => array('views-ui-name'),
-        ),
-      ),
-      'machine_name' => array(
-        'data' => $this->t('Machine name'),
-        '#attributes' => array(
-          'class' => array('views-ui-machine-name'),
-        ),
+        'class' => array('views-ui-name'),
       ),
       'description' => array(
         'data' => $this->t('Description'),
-        '#attributes' => array(
-          'class' => array('views-ui-description'),
-        ),
+        'class' => array('views-ui-description'),
       ),
-      'displays' => array(
-        'data' => $this->t('Displays'),
-        '#attributes' => array(
-          'class' => array('views-ui-displays'),
-        ),
+      'tag' => array(
+        'data' => $this->t('Tag'),
+        'class' => array('views-ui-tag'),
+      ),
+      'path' => array(
+        'data' => $this->t('Path'),
+        'class' => array('views-ui-path'),
       ),
       'operations' => array(
         'data' => $this->t('Operations'),
-        '#attributes' => array(
-          'class' => array('views-ui-operations'),
-        ),
+        'class' => array('views-ui-operations'),
       ),
     );
   }
@@ -202,13 +196,13 @@ class ViewListBuilder extends ConfigEntityListBuilder {
       '#type' => 'search',
       '#title' => $this->t('Filter'),
       '#title_display' => 'invisible',
-      '#size' => 60,
-      '#placeholder' => $this->t('Filter by view name, machine name, description, or display path'),
+      '#size' => 40,
+      '#placeholder' => $this->t('Filter by view name or description'),
       '#attributes' => array(
         'class' => array('views-filter-text'),
         'data-table' => '.views-listing-table',
         'autocomplete' => 'off',
-        'title' => $this->t('Enter a part of the view name, machine name, description, or display path to filter by.'),
+        'title' => $this->t('Enter a part of the view name or description to filter by.'),
       ),
     );
 
@@ -218,9 +212,12 @@ class ViewListBuilder extends ConfigEntityListBuilder {
       $list[$status]['#type'] = 'container';
       $list[$status]['#attributes'] = array('class' => array('views-list-section', $status));
       $list[$status]['table'] = array(
-        '#theme' => 'views_ui_views_listing_table',
-        '#headers' => $this->buildHeader(),
-        '#attributes' => array('class' => array('views-listing-table', $status)),
+        '#type' => 'table',
+        '#attributes' => array(
+          'class' => array('views-listing-table'),
+        ),
+        '#header' => $this->buildHeader(),
+        '#rows' => array(),
       );
       foreach ($entities[$status] as $entity) {
         $list[$status]['table']['#rows'][$entity->id()] = $this->buildRow($entity);
@@ -245,33 +242,46 @@ class ViewListBuilder extends ConfigEntityListBuilder {
    */
   protected function getDisplaysList(EntityInterface $view) {
     $displays = array();
-
-    $executable = $view->getExecutable();
-    $executable->initDisplay();
-    foreach ($executable->displayHandlers as $display) {
-      $rendered_path = FALSE;
-      $definition = $display->getPluginDefinition();
+    foreach ($view->get('display') as $display) {
+      $definition = $this->displayManager->getDefinition($display['display_plugin']);
       if (!empty($definition['admin'])) {
-        if ($display->hasPath()) {
-          $path = $display->getPath();
-          if ($view->status() && strpos($path, '%') === FALSE) {
-            // @todo Views should expect and store a leading /. See:
-            //   https://www.drupal.org/node/2423913
-            $rendered_path = \Drupal::l('/' . $path, Url::fromUserInput('/' . $path));
-          }
-          else {
-            $rendered_path = '/' . $path;
-          }
-        }
-        $displays[] = array(
-          'display' => $definition['admin'],
-          'path' => $rendered_path,
-        );
+        // Cast the admin label to a string since it is an object.
+        // @see \Drupal\Core\StringTranslation\TranslatableMarkup
+        $displays[] = (string) $definition['admin'];
       }
     }
 
     sort($displays);
     return $displays;
+  }
+
+  /**
+   * Gets a list of paths assigned to the view.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $view
+   *   The view entity.
+   *
+   * @return array
+   *   An array of paths for this view.
+   */
+  protected function getDisplayPaths(EntityInterface $view) {
+    $all_paths = array();
+    $executable = $view->getExecutable();
+    $executable->initDisplay();
+    foreach ($executable->displayHandlers as $display) {
+      if ($display->hasPath()) {
+        $path = $display->getPath();
+        if ($view->status() && strpos($path, '%') === FALSE) {
+          // @todo Views should expect and store a leading /. See:
+          //   https://www.drupal.org/node/2423913
+          $all_paths[] = \Drupal::l('/' . $path, Url::fromUserInput('/' . $path));
+        }
+        else {
+          $all_paths[] = '/' . $path;
+        }
+      }
+    }
+    return array_unique($all_paths);
   }
 
 }

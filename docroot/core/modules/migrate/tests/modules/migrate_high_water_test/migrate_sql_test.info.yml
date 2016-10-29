@@ -1,0 +1,13 @@
+type: module
+name: Migrate SQL Source test
+description: 'Provides a database table and records for SQL import testing.'
+package: Testing
+# core: 8.x
+dependencies:
+  - migrate
+
+# Information added by Drupal.org packaging script on 2016-10-11
+version: '8.2.1'
+core: '8.x'
+project: 'drupal'
+datestamp: 1476181718

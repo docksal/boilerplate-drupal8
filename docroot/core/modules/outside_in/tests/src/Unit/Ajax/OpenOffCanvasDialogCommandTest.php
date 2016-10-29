@@ -30,7 +30,10 @@ class OpenOffCanvasDialogCommandTest extends UnitTestCase {
         'resizable' => 'w',
         'draggable' => FALSE,
         'drupalAutoButtons' => FALSE,
+        'buttons' => [],
       ],
+      'effect' => 'fade',
+      'speed' => 1000,
     ];
     $this->assertEquals($expected, $command->render());
   }

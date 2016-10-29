@@ -40,7 +40,3 @@ a.block-demo-backlink:hover {
 .block-form .form-item-settings-admin-label label:after {
   content: ':';
 }
-.block-disabled:not(:hover) {
-  background: #fcfcfa;
-  opacity: 0.675;
-}

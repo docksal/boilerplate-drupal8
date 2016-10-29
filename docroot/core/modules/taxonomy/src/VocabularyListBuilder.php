@@ -56,7 +56,6 @@ class VocabularyListBuilder extends DraggableListBuilder {
    */
   public function buildHeader() {
     $header['label'] = t('Vocabulary name');
-    $header['description'] = t('Description');
     return $header + parent::buildHeader();
   }
 
@@ -65,7 +64,6 @@ class VocabularyListBuilder extends DraggableListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $entity->label();
-    $row['description']['data'] = ['#markup' => $entity->getDescription()];
     return $row + parent::buildRow($entity);
   }
 

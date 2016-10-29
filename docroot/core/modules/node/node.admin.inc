@@ -6,6 +6,7 @@
  */
 
 use Drupal\node\NodeInterface;
+use Drupal\node\Entity\Node;
 
 /**
  * Updates all nodes in the passed-in array with the passed-in field values.
@@ -50,13 +51,12 @@ function node_mass_update(array $nodes, array $updates, $langcode = NULL, $load 
     batch_set($batch);
   }
   else {
-    $storage = \Drupal::entityTypeManager()->getStorage('node');
     if ($load && !$revisions) {
-      $nodes = $storage->loadMultiple($nodes);
+      $nodes = Node::loadMultiple($nodes);
     }
     foreach ($nodes as $node) {
       if ($load && $revisions) {
-        $node = $storage->loadRevision($node);
+        $node = entity_revision_load('node', $node);
       }
       _node_mass_update_helper($node, $updates, $langcode);
     }
@@ -122,14 +122,13 @@ function _node_mass_update_batch_process(array $nodes, array $updates, $langcode
   }
 
   // Process nodes by groups of 5.
-  $storage = \Drupal::entityTypeManager()->getStorage('node');
   $count = min(5, count($context['sandbox']['nodes']));
   for ($i = 1; $i <= $count; $i++) {
     // For each nid, load the node, reset the values, and save it.
     $node = array_shift($context['sandbox']['nodes']);
     if ($load) {
       $node = $revisions ?
-        $storage->loadRevision($node) : $storage->load($node);
+        entity_revision_load('node', $node) : Node::load($node);
     }
     $node = _node_mass_update_helper($node, $updates, $langcode);
 

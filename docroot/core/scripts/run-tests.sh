@@ -5,12 +5,14 @@
  * This script runs Drupal tests from command line.
  */
 
+use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Timer;
 use Drupal\Component\Uuid\Php;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
+use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestRunnerKernel;
 use Drupal\simpletest\Form\SimpletestResultsForm;
 use Drupal\simpletest\TestBase;
@@ -74,6 +76,7 @@ if ($args['list']) {
     $groups = simpletest_test_get_all($args['module']);
   }
   catch (Exception $e) {
+    error_log((string) $e);
     echo (string) $e;
     exit(SIMPLETEST_SCRIPT_EXIT_EXCEPTION);
   }
@@ -123,6 +126,12 @@ $status = simpletest_script_execute_batch($tests_to_run);
 
 // Stop the timer.
 simpletest_script_reporter_timer_stop();
+
+// Ensure all test locks are released once finished. If tests are run with a
+// concurrency of 1 the each test will clean up it's own lock. Test locks are
+// not released if using a higher concurrency to ensure each test method has
+// unique fixtures.
+TestDatabase::releaseAllTestLocks();
 
 // Display results before database is cleared.
 if ($args['browser']) {
@@ -447,6 +456,16 @@ function simpletest_script_init() {
   $_SERVER['PHP_SELF'] = $path . '/index.php';
   $_SERVER['HTTP_USER_AGENT'] = 'Drupal command line';
 
+  if ($args['concurrency'] > 1) {
+    $directory = FileSystem::getOsTemporaryDirectory();
+    $test_symlink = @symlink(__FILE__, $directory . '/test_symlink');
+    if (!$test_symlink) {
+      throw new \RuntimeException('In order to use a concurrency higher than 1 the test system needs to be able to create symlinks in ' . $directory);
+    }
+    unlink($directory . '/test_symlink');
+    putenv('RUN_TESTS_CONCURRENCY=' . $args['concurrency']);
+  }
+
   if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
     // Ensure that any and all environment variables are changed to https://.
     foreach ($_SERVER as $key => $value) {
@@ -665,7 +684,8 @@ function simpletest_script_execute_batch($test_classes) {
           );
           if ($args['die-on-fail']) {
             list($db_prefix) = simpletest_last_test_get($child['test_id']);
-            $test_directory = 'sites/simpletest/' . substr($db_prefix, 10);
+            $test_db = new TestDatabase($db_prefix);
+            $test_directory = $test_db->getTestSitePath();
             echo 'Simpletest database and files kept and test exited immediately on fail so should be reproducible if you change settings.php to use the database prefix ' . $db_prefix . ' and config directories in ' . $test_directory . "\n";
             $args['keep-results'] = TRUE;
             // Exit repeat loop immediately.
@@ -841,7 +861,8 @@ function simpletest_script_cleanup($test_id, $test_class, $exitcode) {
 
   // Check whether a test site directory was setup already.
   // @see \Drupal\simpletest\TestBase::prepareEnvironment()
-  $test_directory = DRUPAL_ROOT . '/sites/simpletest/' . substr($db_prefix, 10);
+  $test_db = new TestDatabase($db_prefix);
+  $test_directory = DRUPAL_ROOT . '/' . $test_db->getTestSitePath();
   if (is_dir($test_directory)) {
     // Output the error_log.
     if (is_file($test_directory . '/error.log')) {

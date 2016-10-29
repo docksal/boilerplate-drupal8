@@ -5,7 +5,7 @@ namespace Drupal\Tests\outside_in\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\JavascriptTestBase;
 
 /**
- * Base class contains common test functionality for the Outside-In module.
+ * Base class contains common test functionality for the Settings Tray module.
  */
 abstract class OutsideInJavascriptTestBase extends JavascriptTestBase {
 
@@ -27,6 +27,8 @@ abstract class OutsideInJavascriptTestBase extends JavascriptTestBase {
    * Waits for Off-canvas tray to open.
    */
   protected function waitForOffCanvasToOpen() {
+    $web_assert = $this->assertSession();
+    $web_assert->assertWaitOnAjaxRequest();
     $this->waitForElement('#drupal-offcanvas');
   }
 

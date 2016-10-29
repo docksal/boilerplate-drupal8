@@ -134,7 +134,7 @@ function drupal_theme_rebuild() {
  */
 function drupal_find_theme_functions($cache, $prefixes) {
   $implementations = [];
-  $grouped_functions = \Drupal::service('theme.registry')->getPrefixGroupedUserFunctions($prefixes);
+  $grouped_functions = \Drupal::service('theme.registry')->getPrefixGroupedUserFunctions();
 
   foreach ($cache as $hook => $info) {
     foreach ($prefixes as $prefix) {
