@@ -40,7 +40,7 @@ services:
   # Used for all console commands and tools.
   cli:
     hostname: cli
-    image: docksal/cli:stable
+    image: docksal/cli:php7
     volumes:
       # Project root folder mapping
       - "${PROJECT_ROOT}/:/var/www"
