@@ -51,7 +51,7 @@ services:
       # Project root volume
       - project_root:/var/www
       # Host home volume (for SSH keys and other credentials).
-      - host_home:/.home
+      - host_home:/.home:ro
     # Mount shared ssh-agent socket
     volumes_from:
       - container:ssh-agent
