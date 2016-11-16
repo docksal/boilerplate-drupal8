@@ -15,7 +15,7 @@ services:
   # Web node
   web:
     hostname: web
-    image: docksal/apache:2.2-stable
+    image: docksal/web:1.0-apache2.2
     volumes:
       # Project root volume
       - project_root:/var/www
@@ -30,7 +30,7 @@ services:
   # DB node
   db:
     hostname: db
-    image: docksal/mysql:5.5
+    image: docksal/db:1.0-mysql-5.5
     ports:
       - ${MYSQL_PORT}
     volumes:
@@ -46,7 +46,7 @@ services:
   # Used for all console commands and tools.
   cli:
     hostname: cli
-    image: docksal/cli:php7
+    image: docksal/cli:1.0-php7
     volumes:
       # Project root volume
       - project_root:/var/www
