@@ -249,7 +249,9 @@ $databases = array();
  *   );
  * @endcode
  */
-$config_directories = array();
+$config_directories = array(
+    CONFIG_SYNC_DIRECTORY => dirname(DRUPAL_ROOT) . '/config/' . basename($site_path),
+);
 
 /**
  * Settings:
@@ -271,7 +273,7 @@ $config_directories = array();
  *
  * @see install_select_profile()
  */
-# $settings['install_profile'] = '';
+$settings['install_profile'] = 'standard';
 
 /**
  * Salt for one-time login links, cancel links, form tokens, etc.
@@ -743,9 +745,6 @@ $settings['file_scan_ignore_directories'] = [
   'node_modules',
   'bower_components',
 ];
-
-$settings['install_profile'] = 'standard';
-$config_directories['sync'] = 'sites/default/files/config_fli35hsYFcfGIvtRwtFrRK3pFkjSABlZ6GNesh3NT2q7yDLT-YfmJpDp0RR6setE6XoAtSfeSg/sync';
 
 /**
  * Load local development override configuration, if available.
