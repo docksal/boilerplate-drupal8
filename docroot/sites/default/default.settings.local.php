@@ -106,10 +106,19 @@ $settings['rebuild_access'] = TRUE;
  */
 $settings['skip_permissions_hardening'] = TRUE;
 
+/**
+ * Access control for update.php script.
+ *
+ * If you are updating your Drupal installation using the update.php script but
+ * are not logged in using either an account with the "Administer software
+ * updates" permission or the site maintenance account (the account that was
+ * created during installation), you will need to modify the access check
+ * statement below. Change the FALSE to a TRUE to disable the access check.
+ * After finishing the upgrade, be sure to open this file again and change the
+ * TRUE back to a FALSE!
+ */
+$settings['update_free_access'] = TRUE;
 
-// Error reporting level configuration.
-ini_set("display_errors", "1"); // 1 - display errors, 0 - hide all errors
-error_reporting(E_ALL); // Report all errors
 
 # Docker DB connection settings.
 $databases['default']['default'] = array (
@@ -125,7 +134,7 @@ $settings['file_chmod_directory'] = 0777;
 $settings['file_chmod_file'] = 0666;
 
 # File system settings.
-$settings['file_temporary_path'] = '/tmp';
+$config['system.file']['path']['temporary'] = '/tmp';
 
 # Reverse proxy configuration (Drude's vhost-proxy)
 if (PHP_SAPI !== 'cli') {
