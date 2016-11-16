@@ -18,7 +18,7 @@ services:
     image: docksal/web:1.0-apache2.2
     volumes:
       # Project root volume
-      - project_root:/var/www
+      - project_root:/var/www:ro
     labels:
       - io.docksal.virtual-host=${VIRTUAL_HOST}
       - io.docksal.project-root=${PROJECT_ROOT}
@@ -33,9 +33,6 @@ services:
     image: docksal/db:1.0-mysql-5.5
     ports:
       - ${MYSQL_PORT}
-    volumes:
-      # DB data volume
-      - db_data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=${MYSQL_USER}
@@ -49,9 +46,8 @@ services:
     image: docksal/cli:1.0-php7
     volumes:
       # Project root volume
-      - project_root:/var/www
+      - project_root:/var/www:rw
       # Host home volume (for SSH keys and other credentials).
       - host_home:/.home:ro
-    # Mount shared ssh-agent socket
-    volumes_from:
-      - container:ssh-agent
+      # Shared ssh-agent socket
+      - docksal_ssh_agent:/.ssh-agent:ro
