@@ -35,8 +35,8 @@ services:
     ports:
       - "${MYSQL_PORT_MAPPING:-3306}"
     volumes:
-      # MySQL configuration overrides
-      - ${PROJECT_ROOT}/.docksal/etc/mysql/my.cnf:/opt/mysql.conf.d/z_my.cnf:ro
+      # Project root volume
+      - project_root:/var/www:ro
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
       - MYSQL_USER=${MYSQL_USER:-user}
@@ -49,10 +49,6 @@ services:
     hostname: cli
     image: docksal/cli:1.0-php7
     volumes:
-      # PHP FPM configuration overrides
-      - ${PROJECT_ROOT}/.docksal/etc/php/php.ini:/etc/php/7.0/fpm/conf.d/z_php.ini:ro
-      # PHP CLI configuration overrides
-      - ${PROJECT_ROOT}/.docksal/etc/php/php-cli.ini:/etc/php/7.0/cli/conf.d/z_php.ini:ro
       # Project root volume
       - project_root:/var/www:rw
       # Host home volume (for SSH keys and other credentials).
