@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-## Initialize Docksal powered Drupal 8 site
+## Initialize a Docksal powered Drupal 8 site
 ##
 ## Usage: fin init
 
@@ -10,8 +10,9 @@ set -e
 #-------------------------- Settings --------------------------------
 
 # PROJECT_ROOT is passed from fin.
-# The following variables are configured in the '.env' file: DOCROOT, SITE_DIRECTORY, SOURCE_ALIAS and others.
+# The following variables are configured in the '.env' file: DOCROOT, VIRTUAL_HOST.
 
+SITE_DIRECTORY="default"
 DOCROOT_PATH="${PROJECT_ROOT}/${DOCROOT}"
 SITEDIR_PATH="${DOCROOT_PATH}/sites/${SITE_DIRECTORY}"
 
@@ -30,15 +31,6 @@ echo-red () { echo -e "${red}$1${NC}"; }
 echo-green () { echo -e "${green}$1${NC}"; }
 echo-green-bg () { echo -e "${green_bg}$1${NC}"; }
 echo-yellow () { echo -e "${yellow}$1${NC}"; }
-
-if_failed ()
-{
-	if [ ! $? -eq 0 ]; then
-		if [[ "$1" == "" ]]; then msg="an error occurred"; else msg="$1"; fi
-		echo-red "$msg";
-		exit 1;
-	fi
-}
 
 is_windows ()
 {
@@ -78,23 +70,13 @@ init_settings ()
 	copy_settings_file "${SITEDIR_PATH}/default.settings.local.php" "${SITEDIR_PATH}/settings.local.php"
 }
 
-# Set file/folder permissions
-file_permissions ()
-{
-	echo-green "Resetting files directory permissions..."
-	mkdir -p "${SITEDIR_PATH}/files"
-	chmod -R 777 "${SITEDIR_PATH}/files"
-}
-
 # Install site
 site_install ()
 {
-	cd ${DOCROOT_PATH}
+	cd $DOCROOT_PATH
+
 	# We disable email sending here so site-install does not return an error
 	fin exec "PHP_OPTIONS="'"-d sendmail_path=`which true`"'" drush site-install -y --site-name='My Drupal 8 Site'"
-
-	# Revert site dir permissions.
-	chmod 755 "${SITEDIR_PATH}"
 }
 
 #-------------------------- END: Functions --------------------------------
@@ -106,12 +88,9 @@ if [[ "$PROJECT_ROOT" == "" ]]; then
 	exit 1
 fi
 
-#echo-green "Setting file/folder permissions..."
-#file_permissions
-
+# Project initialization steps
 echo -e "${green_bg} Step 1 ${NC}${green} Initializing local project configuration...${NC}"
 init_settings
-
 
 if [[ $DOCKER_RUNNING == "true" ]]; then
 	echo -e "${green_bg} Step 2 ${NC}${green} Recreating services...${NC}"
@@ -120,7 +99,8 @@ else
 	echo -e "${green_bg} Step 2 ${NC}${green} Creating services...${NC}"
 	fin up
 fi
-echo "Waiting 10s for MySQL to start...";
+
+echo "Waiting 10s for MySQL to initialize...";
 sleep 10
 
 echo -e "${green_bg} Step 3 ${NC}${green} Installing site...${NC}"
@@ -128,7 +108,7 @@ time site_install
 
 if is_windows; then
 	echo-green "Add ${VIRTUAL_HOST} to your hosts file (/etc/hosts), e.g.:"
-	echo-green "192.168.64.100  ${VIRTUAL_HOST}"
+	echo-green "192.168.64.100 ${VIRTUAL_HOST}"
 	echo
 fi
 
