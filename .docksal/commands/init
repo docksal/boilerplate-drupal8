@@ -70,6 +70,13 @@ init_settings ()
 	copy_settings_file "${SITEDIR_PATH}/default.settings.local.php" "${SITEDIR_PATH}/settings.local.php"
 }
 
+# Fix file/folder permissions
+fix_permissions ()
+{
+	echo-green "Making site directory writable..."
+	chmod 755 "${SITEDIR_PATH}"
+}
+
 # Install site
 site_install ()
 {
@@ -90,6 +97,7 @@ fi
 
 # Project initialization steps
 echo -e "${green_bg} Step 1 ${NC}${green} Initializing local project configuration...${NC}"
+fix_permissions
 init_settings
 
 if [[ $DOCKER_RUNNING == "true" ]]; then
