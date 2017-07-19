@@ -27,6 +27,16 @@
             "recurse": false,
             "replace": false,
             "merge-extra": false
+        },
+        "installer-paths": {
+            "core": ["type:drupal-core"],
+            "libraries/{$name}": ["type:drupal-library"],
+            "modules/contrib/{$name}": ["type:drupal-module"],
+            "profiles/contrib/{$name}": ["type:drupal-profile"],
+            "themes/contrib/{$name}": ["type:drupal-theme"],
+            "drush/{$name}": ["type:drupal-drush"],
+            "modules/custom/{$name}": ["type:drupal-custom-module"],
+            "themes/custom/{$name}": ["type:drupal-custom-theme"]
         }
     },
     "autoload": {
@@ -39,5 +49,11 @@
         "post-autoload-dump": "Drupal\\Core\\Composer\\Composer::ensureHtaccess",
         "post-package-install": "Drupal\\Core\\Composer\\Composer::vendorTestCodeCleanup",
         "post-package-update": "Drupal\\Core\\Composer\\Composer::vendorTestCodeCleanup"
-    }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ]
 }
