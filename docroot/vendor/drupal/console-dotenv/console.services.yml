@@ -1,0 +1,15 @@
+services:
+  console.dotenv_init:
+    class: \Drupal\Console\Dotenv\Command\InitCommand
+    arguments: ['@app.root', '@?console.root', '@console.dotenv_init_generator']
+    tags:
+      - { name: drupal.command, bootstrap: uninstall }
+  console.dotenv_debug:
+    class: \Drupal\Console\Dotenv\Command\DebugCommand
+    arguments: ['@app.root', '@?console.root']
+    tags:
+      - { name: drupal.command, bootstrap: uninstall }
+  console.dotenv_init_generator:
+    class: Drupal\Console\Dotenv\Generator\InitGenerator
+    tags:
+      - { name: drupal.generator, bootstrap: uninstall }

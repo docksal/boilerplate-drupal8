@@ -15,21 +15,21 @@ class Row {
    *
    * @var array
    */
-  protected $source = array();
+  protected $source = [];
 
   /**
    * The source identifiers.
    *
    * @var array
    */
-  protected $sourceIds = array();
+  protected $sourceIds = [];
 
   /**
    * The destination values.
    *
    * @var array
    */
-  protected $destination = array();
+  protected $destination = [];
 
   /**
    * Level separator of destination and source properties.
@@ -41,11 +41,11 @@ class Row {
    *
    * @var array
    */
-  protected $idMap = array(
+  protected $idMap = [
     'original_hash' => '',
     'hash' => '',
     'source_row_status' => MigrateIdMapInterface::STATUS_NEEDS_UPDATE,
-  );
+  ];
 
   /**
    * Whether the source has been frozen already.
@@ -106,10 +106,11 @@ class Row {
    * Retrieves the values of the source identifiers.
    *
    * @return array
-   *   An array containing the values of the source identifiers.
+   *   An array containing the values of the source identifiers. Returns values
+   *   in the same order as defined in $this->sourceIds.
    */
   public function getSourceIdValues() {
-    return array_intersect_key($this->source, $this->sourceIds);
+    return array_merge($this->sourceIds, array_intersect_key($this->source, $this->sourceIds));
   }
 
   /**

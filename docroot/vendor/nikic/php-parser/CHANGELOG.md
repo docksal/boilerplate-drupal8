@@ -1,7 +1,37 @@
-Version 3.0.5-dev
+Version 3.1.0-dev
 -----------------
 
 Nothing yet.
+
+Version 3.0.6 (2017-06-28)
+--------------------------
+
+### Fixed
+
+* Fixed the spelling of `Class_::VISIBILITY_MODIFIER_MASK`. The previous spelling of
+  `Class_::VISIBILITY_MODIFER_MASK` is preserved for backwards compatibility.
+* The pretty printing will now preserve comments inside array literals and function calls by
+  printing the array items / function arguments on separate lines. Array literals and functions that
+  do not contain comments are not affected.
+
+### Added
+
+* Added `Builder\Param::makeVariadic()`.
+
+### Deprecated
+
+* The `Node::setLine()` method has been deprecated.
+
+Version 3.0.5 (2017-03-05)
+--------------------------
+
+### Fixed
+
+* Name resolution of `NullableType`s is now performed earlier, so that a fully resolved signature is
+  available when a function is entered. (#360)
+* `Error` nodes are now considered empty, while previously they extended until the token where the
+  error occurred. This made some nodes larger than expected. (#359)
+* Fixed notices being thrown during error recovery in some situations. (#362)
 
 Version 3.0.4 (2017-02-10)
 --------------------------

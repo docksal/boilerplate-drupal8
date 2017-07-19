@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Finder\Finder;
 use Dflydev\DotAccessConfiguration\YamlFileConfigurationBuilder;
 use Dflydev\DotAccessConfiguration\ConfigurationInterface;
+use Webmozart\PathUtil\Path;
 
 /**
  * Class ConfigurationManager.
@@ -44,7 +45,7 @@ class ConfigurationManager
      */
     public function loadConfiguration($applicationDirectory)
     {
-        $homeConfig = $this->getHomeDirectory() . '/.console/';
+        $homeConfig = Path::getHomeDirectory() . '/.console/';
         if (!is_dir($homeConfig)) {
             mkdir($homeConfig, 0777);
         }
@@ -57,7 +58,7 @@ class ConfigurationManager
         $configurationDirectories[] = $applicationDirectory.DRUPAL_CONSOLE_CORE;
         $configurationDirectories[] = $applicationDirectory.DRUPAL_CONSOLE;
         $configurationDirectories[] = '/etc/console/';
-        $configurationDirectories[] = $this->getHomeDirectory() . '/.console/';
+        $configurationDirectories[] = Path::getHomeDirectory() . '/.console/';
         $configurationDirectories[] = $applicationDirectory .'/console/';
         if ($root) {
             $configurationDirectories[] = $root . '/console/';
@@ -92,7 +93,14 @@ class ConfigurationManager
 
         $builder = new YamlFileConfigurationBuilder($configurationFiles);
         $this->configuration = $builder->build();
-        $this->appendCommandAliases();
+        $aliases = $this->configuration->get('application.extras.alias')?:'true';
+        if ($aliases === 'true') {
+            $this->appendCommandAliases();
+        }
+        $mappings = $this->configuration->get('application.extras.mappings')?:'true';
+        if ($mappings === 'true') {
+            $this->appendCommandMappings();
+        }
 
         if ($configurationFiles) {
             $this->missingConfigurationFiles = [];
@@ -146,20 +154,6 @@ class ConfigurationManager
             $this->configuration->get('application.remote'),
             $targetInformation
         );
-    }
-
-    /**
-     * Return the user home directory.
-     *
-     * @return string
-     */
-    public function getHomeDirectory()
-    {
-        if (function_exists('posix_getuid')) {
-            return posix_getpwuid(posix_getuid())['dir'];
-        }
-
-        return realpath(rtrim(getenv('HOME') ?: getenv('USERPROFILE'), '/\\'));
     }
 
     /**
@@ -238,7 +232,7 @@ class ConfigurationManager
      */
     public function getConsoleDirectory()
     {
-        return sprintf('%s/.console/', $this->getHomeDirectory());
+        return sprintf('%s/.console/', Path::getHomeDirectory());
     }
 
     /**
@@ -258,16 +252,32 @@ class ConfigurationManager
     }
 
     /**
-     * @return string
+     * @return void
      */
-    public function appendCommandAliases()
+    private function appendCommandMappings()
     {
-        $configurationDirectories = array_merge(
-            [$this->applicationDirectory . DRUPAL_CONSOLE_CORE . 'config/dist/'],
-            $this->configurationDirectories
-        );
+        $mappings = [];
+        $mappingsFile = $this->applicationDirectory.DRUPAL_CONSOLE_CORE.'config/mappings.yml';
+
+        if (file_exists($mappingsFile)) {
+            $mappings = Yaml::parse(file_get_contents($mappingsFile));
+        }
+
+        if (array_key_exists('commands', $mappings) && array_key_exists('mappings', $mappings['commands'])) {
+            $this->configuration->set(
+                'application.commands.mappings',
+                $mappings['commands']['mappings']
+            );
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function appendCommandAliases()
+    {
         $aliases = [];
-        foreach ($configurationDirectories as $directory) {
+        foreach ($this->configurationDirectories as $directory) {
             $aliasFile = $directory . 'aliases.yml';
             if (file_exists($aliasFile)) {
                 $aliases = array_merge(
@@ -286,7 +296,7 @@ class ConfigurationManager
 
     public function loadExtendConfiguration()
     {
-        $directory = $this->getHomeDirectory() . '/.console/extend/';
+        $directory = Path::getHomeDirectory() . '/.console/extend/';
         if (!is_dir($directory)) {
             return null;
         }
@@ -301,7 +311,8 @@ class ConfigurationManager
         $this->importConfigurationFile($extendFile);
     }
 
-    public function  importConfigurationFile($configFile) {
+    public function importConfigurationFile($configFile)
+    {
         if (is_file($configFile) && file_get_contents($configFile)!='') {
             $builder = new YamlFileConfigurationBuilder([$configFile]);
             $this->configuration->import($builder->build());
@@ -339,4 +350,8 @@ class ConfigurationManager
         return $this->sites;
     }
 
+    public function getHomeDirectory()
+    {
+        return Path::getHomeDirectory();
+    }
 }

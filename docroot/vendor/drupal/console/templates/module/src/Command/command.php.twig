@@ -25,8 +25,6 @@ use Drupal\Console\Annotations\DrupalCommand;
 /**
  * Class {{ class_name }}.
  *
- * @package Drupal\{{extension}}
- *
  * @DrupalCommand (
  *     extension="{{extension}}",
  *     extensionType="{{ extensionType }}"
@@ -37,7 +35,7 @@ class {{ class_name }} extends Command {% endblock %}
 {% if services is not empty %}
 
   /**
-   * {@inheritdoc}
+   * Constructs a new {{ class_name }} object.
    */
   public function __construct({{ servicesAsParameters(services)|join(', ') }}) {
 {{ serviceClassInitialization(services) }}

@@ -3,7 +3,7 @@
  * Zend Framework (http://framework.zend.com/)
  *
  * @see       http://github.com/zendframework/zend-diactoros for the canonical source repository
- * @copyright Copyright (c) 2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015-2016 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   https://github.com/zendframework/zend-diactoros/blob/master/LICENSE.md New BSD License
  */
 
@@ -24,6 +24,9 @@ class Response implements ResponseInterface
 {
     use MessageTrait;
 
+    const MIN_STATUS_CODE_VALUE = 100;
+    const MAX_STATUS_CODE_VALUE = 599;
+
     /**
      * Map of standard HTTP status code/reason phrases
      *
@@ -42,8 +45,9 @@ class Response implements ResponseInterface
         204 => 'No Content',
         205 => 'Reset Content',
         206 => 'Partial Content',
-        207 => 'Multi-status',
+        207 => 'Multi-Status',
         208 => 'Already Reported',
+        226 => 'IM Used',
         // REDIRECTION CODES
         300 => 'Multiple Choices',
         301 => 'Moved Permanently',
@@ -51,8 +55,9 @@ class Response implements ResponseInterface
         303 => 'See Other',
         304 => 'Not Modified',
         305 => 'Use Proxy',
-        306 => 'Switch Proxy', // Deprecated
+        306 => 'Switch Proxy', // Deprecated to 306 => '(Unused)'
         307 => 'Temporary Redirect',
+        308 => 'Permanent Redirect',
         // CLIENT ERROR
         400 => 'Bad Request',
         401 => 'Unauthorized',
@@ -62,17 +67,18 @@ class Response implements ResponseInterface
         405 => 'Method Not Allowed',
         406 => 'Not Acceptable',
         407 => 'Proxy Authentication Required',
-        408 => 'Request Time-out',
+        408 => 'Request Timeout',
         409 => 'Conflict',
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Request Entity Too Large',
-        414 => 'Request-URI Too Large',
+        413 => 'Payload Too Large',
+        414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
-        416 => 'Requested range not satisfiable',
+        416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
         418 => 'I\'m a teapot',
+        421 => 'Misdirected Request',
         422 => 'Unprocessable Entity',
         423 => 'Locked',
         424 => 'Failed Dependency',
@@ -81,17 +87,22 @@ class Response implements ResponseInterface
         428 => 'Precondition Required',
         429 => 'Too Many Requests',
         431 => 'Request Header Fields Too Large',
+        444 => 'Connection Closed Without Response',
+        451 => 'Unavailable For Legal Reasons',
         // SERVER ERROR
+        499 => 'Client Closed Request',
         500 => 'Internal Server Error',
         501 => 'Not Implemented',
         502 => 'Bad Gateway',
         503 => 'Service Unavailable',
-        504 => 'Gateway Time-out',
-        505 => 'HTTP Version not supported',
+        504 => 'Gateway Timeout',
+        505 => 'HTTP Version Not Supported',
         506 => 'Variant Also Negotiates',
         507 => 'Insufficient Storage',
         508 => 'Loop Detected',
+        510 => 'Not Extended',
         511 => 'Network Authentication Required',
+        599 => 'Network Connect Timeout Error',
     ];
 
     /**
@@ -102,34 +113,19 @@ class Response implements ResponseInterface
     /**
      * @var int
      */
-    private $statusCode = 200;
+    private $statusCode;
 
     /**
-     * @param string|resource|StreamInterface $stream Stream identifier and/or actual stream resource
+     * @param string|resource|StreamInterface $body Stream identifier and/or actual stream resource
      * @param int $status Status code for the response, if any.
      * @param array $headers Headers for the response, if any.
      * @throws InvalidArgumentException on any invalid element.
      */
     public function __construct($body = 'php://memory', $status = 200, array $headers = [])
     {
-        if (! is_string($body) && ! is_resource($body) && ! $body instanceof StreamInterface) {
-            throw new InvalidArgumentException(
-                'Stream must be a string stream resource identifier, '
-                . 'an actual stream resource, '
-                . 'or a Psr\Http\Message\StreamInterface implementation'
-            );
-        }
-
-        if (null !== $status) {
-            $this->validateStatus($status);
-        }
-
-        $this->stream     = ($body instanceof StreamInterface) ? $body : new Stream($body, 'wb+');
-        $this->statusCode = $status ? (int) $status : 200;
-
-        list($this->headerNames, $headers) = $this->filterHeaders($headers);
-        $this->assertHeaders($headers);
-        $this->headers = $headers;
+        $this->setStatusCode($status);
+        $this->stream = $this->getStream($body, 'wb+');
+        $this->setHeaders($headers);
     }
 
     /**
@@ -159,44 +155,32 @@ class Response implements ResponseInterface
      */
     public function withStatus($code, $reasonPhrase = '')
     {
-        $this->validateStatus($code);
         $new = clone $this;
-        $new->statusCode   = (int) $code;
+        $new->setStatusCode($code);
         $new->reasonPhrase = $reasonPhrase;
         return $new;
     }
 
     /**
-     * Validate a status code.
+     * Set a valid status code.
      *
-     * @param int|string $code
+     * @param int $code
      * @throws InvalidArgumentException on an invalid status code.
      */
-    private function validateStatus($code)
+    private function setStatusCode($code)
     {
         if (! is_numeric($code)
             || is_float($code)
-            || $code < 100
-            || $code >= 600
+            || $code < static::MIN_STATUS_CODE_VALUE
+            || $code > static::MAX_STATUS_CODE_VALUE
         ) {
             throw new InvalidArgumentException(sprintf(
-                'Invalid status code "%s"; must be an integer between 100 and 599, inclusive',
-                (is_scalar($code) ? $code : gettype($code))
+                'Invalid status code "%s"; must be an integer between %d and %d, inclusive',
+                (is_scalar($code) ? $code : gettype($code)),
+                static::MIN_STATUS_CODE_VALUE,
+                static::MAX_STATUS_CODE_VALUE
             ));
         }
-    }
-
-    /**
-     * Ensure header names and values are valid.
-     *
-     * @param array $headers
-     * @throws InvalidArgumentException
-     */
-    private function assertHeaders(array $headers)
-    {
-        foreach ($headers as $name => $headerValues) {
-            HeaderSecurity::assertValidName($name);
-            array_walk($headerValues, __NAMESPACE__ . '\HeaderSecurity::assertValid');
-        }
+        $this->statusCode = $code;
     }
 }

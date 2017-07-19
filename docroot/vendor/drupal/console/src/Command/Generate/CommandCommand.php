@@ -21,6 +21,7 @@ use Drupal\Console\Core\Utils\StringConverter;
 use Drupal\Console\Extension\Manager;
 use Drupal\Console\Core\Style\DrupalStyle;
 use Drupal\Console\Utils\Validator;
+use Drupal\Console\Utils\Site;
 
 class CommandCommand extends Command
 {
@@ -51,23 +52,31 @@ class CommandCommand extends Command
     protected $stringConverter;
 
     /**
+     * @var Site
+     */
+    protected $site;
+
+    /**
      * CommandCommand constructor.
      *
      * @param CommandGenerator $generator
      * @param Manager          $extensionManager
      * @param Validator        $validator
      * @param StringConverter  $stringConverter
+     * @param Site             $site
      */
     public function __construct(
         CommandGenerator $generator,
         Manager $extensionManager,
         Validator $validator,
-        StringConverter $stringConverter
+        StringConverter $stringConverter,
+        Site  $site
     ) {
         $this->generator = $generator;
         $this->extensionManager = $extensionManager;
         $this->validator = $validator;
         $this->stringConverter = $stringConverter;
+        $this->site = $site;
         parent::__construct();
     }
 
@@ -82,40 +91,41 @@ class CommandCommand extends Command
             ->setHelp($this->trans('commands.generate.command.help'))
             ->addOption(
                 'extension',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.common.options.extension')
             )
             ->addOption(
                 'extension-type',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.common.options.extension-type')
             )
             ->addOption(
                 'class',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.command.options.class')
             )
             ->addOption(
                 'name',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.command.options.name')
             )
             ->addOption(
                 'container-aware',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.generate.command.options.container-aware')
             )
             ->addOption(
                 'services',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 $this->trans('commands.common.options.services')
-            );
+            )
+            ->setAliases(['gco']);
     }
 
     /**
@@ -135,7 +145,7 @@ class CommandCommand extends Command
 
         // @see use Drupal\Console\Command\Shared\ConfirmationTrait::confirmGeneration
         if (!$this->confirmGeneration($io, $yes)) {
-            return;
+            return 1;
         }
 
         // @see use Drupal\Console\Command\Shared\ServicesTrait::buildServices
@@ -149,6 +159,10 @@ class CommandCommand extends Command
             $containerAware,
             $build_services
         );
+
+        $this->site->removeCachedServicesFile();
+
+        return 0;
     }
 
     /**

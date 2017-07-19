@@ -69,19 +69,20 @@ class AuthenticationProviderCommand extends Command
             ->setName('generate:authentication:provider')
             ->setDescription($this->trans('commands.generate.authentication.provider.description'))
             ->setHelp($this->trans('commands.generate.authentication.provider.help'))
-            ->addOption('module', '', InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
+            ->addOption('module', null, InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
             ->addOption(
                 'class',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.authentication.provider.options.class')
             )
             ->addOption(
                 'provider-id',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.authentication.provider.options.provider-id')
-            );
+            )
+            ->setAliases(['gap']);
     }
 
     /**
@@ -93,7 +94,7 @@ class AuthenticationProviderCommand extends Command
 
         // @see use Drupal\Console\Command\Shared\ConfirmationTrait::confirmGeneration
         if (!$this->confirmGeneration($io)) {
-            return;
+            return 1;
         }
 
         $module = $input->getOption('module');
@@ -101,6 +102,8 @@ class AuthenticationProviderCommand extends Command
         $provider_id = $input->getOption('provider-id');
 
         $this->generator->generate($module, $class, $provider_id);
+
+        return 0;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

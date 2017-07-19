@@ -24,10 +24,10 @@ class InstallerConfigDirectorySetNoDirectoryErrorTest extends InstallerTestBase 
    */
   protected function setUp() {
     $this->configDirectory = $this->publicFilesDirectory . '/config_' . Crypt::randomBytesBase64();
-    $this->settings['config_directories'][CONFIG_SYNC_DIRECTORY] = (object) array(
+    $this->settings['config_directories'][CONFIG_SYNC_DIRECTORY] = (object) [
       'value' => $this->configDirectory . '/sync',
       'required' => TRUE,
-    );
+    ];
     // Create the files directory early so we can test the error case.
     mkdir($this->publicFilesDirectory);
     // Create a file so the directory can not be created.
@@ -44,7 +44,7 @@ class InstallerConfigDirectorySetNoDirectoryErrorTest extends InstallerTestBase 
   }
 
   /**
-   * @{inheritdoc}
+   * {@inheritdoc}
    */
   protected function setUpSite() {
     // This step should not appear as we had a failure prior to the settings

@@ -17,17 +17,7 @@ class DiffFormatter extends DiffFormatterBase {
    *
    * @var array
    */
-  protected $rows = array();
-
-  /**
-   * The line stats.
-   *
-   * @var array
-   */
-  protected $line_stats = array(
-    'counter' => array('x' => 0, 'y' => 0),
-    'offset' => array('x' => 0, 'y' => 0),
-  );
+  protected $rows = [];
 
   /**
    * Creates a DiffFormatter to render diffs in a table.
@@ -45,7 +35,7 @@ class DiffFormatter extends DiffFormatterBase {
    * {@inheritdoc}
    */
   protected function _start_diff() {
-    $this->rows = array();
+    $this->rows = [];
   }
 
   /**
@@ -59,16 +49,16 @@ class DiffFormatter extends DiffFormatterBase {
    * {@inheritdoc}
    */
   protected function _block_header($xbeg, $xlen, $ybeg, $ylen) {
-    return array(
-      array(
+    return [
+      [
         'data' => $xbeg + $this->line_stats['offset']['x'],
         'colspan' => 2,
-      ),
-      array(
+      ],
+      [
         'data' => $ybeg + $this->line_stats['offset']['y'],
         'colspan' => 2,
-      )
-    );
+      ]
+    ];
   }
 
   /**
@@ -96,16 +86,16 @@ class DiffFormatter extends DiffFormatterBase {
    *   An array representing a table row.
    */
   protected function addedLine($line) {
-    return array(
-      array(
+    return [
+      [
         'data' => '+',
         'class' => 'diff-marker',
-      ),
-      array(
+      ],
+      [
         'data' => ['#markup' => $line],
         'class' => 'diff-context diff-addedline',
-      )
-    );
+      ]
+    ];
   }
 
   /**
@@ -118,16 +108,16 @@ class DiffFormatter extends DiffFormatterBase {
    *   An array representing a table row.
    */
   protected function deletedLine($line) {
-    return array(
-      array(
+    return [
+      [
         'data' => '-',
         'class' => 'diff-marker',
-      ),
-      array(
+      ],
+      [
         'data' => ['#markup' => $line],
         'class' => 'diff-context diff-deletedline',
-      )
-    );
+      ]
+    ];
   }
 
   /**
@@ -140,13 +130,13 @@ class DiffFormatter extends DiffFormatterBase {
    *   An array representing a table row.
    */
   protected function contextLine($line) {
-    return array(
+    return [
       ' ',
-      array(
+      [
         'data' => ['#markup' => $line],
         'class' => 'diff-context',
-      )
-    );
+      ]
+    ];
   }
 
   /**
@@ -156,10 +146,10 @@ class DiffFormatter extends DiffFormatterBase {
    *   An array representing a table row.
    */
   protected function emptyLine() {
-    return array(
+    return [
       ' ',
       ' ',
-    );
+    ];
   }
 
   /**

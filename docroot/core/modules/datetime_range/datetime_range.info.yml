@@ -2,13 +2,7 @@ name: 'Datetime Range'
 type: module
 description: 'Provides the ability to store end dates.'
 package: Core (Experimental)
-# version: VERSION
-# core: 8.x
+version: VERSION
+core: 8.x
 dependencies:
   - datetime
-
-# Information added by Drupal.org packaging script on 2016-11-02
-version: '8.2.2'
-core: '8.x'
-project: 'drupal'
-datestamp: 1478110097

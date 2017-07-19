@@ -14,7 +14,7 @@ class UrlHelper {
    *
    * @var array
    */
-  protected static $allowedProtocols = array('http', 'https');
+  protected static $allowedProtocols = ['http', 'https'];
 
   /**
    * Parses an array into a valid, rawurlencoded query string.
@@ -43,10 +43,10 @@ class UrlHelper {
    * @ingroup php_wrappers
    */
   public static function buildQuery(array $query, $parent = '') {
-    $params = array();
+    $params = [];
 
     foreach ($query as $key => $value) {
-      $key = ($parent ? $parent . '[' . rawurlencode($key) . ']' : rawurlencode($key));
+      $key = ($parent ? $parent . rawurlencode('[' . $key . ']') : rawurlencode($key));
 
       // Recurse into children.
       if (is_array($value)) {
@@ -79,7 +79,7 @@ class UrlHelper {
    * @return
    *   An array containing query parameters.
    */
-  public static function filterQueryParameters(array $query, array $exclude = array(), $parent = '') {
+  public static function filterQueryParameters(array $query, array $exclude = [], $parent = '') {
     // If $exclude is empty, there is nothing to filter.
     if (empty($exclude)) {
       return $query;
@@ -88,7 +88,7 @@ class UrlHelper {
       $exclude = array_flip($exclude);
     }
 
-    $params = array();
+    $params = [];
     foreach ($query as $key => $value) {
       $string_key = ($parent ? $parent . '[' . $key . ']' : $key);
       if (isset($exclude[$string_key])) {
@@ -134,15 +134,20 @@ class UrlHelper {
    * @ingroup php_wrappers
    */
   public static function parse($url) {
-    $options = array(
+    $options = [
       'path' => NULL,
-      'query' => array(),
+      'query' => [],
       'fragment' => '',
-    );
+    ];
 
     // External URLs: not using parse_url() here, so we do not have to rebuild
     // the scheme, host, and path without having any use for it.
-    if (strpos($url, '://') !== FALSE) {
+    // The URL is considered external if it contains the '://' delimiter. Since
+    // a URL can also be passed as a query argument, we check if this delimiter
+    // appears in front of the '?' query argument delimiter.
+    $scheme_delimiter_position = strpos($url, '://');
+    $query_delimiter_position = strpos($url, '?');
+    if ($scheme_delimiter_position !== FALSE && ($query_delimiter_position === FALSE || $scheme_delimiter_position < $query_delimiter_position)) {
       // Split off everything before the query string into 'path'.
       $parts = explode('?', $url);
 
@@ -294,7 +299,7 @@ class UrlHelper {
    * @param array $protocols
    *   An array of protocols, for example http, https and irc.
    */
-  public static function setAllowedProtocols(array $protocols = array()) {
+  public static function setAllowedProtocols(array $protocols = []) {
     static::$allowedProtocols = $protocols;
   }
 

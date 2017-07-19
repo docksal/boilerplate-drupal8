@@ -3,6 +3,7 @@
 namespace Drupal\locale\Form;
 
 use Drupal\Component\Gettext\PoStreamWriter;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -24,13 +25,23 @@ class ExportForm extends FormBase {
   protected $languageManager;
 
   /**
+   * The file system service.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  protected $fileSystem;
+
+  /**
    * Constructs a new ExportForm.
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
+   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   *   The file system service.
    */
-  public function __construct(LanguageManagerInterface $language_manager) {
+  public function __construct(LanguageManagerInterface $language_manager, FileSystemInterface $file_system) {
     $this->languageManager = $language_manager;
+    $this->fileSystem = $file_system;
   }
 
   /**
@@ -38,7 +49,8 @@ class ExportForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('language_manager')
+      $container->get('language_manager'),
+      $container->get('file_system')
     );
   }
 
@@ -54,7 +66,7 @@ class ExportForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $languages = $this->languageManager->getLanguages();
-    $language_options = array();
+    $language_options = [];
     foreach ($languages as $langcode => $language) {
       if (locale_is_translatable($langcode)) {
         $language_options[$langcode] = $language->getName();
@@ -63,60 +75,59 @@ class ExportForm extends FormBase {
     $language_default = $this->languageManager->getDefaultLanguage();
 
     if (empty($language_options)) {
-      $form['langcode'] = array(
+      $form['langcode'] = [
         '#type' => 'value',
         '#value' => LanguageInterface::LANGCODE_SYSTEM,
-      );
-      $form['langcode_text'] = array(
+      ];
+      $form['langcode_text'] = [
         '#type' => 'item',
         '#title' => $this->t('Language'),
         '#markup' => $this->t('No language available. The export will only contain source strings.'),
-      );
+      ];
     }
     else {
-      $form['langcode'] = array(
+      $form['langcode'] = [
         '#type' => 'select',
         '#title' => $this->t('Language'),
         '#options' => $language_options,
         '#default_value' => $language_default->getId(),
         '#empty_option' => $this->t('Source text only, no translations'),
         '#empty_value' => LanguageInterface::LANGCODE_SYSTEM,
-      );
-      $form['content_options'] = array(
+      ];
+      $form['content_options'] = [
         '#type' => 'details',
         '#title' => $this->t('Export options'),
-        '#collapsed' => TRUE,
         '#tree' => TRUE,
-        '#states' => array(
-          'invisible' => array(
-            ':input[name="langcode"]' => array('value' => LanguageInterface::LANGCODE_SYSTEM),
-          ),
-        ),
-      );
-      $form['content_options']['not_customized'] = array(
+        '#states' => [
+          'invisible' => [
+            ':input[name="langcode"]' => ['value' => LanguageInterface::LANGCODE_SYSTEM],
+          ],
+        ],
+      ];
+      $form['content_options']['not_customized'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Include non-customized translations'),
         '#default_value' => TRUE,
-      );
-      $form['content_options']['customized'] = array(
+      ];
+      $form['content_options']['customized'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Include customized translations'),
         '#default_value' => TRUE,
-      );
-      $form['content_options']['not_translated'] = array(
+      ];
+      $form['content_options']['not_translated'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Include untranslated text'),
         '#default_value' => TRUE,
-      );
+      ];
     }
 
-    $form['actions'] = array(
+    $form['actions'] = [
       '#type' => 'actions',
-    );
-    $form['actions']['submit'] = array(
+    ];
+    $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Export'),
-    );
+    ];
     return $form;
   }
 
@@ -131,7 +142,7 @@ class ExportForm extends FormBase {
     else {
       $language = NULL;
     }
-    $content_options = $form_state->getValue('content_options', array());
+    $content_options = $form_state->getValue('content_options', []);
     $reader = new PoDatabaseReader();
     $language_name = '';
     if ($language != NULL) {
@@ -148,7 +159,7 @@ class ExportForm extends FormBase {
 
     $item = $reader->readItem();
     if (!empty($item)) {
-      $uri = tempnam('temporary://', 'po_');
+      $uri = $this->fileSystem->tempnam('temporary://', 'po_');
       $header = $reader->getHeader();
       $header->setProjectName($this->config('system.site')->get('name'));
       $header->setLanguageName($language_name);

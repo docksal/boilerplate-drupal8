@@ -70,10 +70,11 @@ class ImportCommand extends Command
             )
             ->addOption(
                 'remove-files',
-                false,
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.config.import.options.remove-files')
-            );
+            )
+            ->setAliases(['ci']);
     }
 
     /**
@@ -130,7 +131,7 @@ class ImportCommand extends Command
                 $config_importer->import();
                 return true;
             } catch (ConfigImporterException $e) {
-                $message = 'The import failed due for the following reasons:' . "\n";
+                $message = $this->trans('commands.config.import.messages.import-fail') . "\n";
                 $message .= implode("\n", $config_importer->getErrors());
                 $io->error(
                     sprintf(

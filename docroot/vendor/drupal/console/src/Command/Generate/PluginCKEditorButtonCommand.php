@@ -78,40 +78,40 @@ class PluginCKEditorButtonCommand extends Command
             ->setHelp($this->trans('commands.generate.plugin.ckeditorbutton.help'))
             ->addOption(
                 'module',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.common.options.module')
             )
             ->addOption(
                 'class',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.ckeditorbutton.options.class')
             )
             ->addOption(
                 'label',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.ckeditorbutton.options.label')
             )
             ->addOption(
                 'plugin-id',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.ckeditorbutton.options.plugin-id')
             )
             ->addOption(
                 'button-name',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.ckeditorbutton.options.button-name')
             )
             ->addOption(
                 'button-icon-path',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.ckeditorbutton.options.button-icon-path')
-            );
+            )->setAliases(['gpc']);
     }
 
     /**
@@ -123,7 +123,7 @@ class PluginCKEditorButtonCommand extends Command
 
         // @see use Drupal\Console\Command\Shared\ConfirmationTrait::confirmGeneration
         if (!$this->confirmGeneration($io)) {
-            return;
+            return 1;
         }
 
         $module = $input->getOption('module');
@@ -138,6 +138,8 @@ class PluginCKEditorButtonCommand extends Command
             ->generate($module, $class_name, $label, $plugin_id, $button_name, $button_icon_path);
 
         $this->chainQueue->addCommand('cache:rebuild', ['cache' => 'discovery'], false);
+
+        return 0;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

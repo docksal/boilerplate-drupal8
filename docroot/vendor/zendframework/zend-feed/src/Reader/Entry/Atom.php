@@ -104,7 +104,7 @@ class Atom extends AbstractEntry implements EntryInterface
     /**
      * Get the entry creation date
      *
-     * @return string
+     * @return \DateTime
      */
     public function getDateCreated()
     {
@@ -122,7 +122,7 @@ class Atom extends AbstractEntry implements EntryInterface
     /**
      * Get the entry modification date
      *
-     * @return string
+     * @return \DateTime
      */
     public function getDateModified()
     {
@@ -199,7 +199,7 @@ class Atom extends AbstractEntry implements EntryInterface
      */
     public function getLink($index = 0)
     {
-        if (!array_key_exists('links', $this->data)) {
+        if (! array_key_exists('links', $this->data)) {
             $this->getLinks();
         }
 
@@ -269,7 +269,7 @@ class Atom extends AbstractEntry implements EntryInterface
 
         $commentcount = $this->getExtension('Thread')->getCommentCount();
 
-        if (!$commentcount) {
+        if (! $commentcount) {
             $commentcount = $this->getExtension('Atom')->getCommentCount();
         }
 

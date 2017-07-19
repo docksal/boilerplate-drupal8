@@ -69,7 +69,7 @@ class ExportViewCommand extends Command
             ->setName('config:export:view')
             ->setDescription($this->trans('commands.config.export.view.description'))
             ->addOption(
-                'module', '',
+                'module', null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.common.options.module')
             )
@@ -80,16 +80,17 @@ class ExportViewCommand extends Command
             )
             ->addOption(
                 'optional-config',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.config.export.view.options.optional-config')
             )
             ->addOption(
                 'include-module-dependencies',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.config.export.view.options.include-module-dependencies')
-            );
+            )
+            ->setAliases(['cev']);
     }
 
     /**
@@ -171,6 +172,6 @@ class ExportViewCommand extends Command
             }
         }
 
-        $this->exportConfigToModule($module, $io, $this->trans('commands.views.export.messages.view_exported'));
+        $this->exportConfigToModule($module, $io, $this->trans('commands.views.export.messages.view-exported'));
     }
 }

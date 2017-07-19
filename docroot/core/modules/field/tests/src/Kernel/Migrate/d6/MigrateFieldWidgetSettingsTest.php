@@ -15,6 +15,11 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
   /**
    * {@inheritdoc}
    */
+  public static $modules = ['menu_ui'];
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $this->migrateFields();
@@ -30,16 +35,17 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
 
     // Text field.
     $component = $form_display->getComponent('field_test');
-    $expected = array('weight' => 1, 'type' => 'text_textfield');
-    $expected['settings'] = array('size' => 60, 'placeholder' => '');
-    $expected['third_party_settings'] = array();
+    $expected = ['weight' => 1, 'type' => 'text_textfield'];
+    $expected['settings'] = ['size' => 60, 'placeholder' => ''];
+    $expected['third_party_settings'] = [];
+    $expected['region'] = 'content';
     $this->assertIdentical($expected, $component, 'Text field settings are correct.');
 
     // Integer field.
     $component = $form_display->getComponent('field_test_two');
     $expected['type'] = 'number';
     $expected['weight'] = 1;
-    $expected['settings'] = array('placeholder' => '');
+    $expected['settings'] = ['placeholder' => ''];
     $this->assertIdentical($expected, $component);
 
     // Float field.
@@ -51,7 +57,7 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
     $component = $form_display->getComponent('field_test_email');
     $expected['type'] = 'email_default';
     $expected['weight'] = 6;
-    $expected['settings'] = array('placeholder' => '', 'size' => 60);
+    $expected['settings'] = ['placeholder' => '', 'size' => 60];
     $this->assertIdentical($expected, $component);
 
     // Link field.
@@ -64,28 +70,28 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
     $component = $form_display->getComponent('field_test_filefield');
     $expected['type'] = 'file_generic';
     $expected['weight'] = 8;
-    $expected['settings'] = array('progress_indicator' => 'bar');
+    $expected['settings'] = ['progress_indicator' => 'bar'];
     $this->assertIdentical($expected, $component);
 
     // Image field.
     $component = $form_display->getComponent('field_test_imagefield');
     $expected['type'] = 'image_image';
     $expected['weight'] = 9;
-    $expected['settings'] = array('progress_indicator' => 'bar', 'preview_image_style' => 'thumbnail');
+    $expected['settings'] = ['progress_indicator' => 'bar', 'preview_image_style' => 'thumbnail'];
     $this->assertIdentical($expected, $component);
 
     // Phone field.
     $component = $form_display->getComponent('field_test_phone');
     $expected['type'] = 'telephone_default';
     $expected['weight'] = 13;
-    $expected['settings'] = array('placeholder' => '');
+    $expected['settings'] = ['placeholder' => ''];
     $this->assertIdentical($expected, $component);
 
     // Date fields.
     $component = $form_display->getComponent('field_test_date');
     $expected['type'] = 'datetime_default';
     $expected['weight'] = 10;
-    $expected['settings'] = array();
+    $expected['settings'] = [];
     $this->assertIdentical($expected, $component);
 
     $component = $form_display->getComponent('field_test_datestamp');
@@ -95,6 +101,16 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
     $component = $form_display->getComponent('field_test_datetime');
     $expected['weight'] = 12;
     $this->assertIdentical($expected, $component);
+
+    $component = entity_get_form_display('node', 'employee', 'default')
+      ->getComponent('field_company');
+    $this->assertInternalType('array', $component);
+    $this->assertSame('options_select', $component['type']);
+
+    $component = entity_get_form_display('node', 'employee', 'default')
+      ->getComponent('field_commander');
+    $this->assertInternalType('array', $component);
+    $this->assertSame('options_select', $component['type']);
   }
 
 }

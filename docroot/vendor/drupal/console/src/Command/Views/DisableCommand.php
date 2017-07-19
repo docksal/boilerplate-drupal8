@@ -62,7 +62,8 @@ class DisableCommand extends Command
                 'view-id',
                 InputArgument::OPTIONAL,
                 $this->trans('commands.views.debug.arguments.view-id')
-            );
+            )
+            ->setAliases(['vd']);
     }
 
     /**
@@ -98,7 +99,8 @@ class DisableCommand extends Command
 
         if (empty($view)) {
             $io->error(sprintf($this->trans('commands.views.debug.messages.not-found'), $viewId));
-            return;
+
+            return 1;
         }
 
         try {
@@ -107,6 +109,10 @@ class DisableCommand extends Command
             $io->success(sprintf($this->trans('commands.views.disable.messages.disabled-successfully'), $view->get('label')));
         } catch (\Exception $e) {
             $io->error($e->getMessage());
+
+            return 1;
         }
+
+        return 0;
     }
 }

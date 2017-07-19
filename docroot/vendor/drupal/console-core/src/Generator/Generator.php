@@ -12,6 +12,7 @@ use Drupal\Console\Core\Utils\FileQueue;
 
 /**
  * Class Generator
+ *
  * @package Drupal\Console\Core\Generator
  */
 abstract class Generator
@@ -69,5 +70,9 @@ abstract class Generator
         }
 
         return false;
+    }
+
+    public function addSkeletonDir($skeletonDir) {
+        $this->renderer->addSkeletonDir($skeletonDir);
     }
 }

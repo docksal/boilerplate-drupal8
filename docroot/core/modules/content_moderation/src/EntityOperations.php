@@ -2,14 +2,16 @@
 
 namespace Drupal\content_moderation;
 
-use Drupal\content_moderation\Entity\ContentModerationState;
+use Drupal\content_moderation\Entity\ContentModerationState as ContentModerationStateEntity;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
+use Drupal\workflows\WorkflowInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -46,6 +48,13 @@ class EntityOperations implements ContainerInjectionInterface {
   protected $tracker;
 
   /**
+   * The entity bundle information service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $bundleInfo;
+
+  /**
    * Constructs a new EntityOperations object.
    *
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
@@ -56,12 +65,15 @@ class EntityOperations implements ContainerInjectionInterface {
    *   The form builder.
    * @param \Drupal\content_moderation\RevisionTrackerInterface $tracker
    *   The revision tracker.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   *   The entity bundle information service.
    */
-  public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder, RevisionTrackerInterface $tracker) {
+  public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder, RevisionTrackerInterface $tracker, EntityTypeBundleInfoInterface $bundle_info) {
     $this->moderationInfo = $moderation_info;
     $this->entityTypeManager = $entity_type_manager;
     $this->formBuilder = $form_builder;
     $this->tracker = $tracker;
+    $this->bundleInfo = $bundle_info;
   }
 
   /**
@@ -72,7 +84,8 @@ class EntityOperations implements ContainerInjectionInterface {
       $container->get('content_moderation.moderation_information'),
       $container->get('entity_type.manager'),
       $container->get('form_builder'),
-      $container->get('content_moderation.revision_tracker')
+      $container->get('content_moderation.revision_tracker'),
+      $container->get('entity_type.bundle.info')
     );
   }
 
@@ -86,20 +99,21 @@ class EntityOperations implements ContainerInjectionInterface {
     if (!$this->moderationInfo->isModeratedEntity($entity)) {
       return;
     }
-    if ($entity->moderation_state->target_id) {
-      $moderation_state = $this->entityTypeManager
-        ->getStorage('moderation_state')
-        ->load($entity->moderation_state->target_id);
-      $published_state = $moderation_state->isPublishedState();
 
-      // This entity is default if it is new, the default revision, or the
-      // default revision is not published.
+    if ($entity->moderation_state->value) {
+      $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
+      /** @var \Drupal\content_moderation\ContentModerationState $current_state */
+      $current_state = $workflow->getState($entity->moderation_state->value);
+
+      // This entity is default if it is new, a new translation, the default
+      // revision, or the default revision is not published.
       $update_default_revision = $entity->isNew()
-        || $moderation_state->isDefaultRevisionState()
-        || !$this->isDefaultRevisionPublished($entity);
+        || $entity->isNewTranslation()
+        || $current_state->isDefaultRevisionState()
+        || !$this->isDefaultRevisionPublished($entity, $workflow);
 
       // Fire per-entity-type logic for handling the save process.
-      $this->entityTypeManager->getHandler($entity->getEntityTypeId(), 'moderation')->onPresave($entity, $update_default_revision, $published_state);
+      $this->entityTypeManager->getHandler($entity->getEntityTypeId(), 'moderation')->onPresave($entity, $update_default_revision, $current_state->isPublishedState());
     }
   }
 
@@ -140,24 +154,23 @@ class EntityOperations implements ContainerInjectionInterface {
    *   The entity to update or create a moderation state for.
    */
   protected function updateOrCreateFromEntity(EntityInterface $entity) {
-    $moderation_state = $entity->moderation_state->target_id;
+    $moderation_state = $entity->moderation_state->value;
+    $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     if (!$moderation_state) {
-      $moderation_state = $this->entityTypeManager
-        ->getStorage($entity->getEntityType()->getBundleEntityType())->load($entity->bundle())
-        ->getThirdPartySetting('content_moderation', 'default_moderation_state');
+      $moderation_state = $workflow->getTypePlugin()->getInitialState($workflow, $entity)->id();
     }
 
-    // @todo what if $entity->moderation_state->target_id is null at this point?
+    // @todo what if $entity->moderation_state is null at this point?
     $entity_type_id = $entity->getEntityTypeId();
     $entity_id = $entity->id();
     $entity_revision_id = $entity->getRevisionId();
-    $entity_langcode = $entity->language()->getId();
 
     $storage = $this->entityTypeManager->getStorage('content_moderation_state');
     $entities = $storage->loadByProperties([
       'content_entity_type_id' => $entity_type_id,
       'content_entity_id' => $entity_id,
+      'workflow' => $workflow->id(),
     ]);
 
     /** @var \Drupal\content_moderation\ContentModerationStateInterface $content_moderation_state */
@@ -167,24 +180,29 @@ class EntityOperations implements ContainerInjectionInterface {
         'content_entity_type_id' => $entity_type_id,
         'content_entity_id' => $entity_id,
       ]);
+      $content_moderation_state->workflow->target_id = $workflow->id();
     }
-    else {
-      // Create a new revision.
+    elseif ($content_moderation_state->content_entity_revision_id->value != $entity_revision_id) {
+      // If a new revision of the content has been created, add a new content
+      // moderation state revision.
       $content_moderation_state->setNewRevision(TRUE);
     }
 
     // Sync translations.
-    if (!$content_moderation_state->hasTranslation($entity_langcode)) {
-      $content_moderation_state->addTranslation($entity_langcode);
-    }
-    if ($content_moderation_state->language()->getId() !== $entity_langcode) {
-      $content_moderation_state = $content_moderation_state->getTranslation($entity_langcode);
+    if ($entity->getEntityType()->hasKey('langcode')) {
+      $entity_langcode = $entity->language()->getId();
+      if (!$content_moderation_state->hasTranslation($entity_langcode)) {
+        $content_moderation_state->addTranslation($entity_langcode);
+      }
+      if ($content_moderation_state->language()->getId() !== $entity_langcode) {
+        $content_moderation_state = $content_moderation_state->getTranslation($entity_langcode);
+      }
     }
 
     // Create the ContentModerationState entity for the inserted entity.
     $content_moderation_state->set('content_entity_revision_id', $entity_revision_id);
     $content_moderation_state->set('moderation_state', $moderation_state);
-    ContentModerationState::updateOrCreateFromEntity($content_moderation_state);
+    ContentModerationStateEntity::updateOrCreateFromEntity($content_moderation_state);
   }
 
   /**
@@ -218,8 +236,7 @@ class EntityOperations implements ContainerInjectionInterface {
     if (!$this->moderationInfo->isLatestRevision($entity)) {
       return;
     }
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    if ($entity->isDefaultRevision()) {
+    if ($this->moderationInfo->isLiveRevision($entity)) {
       return;
     }
 
@@ -234,31 +251,34 @@ class EntityOperations implements ContainerInjectionInterface {
    * Check if the default revision for the given entity is published.
    *
    * The default revision is the same as the entity retrieved by "default" from
-   * the storage handler. If the entity is translated, use the default revision
-   * of the same language as the given entity.
+   * the storage handler. If the entity is translated, check if any of the
+   * translations are published.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity being saved.
+   * @param \Drupal\workflows\WorkflowInterface $workflow
+   *   The workflow being applied to the entity.
    *
    * @return bool
    *   TRUE if the default revision is published. FALSE otherwise.
    */
-  protected function isDefaultRevisionPublished(EntityInterface $entity) {
-    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    $default_revision = $storage->load($entity->id());
+  protected function isDefaultRevisionPublished(EntityInterface $entity, WorkflowInterface $workflow) {
+    $default_revision = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->load($entity->id());
 
-    // Ensure we are comparing the same translation as the current entity.
+    // Ensure we are checking all translations of the default revision.
     if ($default_revision instanceof TranslatableInterface && $default_revision->isTranslatable()) {
-      // If there is no translation, then there is no default revision and is
-      // therefore not published.
-      if (!$default_revision->hasTranslation($entity->language()->getId())) {
-        return FALSE;
+      // Loop through each language that has a translation.
+      foreach ($default_revision->getTranslationLanguages() as $language) {
+        // Load the translated revision.
+        $language_revision = $default_revision->getTranslation($language->getId());
+        // Return TRUE if a translation with a published state is found.
+        if ($workflow->getState($language_revision->moderation_state->value)->isPublishedState()) {
+          return TRUE;
+        }
       }
-
-      $default_revision = $default_revision->getTranslation($entity->language()->getId());
     }
 
-    return $default_revision && $default_revision->moderation_state->entity->isPublishedState();
+    return $workflow->getState($default_revision->moderation_state->value)->isPublishedState();
   }
 
 }

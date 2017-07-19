@@ -14,7 +14,7 @@ class UnmanagedCopyTest extends FileTestBase {
   /**
    * Copy a normal file.
    */
-  function testNormal() {
+  public function testNormal() {
     // Create a file for testing
     $uri = $this->createUri();
 
@@ -44,10 +44,10 @@ class UnmanagedCopyTest extends FileTestBase {
   /**
    * Copy a non-existent file.
    */
-  function testNonExistent() {
+  public function testNonExistent() {
     // Copy non-existent file
     $desired_filepath = $this->randomMachineName();
-    $this->assertFalse(file_exists($desired_filepath), "Randomly named file doesn't exists.");
+    $this->assertFalse(file_exists($desired_filepath), "Randomly named file doesn't exist.");
     $new_filepath = file_unmanaged_copy($desired_filepath, $this->randomMachineName());
     $this->assertFalse($new_filepath, 'Copying a missing file fails.');
   }
@@ -55,7 +55,7 @@ class UnmanagedCopyTest extends FileTestBase {
   /**
    * Copy a file onto itself.
    */
-  function testOverwriteSelf() {
+  public function testOverwriteSelf() {
     // Create a file for testing
     $uri = $this->createUri();
 

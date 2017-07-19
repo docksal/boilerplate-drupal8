@@ -59,16 +59,16 @@ class UpdateCommand extends Command
             )
             ->addOption(
                 'composer',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.module.update.options.composer')
             )
             ->addOption(
                 'simulate',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.module.update.options.simulate')
-            );
+            )->setAliases(['moup']);
     }
 
     /**

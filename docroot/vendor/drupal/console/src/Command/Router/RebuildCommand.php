@@ -38,7 +38,8 @@ class RebuildCommand extends Command
     {
         $this
             ->setName('router:rebuild')
-            ->setDescription($this->trans('commands.router.rebuild.description'));
+            ->setDescription($this->trans('commands.router.rebuild.description'))
+            ->setAliases(['rr']);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

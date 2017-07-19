@@ -1,10 +1,4 @@
 name: 'Outbound route/path processing'
 type: module
-# core: 8.x
+core: 8.x
 hidden: true
-
-# Information added by Drupal.org packaging script on 2016-11-02
-version: '8.2.2'
-core: '8.x'
-project: 'drupal'
-datestamp: 1478110097

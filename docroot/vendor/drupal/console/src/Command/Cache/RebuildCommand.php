@@ -75,7 +75,7 @@ class RebuildCommand extends Command
                 'cache',
                 InputArgument::OPTIONAL,
                 $this->trans('commands.cache.rebuild.options.cache')
-            );
+            )->setAliases(['cr']);
     }
 
     /**
@@ -84,13 +84,13 @@ class RebuildCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new DrupalStyle($input, $output);
-        $cache = $input->getArgument('cache');
+        $cache = $input->getArgument('cache')?:'all';
         $this->site->loadLegacyFile('/core/includes/utility.inc');
 
         if ($cache && !$this->drupalApi->isValidCache($cache)) {
             $io->error(
                 sprintf(
-                    $this->trans('commands.cache.rebuild.messages.invalid_cache'),
+                    $this->trans('commands.cache.rebuild.messages.invalid-cache'),
                     $cache
                 )
             );

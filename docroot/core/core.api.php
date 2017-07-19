@@ -1073,8 +1073,9 @@
  *   yourmodule/tests/src/Unit directory, according to the PSR-4 standard.
  * - Your test class needs a phpDoc comment block with a description and
  *   a @group annotation, which gives information about the test.
- * - Methods in your test class whose names start with 'test' are the actual
- *   test cases. Each one should test a logical subset of the functionality.
+ * - Add test cases by adding method names that start with 'test' and have no
+ *   arguments, for example testYourTestCase(). Each one should test a logical
+ *   subset of the functionality.
  * For more details, see:
  * - https://www.drupal.org/phpunit for full documentation on how to write
  *   PHPUnit tests for Drupal.
@@ -1110,9 +1111,9 @@
  *   set up content types and similar procedures.
  * - In some cases, you may need to write a test module to support your test;
  *   put such modules under the yourmodule/tests/modules directory.
- * - Methods in your test class whose names start with 'test', and which have
- *   no arguments, are the actual test cases. Each one should test a logical
- *   subset of the functionality, and each one runs in a new, isolated test
+ * - Add test cases by adding method names that start with 'test' and have no
+ *   arguments, for example testYourTestCase(). Each one should test a logical
+ *   subset of the functionality. Each method runs in a new, isolated test
  *   environment, so it can only rely on the setUp() method, not what has
  *   been set up by other test methods.
  * For more details, see:
@@ -1120,6 +1121,52 @@
  *   functional tests for Drupal.
  * - @link oo_conventions Object-oriented programming topic @endlink for more
  *   on PSR-4, namespaces, and where to place classes.
+ *
+ * @section write_functional_phpunit Write functional PHP tests (phpunit)
+ * Functional tests extend the BrowserTestBase base class, and use PHPUnit as
+ * their underlying framework. They use a simulated browser, in which the test
+ * can click links, visit URLs, post to forms, etc. To write a functional test:
+ * - Extend \Drupal\Tests\BrowserTestBase.
+ * - Place the test in the yourmodule/tests/src/Functional/ directory and use
+ *   the \Drupal\Tests\yourmodule\Functional namespace.
+ * - Add a @group annotation. For example, if the test is for a Drupal 6
+ *   migration process, the group core uses is migrate_drupal_6. Use yourmodule
+ *   as the group name if the test does not belong to another larger group.
+ * - You may also override the default setUp() method, which can be used to set
+ *   up content types and similar procedures. Don't forget to call the parent
+ *   method.
+ * - In some cases, you may need to write a test module to support your test;
+ *   put such modules under the yourmodule/tests/modules directory.
+ * - Add test cases by adding method names that start with 'test' and have no
+ *   arguments, for example testYourTestCase(). Each one should test a logical
+ *   subset of the functionality. Each method runs in a new, isolated test
+ *   environment, so it can only rely on the setUp() method, not what has
+ *   been set up by other test methods.
+ * For more details, see:
+ * - https://www.drupal.org/docs/8/phpunit/phpunit-browser-test-tutorial for
+ *   a full tutorial on how to write functional PHPUnit tests for Drupal.
+ * - https://www.drupal.org/phpunit for the full documentation on how to write
+ *   PHPUnit tests for Drupal.
+ *
+ * @section write_jsfunctional_phpunit Write functional JavaScript tests (phpunit)
+ * To write a functional test that relies on JavaScript:
+ * - Extend \Drupal\FunctionalJavaScriptTests\JavascriptTestBase.
+ * - Place the test into the yourmodule/tests/src/FunctionalJavascript/
+ *   directory and use the \Drupal\Tests\yourmodule\FunctionalJavascript
+ *   namespace.
+ * - Add a @group annotation. Use yourmodule as the group name if the test does
+ *   not belong to another larger group.
+ * - Set up PhantomJS; see http://phantomjs.org/download.html.
+ * - To run tests, see core/tests/README.md.
+ * - When clicking a link/button with Ajax behavior attached, keep in mind that
+ *   the underlying browser might take time to deliver changes to the HTML. Use
+ *   $this->assertSession()->assertWaitOnAjaxRequest() to wait for the Ajax
+ *   request to finish.
+ * For more details, see:
+ * - https://www.drupal.org/docs/8/phpunit/phpunit-javascript-testing-tutorial
+ *   for a full tutorial on how to write PHPUnit JavaScript tests for Drupal.
+ * - https://www.drupal.org/phpunit for the full documentation on how to write
+ *   PHPUnit tests for Drupal.
  *
  * @section running Running tests
  * You can run both Simpletest and PHPUnit tests by enabling the core Testing
@@ -1225,7 +1272,7 @@
  *   site; CSS files, which alter the styling applied to the HTML; and
  *   JavaScript, Flash, images, and other files. For more information, see the
  *   @link theme_render Theme system and render API topic @endlink and
- *   https://www.drupal.org/theme-guide/8
+ *   https://www.drupal.org/docs/8/theming
  * - Modules: Modules add to or alter the behavior and functionality of Drupal,
  *   by using one or more of the methods listed below. For more information
  *   about creating modules, see https://www.drupal.org/developing/modules/8
@@ -1721,8 +1768,8 @@
  * processing state.
  *
  * The argument to \Drupal::formBuilder()->getForm() is the name of a class that
- * implements FormBuilderInterface. Any additional arguments passed to the
- * getForm() method will be passed along as additional arguments to the
+ * implements FormInterface. Any additional arguments passed to the getForm()
+ * method will be passed along as additional arguments to the
  * ExampleForm::buildForm() method.
  *
  * For example:
@@ -2056,39 +2103,39 @@ function hook_mail_alter(&$message) {
 function hook_mail($key, &$message, $params) {
   $account = $params['account'];
   $context = $params['context'];
-  $variables = array(
+  $variables = [
     '%site_name' => \Drupal::config('system.site')->get('name'),
     '%username' => $account->getDisplayName(),
-  );
+  ];
   if ($context['hook'] == 'taxonomy') {
     $entity = $params['entity'];
     $vocabulary = Vocabulary::load($entity->id());
-    $variables += array(
+    $variables += [
       '%term_name' => $entity->name,
       '%term_description' => $entity->description,
       '%term_id' => $entity->id(),
       '%vocabulary_name' => $vocabulary->label(),
       '%vocabulary_description' => $vocabulary->getDescription(),
       '%vocabulary_id' => $vocabulary->id(),
-    );
+    ];
   }
 
   // Node-based variable translation is only available if we have a node.
   if (isset($params['node'])) {
     /** @var \Drupal\node\NodeInterface $node */
     $node = $params['node'];
-    $variables += array(
+    $variables += [
       '%uid' => $node->getOwnerId(),
-      '%url' => $node->url('canonical', array('absolute' => TRUE)),
+      '%url' => $node->url('canonical', ['absolute' => TRUE]),
       '%node_type' => node_get_type_label($node),
       '%title' => $node->getTitle(),
       '%teaser' => $node->teaser,
       '%body' => $node->body,
-    );
+    ];
   }
   $subject = strtr($context['subject'], $variables);
   $body = strtr($context['message'], $variables);
-  $message['subject'] .= str_replace(array("\r", "\n"), '', $subject);
+  $message['subject'] .= str_replace(["\r", "\n"], '', $subject);
   $message['body'][] = MailFormatHelper::htmlToText($body);
 }
 
@@ -2129,6 +2176,17 @@ function hook_countries_alter(&$countries) {
  */
 function hook_display_variant_plugin_alter(array &$definitions) {
   $definitions['full_page']['admin_label'] = t('Block layout');
+}
+
+/**
+ * Allow modules to alter layout plugin definitions.
+ *
+ * @param \Drupal\Core\Layout\LayoutDefinition[] $definitions
+ *   The array of layout definitions, keyed by plugin ID.
+ */
+function hook_layout_alter(&$definitions) {
+  // Remove a layout.
+  unset($definitions['twocol']);
 }
 
 /**
@@ -2493,7 +2551,7 @@ function hook_validation_constraint_alter(array &$definitions) {
  *   this class is subscribed to, and which methods on the class should be
  *   called for each one. Example:
  *   @code
- *   public function getSubscribedEvents() {
+ *   public static function getSubscribedEvents() {
  *     // Subscribe to kernel terminate with priority 100.
  *     $events[KernelEvents::TERMINATE][] = array('onTerminate', 100);
  *     // Subscribe to kernel request with default priority of 0.

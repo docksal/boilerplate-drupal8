@@ -52,8 +52,6 @@ class RunCommand extends Command
      */
     protected $dateFormatter;
 
-
-
     /**
      * RunCommand constructor.
      *
@@ -91,10 +89,11 @@ class RunCommand extends Command
             )
             ->addOption(
                 'url',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.test.run.arguments.url')
-            );
+            )
+            ->setAliases(['ter']);
     }
 
     /*

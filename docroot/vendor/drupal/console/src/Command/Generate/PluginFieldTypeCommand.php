@@ -80,43 +80,44 @@ class PluginFieldTypeCommand extends Command
             ->setName('generate:plugin:fieldtype')
             ->setDescription($this->trans('commands.generate.plugin.fieldtype.description'))
             ->setHelp($this->trans('commands.generate.plugin.fieldtype.help'))
-            ->addOption('module', '', InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
+            ->addOption('module', null, InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
             ->addOption(
                 'class',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.fieldtype.options.class')
             )
             ->addOption(
                 'label',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.fieldtype.options.label')
             )
             ->addOption(
                 'plugin-id',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.fieldtype.options.plugin-id')
             )
             ->addOption(
                 'description',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.fieldtype.options.description')
             )
             ->addOption(
                 'default-widget',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.fieldtype.options.default-widget')
             )
             ->addOption(
                 'default-formatter',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.fieldtype.options.default-formatter')
-            );
+            )
+            ->setAliases(['gpft']);
     }
 
     /**
@@ -128,7 +129,7 @@ class PluginFieldTypeCommand extends Command
 
         // @see use Drupal\Console\Command\Shared\ConfirmationTrait::confirmGeneration
         if (!$this->confirmGeneration($io)) {
-            return;
+            return 1;
         }
 
         $module = $input->getOption('module');
@@ -143,6 +144,8 @@ class PluginFieldTypeCommand extends Command
             ->generate($module, $class_name, $label, $plugin_id, $description, $default_widget, $default_formatter);
 
         $this->chainQueue->addCommand('cache:rebuild', ['cache' => 'discovery'], false);
+
+        return 0;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

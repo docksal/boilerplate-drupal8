@@ -20,7 +20,14 @@ use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
 use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Console\Annotations\DrupalCommand;
 
+/**
+ * @DrupalCommand(
+ *     extension = "migrate",
+ *     extensionType = "module"
+ * )
+ */
 class SetupCommand extends Command
 {
     use ContainerAwareCommandTrait;
@@ -42,8 +49,10 @@ class SetupCommand extends Command
      *
      * @param StateInterface $pluginManagerMigration
      */
-    public function __construct(StateInterface $state, MigrationPluginManagerInterface $pluginManagerMigration)
-    {
+    public function __construct(
+        StateInterface $state,
+        MigrationPluginManagerInterface $pluginManagerMigration
+    ) {
         $this->state = $state;
         $this->pluginManagerMigration = $pluginManagerMigration;
         parent::__construct();
@@ -56,52 +65,53 @@ class SetupCommand extends Command
             ->setDescription($this->trans('commands.migrate.setup.description'))
             ->addOption(
                 'db-type',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.setup.options.db-type')
             )
             ->addOption(
                 'db-host',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.setup.options.db-host')
             )
             ->addOption(
                 'db-name',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.setup.options.db-name')
             )
             ->addOption(
                 'db-user',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.setup.options.db-user')
             )
             ->addOption(
                 'db-pass',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.migrate.setup.options.db-pass')
             )
             ->addOption(
                 'db-prefix',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.migrate.setup.options.db-prefix')
             )
             ->addOption(
                 'db-port',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.setup.options.db-port')
             )
             ->addOption(
                 'source-base_path',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
-                $this->trans('commands.migrate.setup.options.source-base_path')
-            );
+                $this->trans('commands.migrate.setup.options.source-base-path')
+            )->setAliases(['mis']);
+        ;
     }
 
     /**
@@ -164,7 +174,7 @@ class SetupCommand extends Command
         $sourceBasepath = $input->getOption('source-base_path');
         if (!$sourceBasepath) {
             $sourceBasepath = $io->ask(
-                $this->trans('commands.migrate.setup.questions.source-base_path'),
+                $this->trans('commands.migrate.setup.questions.source-base-path'),
                 ''
             );
             $input->setOption('source-base_path', $sourceBasepath);
@@ -183,7 +193,7 @@ class SetupCommand extends Command
 
         if (!$drupal_version = $this->getLegacyDrupalVersion($this->migrateConnection)) {
             $io->error($this->trans('commands.migrate.setup.migrations.questions.not-drupal'));
-            return;
+            return 1;
         }
         
         $database = $this->getDBInfo();
@@ -202,5 +212,7 @@ class SetupCommand extends Command
                 )
             );
         }
+
+        return 0;
     }
 }

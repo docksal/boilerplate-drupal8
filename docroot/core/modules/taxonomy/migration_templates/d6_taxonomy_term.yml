@@ -3,11 +3,13 @@ label: Taxonomy terms
 migration_tags:
   - Drupal 6
 source:
-  plugin: taxonomy_term
+  plugin: d6_taxonomy_term
 process:
+  # If you are using this file to build a custom migration consider removing
+  # the tid field to allow incremental migrations.
   tid: tid
   vid:
-    plugin: migration
+    plugin: migration_lookup
     migration: d6_taxonomy_vocabulary
     source: vid
   name: name
@@ -20,7 +22,7 @@ process:
       method: process
       source: parent
     -
-      plugin: migration
+      plugin: migration_lookup
       migration: d6_taxonomy_term
   parent:
     plugin: default_value

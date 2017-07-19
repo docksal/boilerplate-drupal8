@@ -1,3 +1,28 @@
+1.6.4 (2016-07-18)
+------------------
+
+   * fixed #134 type safe directory names, reported and fixed by Sebastian Hopfe
+
+
+1.6.3 (2016-04-09)
+------------------
+
+   * fixed #131 recursive mkdir() fails if the last dirname is '0'
+
+
+1.6.2 (2016-01-13)
+------------------
+
+   * fixed #128 duplicate "valid" files/directories and incorrect file names
+
+
+1.6.1 (2015-12-04)
+------------------
+
+   * `vfsStream::url()` didn't urlencode single path parts while `vfsStream::path()` did urldecode them
+   * fixed #120, #122: create directory with trailing slash results in "Uninitialized string offset: 0"
+
+
 1.6.0 (2015-10-06)
 ------------------
 

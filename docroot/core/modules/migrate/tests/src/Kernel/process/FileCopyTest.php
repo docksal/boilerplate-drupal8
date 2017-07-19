@@ -4,6 +4,7 @@ namespace Drupal\Tests\migrate\Kernel\process;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\KernelTests\Core\File\FileTestBase;
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\process\FileCopy;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
@@ -11,6 +12,8 @@ use Drupal\migrate\Row;
 
 /**
  * Tests the file_copy process plugin.
+ *
+ * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\FileCopy
  *
  * @group migrate
  */
@@ -72,6 +75,32 @@ class FileCopyTest extends FileTestBase {
   }
 
   /**
+   * Test successful file reuse.
+   */
+  public function testSuccessfulReuse() {
+    $source_path = $this->root . '/core/modules/simpletest/files/image-test.jpg';
+    $destination_path = 'public://file1.jpg';
+    $file_reuse = file_unmanaged_copy($source_path, $destination_path);
+    $timestamp = (new \SplFileInfo($file_reuse))->getMTime();
+    $this->assertInternalType('int', $timestamp);
+
+    // We need to make sure the modified timestamp on the file is sooner than
+    // the attempted migration.
+    sleep(1);
+    $configuration = ['reuse' => TRUE];
+    $this->doTransform($source_path, $destination_path, $configuration);
+    clearstatcache(TRUE, $destination_path);
+    $modified_timestamp = (new \SplFileInfo($destination_path))->getMTime();
+    $this->assertEquals($timestamp, $modified_timestamp);
+
+    $configuration = ['reuse' => FALSE];
+    $this->doTransform($source_path, $destination_path, $configuration);
+    clearstatcache(TRUE, $destination_path);
+    $modified_timestamp = (new \SplFileInfo($destination_path))->getMTime();
+    $this->assertGreaterThan($timestamp, $modified_timestamp);
+  }
+
+  /**
    * Test successful moves.
    */
   public function testSuccessfulMoves() {
@@ -110,14 +139,37 @@ class FileCopyTest extends FileTestBase {
 
   /**
    * Test that non-existent files throw an exception.
-   *
-   * @expectedException \Drupal\migrate\MigrateException
-   *
-   * @expectedExceptionMessage File '/non/existent/file' does not exist
    */
   public function testNonExistentSourceFile() {
     $source = '/non/existent/file';
+    $this->setExpectedException(MigrateException::class, "File '/non/existent/file' does not exist");
     $this->doTransform($source, 'public://wontmatter.jpg');
+  }
+
+  /**
+   * Tests that non-writable destination throw an exception.
+   *
+   * @covers ::transform
+   */
+  public function testNonWritableDestination() {
+    $source = $this->createUri('file.txt', NULL, 'temporary');
+
+    // Create the parent location.
+    $this->createDirectory('public://dir');
+
+    // Copy the file under public://dir/subdir1/.
+    $this->doTransform($source, 'public://dir/subdir1/file.txt');
+
+    // Check that 'subdir1' was created and the file was successfully migrated.
+    $this->assertFileExists('public://dir/subdir1/file.txt');
+
+    // Remove all permissions from public://dir to trigger a failure when
+    // trying to create a subdirectory 'subdir2' inside public://dir.
+    $this->fileSystem->chmod('public://dir', 0);
+
+    // Check that the proper exception is raised.
+    $this->setExpectedException(MigrateException::class, "Could not create or write to directory 'public://dir/subdir2'");
+    $this->doTransform($source, 'public://dir/subdir2/file.txt');
   }
 
   /**

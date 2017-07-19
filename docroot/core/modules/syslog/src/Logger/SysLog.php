@@ -53,9 +53,6 @@ class SysLog implements LoggerInterface {
   protected function openConnection() {
     if (!$this->connectionOpened) {
       $facility = $this->config->get('facility');
-      if ($facility === '') {
-        $facility = defined('LOG_LOCAL0') ? LOG_LOCAL0 : LOG_USER;
-      }
       $this->connectionOpened = openlog($this->config->get('identity'), LOG_NDELAY, $facility);
     }
   }
@@ -63,7 +60,7 @@ class SysLog implements LoggerInterface {
   /**
    * {@inheritdoc}
    */
-  public function log($level, $message, array $context = array()) {
+  public function log($level, $message, array $context = []) {
     global $base_url;
 
     // Ensure we have a connection available.
@@ -73,7 +70,7 @@ class SysLog implements LoggerInterface {
     $message_placeholders = $this->parser->parseMessagePlaceholders($message, $context);
     $message = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
 
-    $entry = strtr($this->config->get('format'), array(
+    $entry = strtr($this->config->get('format'), [
       '!base_url' => $base_url,
       '!timestamp' => $context['timestamp'],
       '!type' => $context['channel'],
@@ -83,7 +80,7 @@ class SysLog implements LoggerInterface {
       '!uid' => $context['uid'],
       '!link' => strip_tags($context['link']),
       '!message' => strip_tags($message),
-    ));
+    ]);
 
     syslog($level, $entry);
   }

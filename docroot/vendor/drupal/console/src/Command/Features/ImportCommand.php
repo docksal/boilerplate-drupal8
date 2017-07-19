@@ -41,7 +41,7 @@ class ImportCommand extends Command
             ->setDescription($this->trans('commands.features.import.description'))
             ->addOption(
                 'bundle',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.features.import.options.bundle')
             )
@@ -49,7 +49,8 @@ class ImportCommand extends Command
                 'packages',
                 InputArgument::IS_ARRAY,
                 $this->trans('commands.features.import.arguments.packages')
-            );
+            )->setAliases(['fei']);
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

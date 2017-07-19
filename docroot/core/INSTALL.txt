@@ -88,7 +88,7 @@ INSTALLATION
    directory within your web server's document root or your public HTML
    directory, continue with this command:
 
-     mv drupal-x.y.z/* drupal-x.y.z/.htaccess drupal-x.y.z/.csslintrc drupal-x.y.z/.editorconfig drupal-x.y.z/.eslintignore drupal-x.y.z/.eslintrc drupal-x.y.z/.gitattributes /path/to/your/installation
+     mv drupal-x.y.z/* drupal-x.y.z/.htaccess drupal-x.y.z/.csslintrc drupal-x.y.z/.editorconfig drupal-x.y.z/.eslintignore drupal-x.y.z/.eslintrc.json drupal-x.y.z/.gitattributes /path/to/your/installation
 
    You can also download the latest version of Drupal using Git on the command
    line and set up a repository by following the instructions at
@@ -353,7 +353,7 @@ Never edit Drupal's core modules and themes; instead, use the hooks available in
 the Drupal API. To modify the behavior of Drupal, develop a module as described
 at https://www.drupal.org/developing/modules. To modify the look of Drupal,
 create a subtheme as described at https://www.drupal.org/node/2165673, or a
-completely new theme as described at https://www.drupal.org/documentation/theme
+completely new theme as described at https://www.drupal.org/docs/8/theming
 
 MULTISITE CONFIGURATION
 -----------------------

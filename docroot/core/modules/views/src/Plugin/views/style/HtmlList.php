@@ -20,9 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
 class HtmlList extends StylePluginBase {
 
   /**
-   * Does the style plugin allows to use style plugins.
-   *
-   * @var bool
+   * {@inheritdoc}
    */
   protected $usesRowPlugin = TRUE;
 
@@ -39,9 +37,9 @@ class HtmlList extends StylePluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
 
-    $options['type'] = array('default' => 'ul');
-    $options['class'] = array('default' => '');
-    $options['wrapper_class'] = array('default' => 'item-list');
+    $options['type'] = ['default' => 'ul'];
+    $options['class'] = ['default' => ''];
+    $options['wrapper_class'] = ['default' => 'item-list'];
 
     return $options;
   }
@@ -51,26 +49,26 @@ class HtmlList extends StylePluginBase {
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
-    $form['type'] = array(
+    $form['type'] = [
       '#type' => 'radios',
       '#title' => $this->t('List type'),
-      '#options' => array('ul' => $this->t('Unordered list'), 'ol' => $this->t('Ordered list')),
+      '#options' => ['ul' => $this->t('Unordered list'), 'ol' => $this->t('Ordered list')],
       '#default_value' => $this->options['type'],
-    );
-    $form['wrapper_class'] = array(
+    ];
+    $form['wrapper_class'] = [
       '#title' => $this->t('Wrapper class'),
       '#description' => $this->t('The class to provide on the wrapper, outside the list.'),
       '#type' => 'textfield',
       '#size' => '30',
       '#default_value' => $this->options['wrapper_class'],
-    );
-    $form['class'] = array(
+    ];
+    $form['class'] = [
       '#title' => $this->t('List class'),
       '#description' => $this->t('The class to provide on the list element itself.'),
       '#type' => 'textfield',
       '#size' => '30',
       '#default_value' => $this->options['class'],
-    );
+    ];
   }
 
 }

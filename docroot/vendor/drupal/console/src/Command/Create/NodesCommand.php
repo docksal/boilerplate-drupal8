@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
+use Drupal\Console\Annotations\DrupalCommand;
 use Drupal\Console\Core\Command\Shared\CommandTrait;
 use Drupal\Console\Command\Shared\CreateTrait;
 use Drupal\Console\Utils\Create\NodeData;
@@ -23,6 +24,11 @@ use Drupal\Core\Language\LanguageInterface;
  * Class NodesCommand
  *
  * @package Drupal\Console\Command\Generate
+ *
+ * @DrupalCommand(
+ *     extension = "node",
+ *     extensionType = "module"
+ * )
  */
 class NodesCommand extends Command
 {
@@ -89,7 +95,7 @@ class NodesCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.create.nodes.options.language')
-            );
+            )->setAliases(['crn']);
     }
 
     /**
@@ -151,16 +157,17 @@ class NodesCommand extends Command
         }
 
         // Language module is enabled or not.
-        $language_module_enabled = \Drupal::moduleHandler()->moduleExists('language');
+        $languageModuleEnabled = \Drupal::moduleHandler()
+            ->moduleExists('language');
 
         // If language module is enabled.
-        if ($language_module_enabled) {
+        if ($languageModuleEnabled) {
             // Get available languages on site.
-            $available_languages = \Drupal::languageManager()->getLanguages();
+            $languages = \Drupal::languageManager()->getLanguages();
             // Holds the available languages.
             $language_list = [];
 
-            foreach ($available_languages as $lang) {
+            foreach ($languages as $lang) {
                 $language_list[$lang->getId()] = $lang->getName();
             }
 
@@ -191,7 +198,7 @@ class NodesCommand extends Command
         $titleWords = $input->getOption('title-words')?:5;
         $timeRange = $input->getOption('time-range')?:31536000;
         $available_types = array_keys($this->drupalApi->getBundles());
-        $language = $input->getOption('language');
+        $language = $input->getOption('language')?:'und';
 
         foreach ($contentTypes as $type) {
             if (!in_array($type, $available_types)) {
@@ -210,6 +217,8 @@ class NodesCommand extends Command
             $timeRange,
             $language
         );
+        
+        $nodes = is_array($nodes) ? $nodes : [$nodes];
 
         $tableHeader = [
           $this->trans('commands.create.nodes.messages.node-id'),
