@@ -109,10 +109,12 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
    *   Role IDs the user account is expected to have.
    * @param int $field_integer
    *   The value of the integer field.
+   * @param int|false $field_file_target_id
+   *   (optional) The target ID of the file field.
    * @param bool $has_picture
-   *   Whether the user is expected to have a picture attached.
+   *   (optional) Whether the user is expected to have a picture attached.
    */
-  protected function assertEntity($id, $label, $mail, $password, $created, $access, $login, $blocked, $langcode, $timezone, $init, $roles, $field_integer, $has_picture = FALSE) {
+  protected function assertEntity($id, $label, $mail, $password, $created, $access, $login, $blocked, $langcode, $timezone, $init, $roles, $field_integer, $field_file_target_id = FALSE, $has_picture = FALSE) {
     /** @var \Drupal\user\UserInterface $user */
     $user = User::load($id);
     $this->assertTrue($user instanceof UserInterface);
@@ -155,6 +157,10 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
       $this->assertTrue($user->hasField('field_integer'));
       $this->assertEquals($field_integer[0], $user->field_integer->value);
     }
+    if (!empty($field_file_target_id)) {
+      $this->assertTrue($user->hasField('field_file'));
+      $this->assertSame($field_file_target_id, $user->field_file->target_id);
+    }
   }
 
   /**
@@ -171,24 +177,31 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
     foreach ($users as $source) {
       $rids = Database::getConnection('default', 'migrate')
         ->select('users_roles', 'ur')
-        ->fields('ur', array('rid'))
+        ->fields('ur', ['rid'])
         ->condition('ur.uid', $source->uid)
         ->execute()
         ->fetchCol();
-      $roles = array(RoleInterface::AUTHENTICATED_ID);
+      $roles = [RoleInterface::AUTHENTICATED_ID];
       $id_map = $this->getMigration('d7_user_role')->getIdMap();
       foreach ($rids as $rid) {
-        $role = $id_map->lookupDestinationId(array($rid));
+        $role = $id_map->lookupDestinationId([$rid]);
         $roles[] = reset($role);
       }
 
       $field_integer = Database::getConnection('default', 'migrate')
         ->select('field_data_field_integer', 'fi')
-        ->fields('fi', array('field_integer_value'))
+        ->fields('fi', ['field_integer_value'])
         ->condition('fi.entity_id', $source->uid)
         ->execute()
         ->fetchCol();
       $field_integer = !empty($field_integer) ? $field_integer : NULL;
+
+      $field_file = Database::getConnection('default', 'migrate')
+        ->select('field_data_field_file', 'ff')
+        ->fields('ff', ['field_file_fid'])
+        ->condition('ff.entity_id', $source->uid)
+        ->execute()
+        ->fetchField();
 
       $this->assertEntity(
         $source->uid,
@@ -203,7 +216,8 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
         $source->timezone,
         $source->init,
         $roles,
-        $field_integer
+        $field_integer,
+        $field_file
       );
 
       // Ensure that the user can authenticate.

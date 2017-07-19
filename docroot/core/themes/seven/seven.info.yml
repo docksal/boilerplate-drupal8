@@ -17,11 +17,17 @@ base theme: classy
 description: 'The default administration theme for Drupal 8 was designed with clean lines, simple blocks, and sans-serif font to emphasize the tools and tasks at hand.'
 alt text: 'Default administration theme for Drupal 8 with simple blocks and clean lines.'
 package: Core
-# version: VERSION
-# core: 8.x
+version: VERSION
+core: 8.x
 libraries:
  - seven/global-styling
 libraries-override:
+  system/base:
+    css:
+      component:
+        /core/themes/stable/css/system/components/system-status-counter.css: css/components/system-status-counter.css
+        /core/themes/stable/css/system/components/system-status-report-counters.css: css/components/system-status-report-counters.css
+        /core/themes/stable/css/system/components/system-status-report-general-info.css: css/components/system-status-report-general-info.css
   core/drupal.vertical-tabs:
     css:
       component:
@@ -59,9 +65,3 @@ regions:
   sidebar_first: 'First sidebar'
 regions_hidden:
   - sidebar_first
-
-# Information added by Drupal.org packaging script on 2016-11-02
-version: '8.2.2'
-core: '8.x'
-project: 'drupal'
-datestamp: 1478110098

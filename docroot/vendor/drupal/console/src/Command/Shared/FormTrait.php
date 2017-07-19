@@ -69,7 +69,7 @@ trait FormTrait
                 $input_machine_name = $this->stringConverter->createMachineName($input_label);
 
                 $input_name = $io->ask(
-                    $this->trans('commands.common.questions.inputs.machine_name'),
+                    $this->trans('commands.common.questions.inputs.machine-name'),
                     $input_machine_name
                 );
 
@@ -126,7 +126,7 @@ trait FormTrait
                         $input_options_output[$key] = "'$value' => \$this->t('".$value."')";
                     }
 
-                    $input_options = 'array('.implode(', ', $input_options_output).')';
+                    $input_options = '['.implode(', ', $input_options_output).']';
                 }
 
                 // Description for input

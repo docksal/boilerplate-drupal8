@@ -73,19 +73,19 @@ class PluginMigrateProcessCommand extends Command
             ->setName('generate:plugin:migrate:process')
             ->setDescription($this->trans('commands.generate.plugin.migrate.process.description'))
             ->setHelp($this->trans('commands.generate.plugin.migrate.process.help'))
-            ->addOption('module', '', InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
+            ->addOption('module', null, InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
             ->addOption(
                 'class',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.migrate.process.options.class')
             )
             ->addOption(
                 'plugin-id',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.migrate.process.options.plugin-id')
-            );
+            )->setAliases(['gpmp']);
     }
 
     /**

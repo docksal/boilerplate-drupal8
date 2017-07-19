@@ -29,8 +29,8 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     private $lowerCamelCase;
 
     /**
-     * @param null|array $attributes     The list of attributes to rename or null for all attributes.
-     * @param bool       $lowerCamelCase Use lowerCamelCase style.
+     * @param null|array $attributes     The list of attributes to rename or null for all attributes
+     * @param bool       $lowerCamelCase Use lowerCamelCase style
      */
     public function __construct(array $attributes = null, $lowerCamelCase = true)
     {
@@ -44,14 +44,15 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
     public function normalize($propertyName)
     {
         if (null === $this->attributes || in_array($propertyName, $this->attributes)) {
+            $lcPropertyName = lcfirst($propertyName);
             $snakeCasedName = '';
 
-            $len = strlen($propertyName);
+            $len = strlen($lcPropertyName);
             for ($i = 0; $i < $len; ++$i) {
-                if (ctype_upper($propertyName[$i])) {
-                    $snakeCasedName .= '_'.strtolower($propertyName[$i]);
+                if (ctype_upper($lcPropertyName[$i])) {
+                    $snakeCasedName .= '_'.strtolower($lcPropertyName[$i]);
                 } else {
-                    $snakeCasedName .= strtolower($propertyName[$i]);
+                    $snakeCasedName .= strtolower($lcPropertyName[$i]);
                 }
             }
 
@@ -75,7 +76,7 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
         }
 
         if (null === $this->attributes || in_array($camelCasedName, $this->attributes)) {
-            return $this->lowerCamelCase ? lcfirst($camelCasedName) : $camelCasedName;
+            return $camelCasedName;
         }
 
         return $propertyName;

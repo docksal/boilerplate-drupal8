@@ -22,7 +22,14 @@ use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\State\StateInterface;
 use Symfony\Component\Console\Command\Command;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
+use Drupal\Console\Annotations\DrupalCommand;
 
+/**
+ * @DrupalCommand(
+ *     extension = "migrate",
+ *     extensionType = "module"
+ * )
+ */
 class ExecuteCommand extends Command
 {
     use DatabaseTrait;
@@ -41,19 +48,13 @@ class ExecuteCommand extends Command
      *
      * @param MigrationPluginManagerInterface $pluginManagerMigration
      */
-    public function __construct(MigrationPluginManagerInterface $pluginManagerMigration)
-    {
+    public function __construct(
+        MigrationPluginManagerInterface $pluginManagerMigration
+    ) {
         $this->pluginManagerMigration = $pluginManagerMigration;
         parent::__construct();
     }
 
-    /**
-     * @DrupalCommand(
-     *     dependencies = {
-     *         "migrate"
-     *     }
-     * )
-     */
     protected function configure()
     {
         $this
@@ -62,65 +63,66 @@ class ExecuteCommand extends Command
             ->addArgument('migration-ids', InputArgument::IS_ARRAY, $this->trans('commands.migrate.execute.arguments.id'))
             ->addOption(
                 'site-url',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.execute.options.site-url')
             )
             ->addOption(
                 'db-type',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.setup.migrations.options.db-type')
             )
             ->addOption(
                 'db-host',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.execute.options.db-host')
             )
             ->addOption(
                 'db-name',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.execute.options.db-name')
             )
             ->addOption(
                 'db-user',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.execute.options.db-user')
             )
             ->addOption(
                 'db-pass',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.migrate.execute.options.db-pass')
             )
             ->addOption(
                 'db-prefix',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.migrate.execute.options.db-prefix')
             )
             ->addOption(
                 'db-port',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.migrate.execute.options.db-port')
             )
             ->addOption(
                 'exclude',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 $this->trans('commands.migrate.execute.options.exclude'),
                 []
             )
             ->addOption(
                 'source-base_path',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
-                $this->trans('commands.migrate.execute.options.source-base_path')
-            );
+                $this->trans('commands.migrate.execute.options.source-base-path')
+            )
+            ->setAliases(['mie']);
         ;
     }
 
@@ -204,7 +206,7 @@ class ExecuteCommand extends Command
 
         if (!$drupal_version = $this->getLegacyDrupalVersion($this->migrateConnection)) {
             $io->error($this->trans('commands.migrate.setup.migrations.questions.not-drupal'));
-            return;
+            return 1;
         }
         
         $database = $this->getDBInfo();
@@ -272,7 +274,7 @@ class ExecuteCommand extends Command
         $sourceBasepath = $input->getOption('source-base_path');
         if (!$sourceBasepath) {
             $sourceBasepath = $io->ask(
-                $this->trans('commands.migrate.setup.questions.source-base_path'),
+                $this->trans('commands.migrate.setup.questions.source-base-path'),
                 ''
             );
             $input->setOption('source-base_path', $sourceBasepath);
@@ -294,7 +296,7 @@ class ExecuteCommand extends Command
 
         // If migrations weren't provided finish execution
         if (empty($migration_ids)) {
-            return;
+            return 1;
         }
 
         if (!$this->migrateConnection) {
@@ -304,7 +306,7 @@ class ExecuteCommand extends Command
         
         if (!$drupal_version = $this->getLegacyDrupalVersion($this->migrateConnection)) {
             $io->error($this->trans('commands.migrate.setup.migrations.questions.not-drupal'));
-            return;
+            return 1;
         }
         
         $version_tag = 'Drupal ' . $drupal_version;
@@ -322,7 +324,7 @@ class ExecuteCommand extends Command
         
         if (count($migrations) == 0) {
             $io->error($this->trans('commands.migrate.execute.messages.no-migrations'));
-            return;
+            return 1;
         }
 
         foreach ($migrations as $migration_id) {
@@ -386,7 +388,11 @@ class ExecuteCommand extends Command
                 }
             } else {
                 $io->error($this->trans('commands.migrate.execute.messages.fail-load'));
+
+                return 1;
             }
         }
+
+        return 0;
     }
 }

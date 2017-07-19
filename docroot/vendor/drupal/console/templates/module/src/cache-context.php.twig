@@ -9,22 +9,21 @@ namespace Drupal\{{module}}\CacheContext;
 {% endblock %}
 
 {% block use_class %}
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 {% endblock %}
 
 {% block class_declaration %}
 /**
 * Class {{ class }}.
-*
-* @package Drupal\{{module}}
 */
 class {{ class }} implements CacheContextInterface {% endblock %}
 
 {% block class_construct %}
 
   /**
-  * Constructor.
-  */
+   * Constructs a new {{ class }} object.
+   */
   public function __construct({{ servicesAsParameters(services)|join(', ') }}) {
   {{ serviceClassInitialization(services) }}
   }
@@ -35,21 +34,21 @@ class {{ class }} implements CacheContextInterface {% endblock %}
   /**
   * {@inheritdoc}
   */
-  static function getLabel() {
-  drupal_set_message('Lable of cache context');
+  public static function getLabel() {
+    drupal_set_message('Lable of cache context');
   }
 
   /**
   * {@inheritdoc}
   */
   public function getContext() {
-  // Actual logic of context variation will lie here.
+    // Actual logic of context variation will lie here.
   }
 
   /**
   * {@inheritdoc}
   */
   public function getCacheableMetadata() {
-  // The buble cache metadata.
+    return new CacheableMetadata();
   }
 {% endblock %}

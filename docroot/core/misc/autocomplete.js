@@ -77,6 +77,11 @@
    */
   function searchHandler(event) {
     var options = autocomplete.options;
+
+    if (options.isComposing) {
+      return false;
+    }
+
     var term = autocomplete.extractLastTerm(event.target.value);
     // Abort search if the first character is in firstCharacterBlacklist.
     if (term.length > 0 && options.firstCharacterBlacklist.indexOf(term[0]) !== -1) {
@@ -172,12 +177,8 @@
     // Remove the current input.
     terms.pop();
     // Add the selected item.
-    if (ui.item.value.search(',') > 0) {
-      terms.push('"' + ui.item.value + '"');
-    }
-    else {
-      terms.push(ui.item.value);
-    }
+    terms.push(ui.item.value);
+
     event.target.value = terms.join(', ');
     // Return false to tell jQuery UI that we've filled in the value already.
     return false;
@@ -225,6 +226,14 @@
           .each(function () {
             $(this).data('ui-autocomplete')._renderItem = autocomplete.options.renderItem;
           });
+
+        // Use CompositionEvent to handle IME inputs. It requests remote server on "compositionend" event only.
+        $autocomplete.on('compositionstart.autocomplete', function () {
+          autocomplete.options.isComposing = true;
+        });
+        $autocomplete.on('compositionend.autocomplete', function () {
+          autocomplete.options.isComposing = false;
+        });
       }
     },
     detach: function (context, settings, trigger) {
@@ -261,7 +270,9 @@
       renderItem: renderItem,
       minLength: 1,
       // Custom options, used by Drupal.autocomplete.
-      firstCharacterBlacklist: ''
+      firstCharacterBlacklist: '',
+      // Custom options, indicate IME usage status.
+      isComposing: false
     },
     ajax: {
       dataType: 'json'

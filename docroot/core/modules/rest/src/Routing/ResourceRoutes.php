@@ -59,13 +59,14 @@ class ResourceRoutes extends RouteSubscriberBase {
    * @return array
    */
   protected function alterRoutes(RouteCollection $collection) {
-    // Iterate over all enabled REST resource configs.
+    // Iterate over all enabled REST resource config entities.
     /** @var \Drupal\rest\RestResourceConfigInterface[] $resource_configs */
     $resource_configs = $this->resourceConfigStorage->loadMultiple();
-    // Iterate over all enabled resource plugins.
     foreach ($resource_configs as $resource_config) {
-      $resource_routes = $this->getRoutesForResourceConfig($resource_config);
-      $collection->addCollection($resource_routes);
+      if ($resource_config->status()) {
+        $resource_routes = $this->getRoutesForResourceConfig($resource_config);
+        $collection->addCollection($resource_routes);
+      }
     }
   }
 
@@ -95,13 +96,13 @@ class ResourceRoutes extends RouteSubscriberBase {
 
         // Check that authentication providers are defined.
         if (empty($rest_resource_config->getAuthenticationProviders($method))) {
-          $this->logger->error('At least one authentication provider must be defined for resource @id', array(':id' => $rest_resource_config->id()));
+          $this->logger->error('At least one authentication provider must be defined for resource @id', [':id' => $rest_resource_config->id()]);
           continue;
         }
 
         // Check that formats are defined.
         if (empty($rest_resource_config->getFormats($method))) {
-          $this->logger->error('At least one format must be defined for resource @id', array(':id' => $rest_resource_config->id()));
+          $this->logger->error('At least one format must be defined for resource @id', [':id' => $rest_resource_config->id()]);
           continue;
         }
 
@@ -112,8 +113,15 @@ class ResourceRoutes extends RouteSubscriberBase {
           continue;
         }
 
-        // The configuration seems legit at this point, so we set the
-        // authentication provider and add the route.
+        // The configuration has been validated, so we update the route to:
+        // - set the allowed request body content types/formats for methods that
+        //   allow request bodies to be sent
+        // - set the allowed authentication providers
+        if (in_array($method, ['POST', 'PATCH', 'PUT'], TRUE)) {
+          // Restrict the incoming HTTP Content-type header to the allowed
+          // formats.
+          $route->addRequirements(['_content_type_format' => implode('|', $rest_resource_config->getFormats($method))]);
+        }
         $route->setOption('_auth', $rest_resource_config->getAuthenticationProviders($method));
         $route->setDefault('_rest_resource_config', $rest_resource_config->id());
         $collection->add("rest.$name", $route);

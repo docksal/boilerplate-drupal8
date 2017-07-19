@@ -2,6 +2,8 @@
 
 namespace Drupal\block_content\Tests\Views;
 
+@trigger_error('\Drupal\block_content\Tests\Views\BlockContentTestBase is deprecated in 8.4.0 and will be removed before Drupal 9.0.0. Use \Drupal\Tests\block_content\Functional\Views\BlockContentTestBase.', E_USER_DEPRECATED);
+
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Utility\SafeMarkup;
@@ -10,6 +12,9 @@ use Drupal\views\Tests\ViewTestData;
 
 /**
  * Base class for all block_content tests.
+ *
+ * @deprecated in Drupal 8.4.0 and will be removed before Drupal 9.0.0.
+ *   Use \Drupal\Tests\block_content\Functional\Views\BlockContentTestBase.
  */
 abstract class BlockContentTestBase extends ViewTestBase {
 
@@ -25,26 +30,26 @@ abstract class BlockContentTestBase extends ViewTestBase {
    *
    * @var array
    */
-  protected $permissions = array(
+  protected $permissions = [
     'administer blocks',
-  );
+  ];
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = array('block', 'block_content', 'block_content_test_views');
+  public static $modules = ['block', 'block_content', 'block_content_test_views'];
 
   protected function setUp($import_test_views = TRUE) {
     parent::setUp($import_test_views);
     // Ensure the basic bundle exists. This is provided by the standard profile.
-    $this->createBlockContentType(array('id' => 'basic'));
+    $this->createBlockContentType(['id' => 'basic']);
 
     $this->adminUser = $this->drupalCreateUser($this->permissions);
 
     if ($import_test_views) {
-      ViewTestData::createTestViews(get_class($this), array('block_content_test_views'));
+      ViewTestData::createTestViews(get_class($this), ['block_content_test_views']);
     }
   }
 
@@ -58,17 +63,17 @@ abstract class BlockContentTestBase extends ViewTestBase {
    * @return \Drupal\block_content\Entity\BlockContent
    *   Created custom block.
    */
-  protected function createBlockContent(array $settings = array()) {
+  protected function createBlockContent(array $settings = []) {
     $status = 0;
-    $settings += array(
+    $settings += [
       'info' => $this->randomMachineName(),
       'type' => 'basic',
       'langcode' => 'en',
-    );
+    ];
     if ($block_content = BlockContent::create($settings)) {
       $status = $block_content->save();
     }
-    $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created block content %info.', array('%info' => $block_content->label())));
+    $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created block content %info.', ['%info' => $block_content->label()]));
     return $block_content;
   }
 
@@ -81,7 +86,7 @@ abstract class BlockContentTestBase extends ViewTestBase {
    * @return \Drupal\block_content\Entity\BlockContentType
    *   Created custom block type.
    */
-  protected function createBlockContentType(array $values = array()) {
+  protected function createBlockContentType(array $values = []) {
     // Find a non-existent random type name.
     if (!isset($values['id'])) {
       do {
@@ -91,16 +96,16 @@ abstract class BlockContentTestBase extends ViewTestBase {
     else {
       $id = $values['id'];
     }
-    $values += array(
+    $values += [
       'id' => $id,
       'label' => $id,
       'revision' => FALSE
-    );
+    ];
     $bundle = BlockContentType::create($values);
     $status = $bundle->save();
     block_content_add_body_field($bundle->id());
 
-    $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created block content type %bundle.', array('%bundle' => $bundle->id())));
+    $this->assertEqual($status, SAVED_NEW, SafeMarkup::format('Created block content type %bundle.', ['%bundle' => $bundle->id()]));
     return $bundle;
   }
 

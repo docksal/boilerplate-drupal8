@@ -219,7 +219,7 @@ class XmlFileLoader extends FileLoader
      * @param \DOMElement $node Element to parse that contains the configs
      * @param string      $path Full path of the XML file being processed
      *
-     * @return array An array with the defaults as first item, requirements as second and options as third.
+     * @return array An array with the defaults as first item, requirements as second and options as third
      *
      * @throws \InvalidArgumentException When the XML is invalid
      */
@@ -250,7 +250,7 @@ class XmlFileLoader extends FileLoader
                     $condition = trim($n->textContent);
                     break;
                 default:
-                    throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $n->localName, $path));
+                    throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement", "option" or "condition".', $n->localName, $path));
             }
         }
 

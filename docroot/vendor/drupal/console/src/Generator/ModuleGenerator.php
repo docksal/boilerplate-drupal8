@@ -117,7 +117,7 @@ class ModuleGenerator extends Generator
         if ($test) {
             $this->renderFile(
                 'module/src/Tests/load-test.php.twig',
-                $dir . '/src/Tests/' . 'LoadTest.php',
+                $dir . '/tests/src/Functional/' . 'LoadTest.php',
                 $parameters
             );
         }
@@ -163,7 +163,7 @@ class ModuleGenerator extends Generator
             }
             $this->renderFile(
                 'module/twig-template-file.twig',
-                $dir . $machineName . '.html.twig',
+                $dir . str_replace("_", "-", $machineName) . '.html.twig',
                 $parameters
             );
         }

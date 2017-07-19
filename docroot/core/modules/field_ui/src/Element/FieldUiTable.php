@@ -42,7 +42,7 @@ class FieldUiTable extends Table {
    * @see \Drupal\Core\Render\Element\Table::preRenderTable()
    */
   public static function tablePreRender($elements) {
-    $js_settings = array();
+    $js_settings = [];
 
     // For each region, build the tree structure from the weight and parenting
     // data contained in the flat form structure, to determine row order and
@@ -67,7 +67,7 @@ class FieldUiTable extends Table {
           unset($list[$name]);
 
           // Determine the region for the row.
-          $region_name = call_user_func($row['#region_callback'], $row);
+          $region_name = call_user_func_array($row['#region_callback'], [&$row]);
 
           // Add the element in the tree.
           $target = &$trees[$region_name][''];

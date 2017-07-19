@@ -83,11 +83,8 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    * Derived classes must implement fields(), returning a list of available
    * destination fields.
    *
-   * @todo Review the cases where we need the Migration parameter, can we avoid
-   *   that? To be resolved with https://www.drupal.org/node/2543568.
-   *
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   (optional) The migration containing this destination. Defaults to NULL.
+   *   Unused, will be removed before Drupal 9.0.x. Defaults to NULL.
    *
    * @return array
    *   - Keys: machine names of the fields
@@ -109,7 +106,7 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    * @return mixed
    *   The entity ID or an indication of success.
    */
-  public function import(Row $row, array $old_destination_id_values = array());
+  public function import(Row $row, array $old_destination_id_values = []);
 
   /**
    * Delete the specified destination object from the target Drupal.

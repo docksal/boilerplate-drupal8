@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\ProcessBuilder;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Console\Command\Command;
 use Drupal\Console\Command\Shared\ProjectDownloadTrait;
 use Drupal\Console\Command\Shared\ModuleTrait;
@@ -42,23 +41,23 @@ class InstallCommand extends Command
     protected $site;
 
     /**
- * @var Validator
-*/
+     * @var Validator
+     */
     protected $validator;
 
     /**
- * @var ModuleInstaller
-*/
+     * @var ModuleInstaller
+     */
     protected $moduleInstaller;
 
     /**
- * @var DrupalApi
-*/
+     * @var DrupalApi
+     */
     protected $drupalApi;
 
     /**
- * @var Manager
-*/
+     * @var Manager
+     */
     protected $extensionManager;
 
     /**
@@ -116,16 +115,17 @@ class InstallCommand extends Command
             )
             ->addOption(
                 'latest',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.module.install.options.latest')
             )
             ->addOption(
                 'composer',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.module.uninstall.options.composer')
-            );
+            )
+            ->setAliases(['moi']);
     }
 
     /**
@@ -175,20 +175,18 @@ class InstallCommand extends Command
                 if ($process->isSuccessful()) {
                     $io->info(
                         sprintf(
-                            'Module %s was downloaded with Composer.',
+                            $this->trans('commands.module.install.messages.download-with-composer'),
                             $moduleItem
                         )
                     );
                 } else {
                     $io->error(
                         sprintf(
-                            'Module %s seems not to be installed with Composer. Halting.',
+                            $this->trans('commands.module.install.messages.not-installed-with-composer'),
                             $moduleItem
                         )
                     );
                     throw new \RuntimeException($process->getErrorOutput());
-
-                    return 0;
                 }
             }
 
@@ -204,7 +202,7 @@ class InstallCommand extends Command
                     unset($module[array_search($invalidModule, $module)]);
                     $io->error(
                         sprintf(
-                            'Invalid module name: %s',
+                            $this->trans('commands.module.install.messages.invalid-name'),
                             $invalidModule
                         )
                     );
@@ -241,6 +239,7 @@ class InstallCommand extends Command
             return 1;
         }
 
+        $this->site->removeCachedServicesFile();
         $this->chainQueue->addCommand('cache:rebuild', ['cache' => 'all']);
     }
 }

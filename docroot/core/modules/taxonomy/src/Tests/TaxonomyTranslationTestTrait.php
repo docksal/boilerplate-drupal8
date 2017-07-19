@@ -2,6 +2,8 @@
 
 namespace Drupal\taxonomy\Tests;
 
+@trigger_error(__NAMESPACE__ . '\TaxonomyTranslationTestTrait is deprecated in Drupal 8.4.0 and will be removed before Drupal 9.0.0. Instead, use \Drupal\Tests\taxonomy\Functional\TaxonomyTranslationTestTrait', E_USER_DEPRECATED);
+
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Tests\EntityReference\EntityReferenceTestTrait;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -9,6 +11,9 @@ use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Provides common testing base for translated taxonomy terms.
+ *
+ * @deprecated in Drupal 8.4.0 and will be removed before Drupal 9.0.0.
+ *   Use \Drupal\Tests\taxonomy\Functional\TaxonomyTranslationTestTrait
  */
 trait TaxonomyTranslationTestTrait {
 
@@ -79,26 +84,26 @@ trait TaxonomyTranslationTestTrait {
    *   to FALSE.
    */
   protected function setUpTermReferenceField() {
-    $handler_settings = array(
-      'target_bundles' => array(
+    $handler_settings = [
+      'target_bundles' => [
         $this->vocabulary->id() => $this->vocabulary->id(),
-      ),
+      ],
       'auto_create' => TRUE,
-    );
+    ];
     $this->createEntityReferenceField('node', 'article', $this->termFieldName, NULL, 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     $field_storage = FieldStorageConfig::loadByName('node', $this->termFieldName);
     $field_storage->setTranslatable(FALSE);
     $field_storage->save();
 
     entity_get_form_display('node', 'article', 'default')
-      ->setComponent($this->termFieldName, array(
+      ->setComponent($this->termFieldName, [
         'type' => 'entity_reference_autocomplete_tags',
-      ))
+      ])
       ->save();
     entity_get_display('node', 'article', 'default')
-      ->setComponent($this->termFieldName, array(
+      ->setComponent($this->termFieldName, [
         'type' => 'entity_reference_label',
-      ))
+      ])
       ->save();
   }
 

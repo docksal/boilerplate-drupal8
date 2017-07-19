@@ -16,9 +16,9 @@ class ConfigTest extends UnitTestCase {
    * Test the import method.
    */
   public function testImport() {
-    $source = array(
+    $source = [
       'test' => 'x',
-    );
+    ];
     $migration = $this->getMockBuilder('Drupal\migrate\Plugin\Migration')
       ->disableOriginalConstructor()
       ->getMock();
@@ -44,9 +44,6 @@ class ConfigTest extends UnitTestCase {
     $row = $this->getMockBuilder('Drupal\migrate\Row')
       ->disableOriginalConstructor()
       ->getMock();
-    $row->expects($this->once())
-      ->method('hasDestinationProperty')
-      ->will($this->returnValue(FALSE));
     $row->expects($this->any())
       ->method('getRawDestination')
       ->will($this->returnValue($source));
@@ -57,7 +54,7 @@ class ConfigTest extends UnitTestCase {
       ->method('getLanguageConfigOverride')
       ->with('fr', 'd8_config')
       ->will($this->returnValue($config));
-    $destination = new Config(array('config_name' => 'd8_config'), 'd8_config', array('pluginId' => 'd8_config'), $migration, $config_factory, $language_manager);
+    $destination = new Config(['config_name' => 'd8_config'], 'd8_config', ['pluginId' => 'd8_config'], $migration, $config_factory, $language_manager);
     $destination_id = $destination->import($row);
     $this->assertEquals($destination_id, ['d8_config']);
   }
@@ -66,9 +63,9 @@ class ConfigTest extends UnitTestCase {
    * Test the import method.
    */
   public function testLanguageImport() {
-    $source = array(
+    $source = [
       'langcode' => 'mi',
-    );
+    ];
     $migration = $this->getMockBuilder(MigrationInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -94,9 +91,6 @@ class ConfigTest extends UnitTestCase {
     $row = $this->getMockBuilder('Drupal\migrate\Row')
       ->disableOriginalConstructor()
       ->getMock();
-    $row->expects($this->once())
-      ->method('hasDestinationProperty')
-      ->will($this->returnValue($source));
     $row->expects($this->any())
       ->method('getRawDestination')
       ->will($this->returnValue($source));
@@ -110,9 +104,9 @@ class ConfigTest extends UnitTestCase {
       ->method('getLanguageConfigOverride')
       ->with('mi', 'd8_config')
       ->will($this->returnValue($config));
-    $destination = new Config(array('config_name' => 'd8_config'), 'd8_config', array('pluginId' => 'd8_config'), $migration, $config_factory, $language_manager);
+    $destination = new Config(['config_name' => 'd8_config', 'translations' => 'true'], 'd8_config', ['pluginId' => 'd8_config'], $migration, $config_factory, $language_manager);
     $destination_id = $destination->import($row);
-    $this->assertEquals($destination_id, ['d8_config']);
+    $this->assertEquals($destination_id, ['d8_config', 'mi']);
   }
 
 }

@@ -122,22 +122,23 @@ class DownloadCommand extends Command
             )
             ->addOption(
                 'latest',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.module.download.options.latest')
             )
             ->addOption(
                 'composer',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.module.install.options.composer')
             )
             ->addOption(
                 'unstable',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.module.install.options.unstable')
-            );
+            )
+            ->setAliases(['mod']);
     }
 
     /**

@@ -10,6 +10,7 @@ drupal.ckeditor:
     - core/drupal
     - core/drupalSettings
     - core/drupal.debounce
+    - core/drupal.displace
     - core/ckeditor
     - editor/drupal.editor
     # Ensure to run after core/matchmedia.
@@ -44,7 +45,7 @@ drupal.ckeditor.admin:
   css:
     theme:
       css/ckeditor.admin.css: {}
-      /core/assets/vendor/ckeditor/skins/moono/editor.css: {}
+      /core/assets/vendor/ckeditor/skins/moono-lisa/editor.css: {}
   dependencies:
     - core/jquery
     - core/drupal

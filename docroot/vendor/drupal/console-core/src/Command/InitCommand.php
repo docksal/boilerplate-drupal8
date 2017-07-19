@@ -21,6 +21,7 @@ use Drupal\Console\Core\Style\DrupalStyle;
 
 /**
  * Class InitCommand
+ *
  * @package Drupal\Console\Core\Command
  */
 class InitCommand extends Command
@@ -55,6 +56,8 @@ class InitCommand extends Command
     private $configParameters = [
         'language' => 'en',
         'temp' => '/tmp',
+        'chain' => false,
+        'sites' => false,
         'learning' => false,
         'generate_inline' => false,
         'generate_chain' => false
@@ -62,6 +65,7 @@ class InitCommand extends Command
 
     /**
      * InitCommand constructor.
+     *
      * @param ShowFile             $showFile
      * @param ConfigurationManager $configurationManager
      * @param InitGenerator        $generator
@@ -145,9 +149,19 @@ class InitCommand extends Command
             '/tmp'
         );
 
+        $this->configParameters['chain'] = $io->confirm(
+            $this->trans('commands.init.questions.chain'),
+            false
+        );
+
+        $this->configParameters['sites'] = $io->confirm(
+            $this->trans('commands.init.questions.sites'),
+            false
+        );
+
         $this->configParameters['learning'] = $io->confirm(
             $this->trans('commands.init.questions.learning'),
-            true
+            false
         );
 
         $this->configParameters['generate_inline'] = $io->confirm(
@@ -191,6 +205,12 @@ class InitCommand extends Command
                 DRUPAL_CONSOLE_CORE
             )
         );
+        if (!$this->configParameters['chain']) {
+            $finder->exclude('chain/optional');
+        }
+        if (!$this->configParameters['sites']) {
+            $finder->exclude('sites');
+        }
         $finder->files();
 
         foreach ($finder as $configFile) {
@@ -207,6 +227,12 @@ class InitCommand extends Command
                 $configFile->getRelativePathname()
             );
 
+            $destinationFile = str_replace(
+                'chain/optional/',
+                'chain/',
+                $destinationFile
+            );
+
             if ($this->copyFile($sourceFile, $destinationFile, $override)) {
                 $copiedFiles[] = $destinationFile;
             }
@@ -219,7 +245,7 @@ class InitCommand extends Command
 
         $executableName = null;
         if ($autocomplete) {
-            $processBuilder = new ProcessBuilder(array('bash'));
+            $processBuilder = new ProcessBuilder(['bash']);
             $process = $processBuilder->getProcess();
             $process->setCommandLine('echo $_');
             $process->run();

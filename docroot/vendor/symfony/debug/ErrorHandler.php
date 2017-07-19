@@ -103,6 +103,7 @@ class ErrorHandler
     private static $stackedErrors = array();
     private static $stackedErrorLevels = array();
     private static $toStringException = null;
+    private static $exitCode = 0;
 
     /**
      * Same init value as thrownErrors.
@@ -432,7 +433,7 @@ class ErrorHandler
                 $throw = new \ErrorException($this->levels[$type].': '.$message, 0, $type, $file, $line);
             }
 
-            if (PHP_VERSION_ID <= 50407 && (PHP_VERSION_ID >= 50400 || PHP_VERSION_ID <= 50317)) {
+            if (\PHP_VERSION_ID <= 50407 && (\PHP_VERSION_ID >= 50400 || \PHP_VERSION_ID <= 50317)) {
                 // Exceptions thrown from error handlers are sometimes not caught by the exception
                 // handler and shutdown handlers are bypassed before 5.4.8/5.3.18.
                 // We temporarily re-enable display_errors to prevent any blank page related to this bug.
@@ -547,6 +548,9 @@ class ErrorHandler
      */
     public function handleException($exception, array $error = null)
     {
+        if (null === $error) {
+            self::$exitCode = 255;
+        }
         if (!$exception instanceof \Exception) {
             $exception = new FatalThrowableError($exception);
         }
@@ -632,7 +636,7 @@ class ErrorHandler
             return;
         }
 
-        if (null === $error) {
+        if ($exit = null === $error) {
             $error = error_get_last();
         }
 
@@ -656,14 +660,20 @@ class ErrorHandler
             } else {
                 $exception = new FatalErrorException($handler->levels[$error['type']].': '.$error['message'], 0, $error['type'], $error['file'], $error['line'], 2, true, $trace);
             }
-        } elseif (!isset($exception)) {
-            return;
         }
 
         try {
-            $handler->handleException($exception, $error);
+            if (isset($exception)) {
+                self::$exitCode = 255;
+                $handler->handleException($exception, $error);
+            }
         } catch (FatalErrorException $e) {
             // Ignore this re-throw
+        }
+
+        if ($exit && self::$exitCode) {
+            $exitCode = self::$exitCode;
+            register_shutdown_function('register_shutdown_function', function () use ($exitCode) { exit($exitCode); });
         }
     }
 

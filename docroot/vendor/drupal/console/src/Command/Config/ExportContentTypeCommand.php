@@ -69,17 +69,18 @@ class ExportContentTypeCommand extends Command
         $this
             ->setName('config:export:content:type')
             ->setDescription($this->trans('commands.config.export.content.type.description'))
-            ->addOption('module', '', InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
+            ->addOption('module', null, InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
             ->addArgument(
                 'content-type',
                 InputArgument::REQUIRED,
                 $this->trans('commands.config.export.content.type.arguments.content-type')
             )->addOption(
                 'optional-config',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.config.export.content.type.options.optional-config')
-            );
+            )
+            ->setAliases(['cect']);
 
         $this->configExport = [];
     }
@@ -149,7 +150,7 @@ class ExportContentTypeCommand extends Command
 
         $this->getViewDisplays($contentType, $optionalConfig);
 
-        $this->exportConfigToModule($module, $io, $this->trans('commands.config.export.content.type.messages.content_type_exported'));
+        $this->exportConfigToModule($module, $io, $this->trans('commands.config.export.content.type.messages.content-type-exported'));
     }
 
     protected function getFields($contentType, $optional = false)

@@ -7,9 +7,11 @@ source:
   constants:
     entity_type: node
 process:
+  # If you are using this file to build a custom migration consider removing
+  # the cid field to allow incremental migrations.
   cid: cid
   pid:
-    plugin: migration
+    plugin: migration_lookup
     migration: d6_comment
     source: pid
   entity_id: nid
@@ -30,7 +32,7 @@ process:
   thread: thread
   'comment_body/value': comment
   'comment_body/format':
-    plugin: migration
+    plugin: migration_lookup
     migration: d6_filter_format
     source: format
 destination:

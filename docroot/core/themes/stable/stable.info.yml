@@ -2,8 +2,8 @@ name: Stable
 type: theme
 description: A default base theme using Drupal 8.0.0's core markup and CSS.
 package: Core
-# version: VERSION
-# core: 8.x
+version: VERSION
+core: 8.x
 base theme: false
 hidden: true
 
@@ -98,6 +98,12 @@ libraries-override:
     css:
       theme:
         css/image.admin.css: css/image/image.admin.css
+  image/quickedit.inPlaceEditor.image:
+    css:
+      component:
+        css/editors/image.css: css/image/editors/image.css
+      theme:
+        css/editors/image.theme.css: css/image/editors/image.theme.css
 
   language/drupal.language.admin:
     css:
@@ -169,6 +175,9 @@ libraries-override:
         css/components/reset-appearance.module.css: css/system/components/reset-appearance.module.css
         css/components/resize.module.css: css/system/components/resize.module.css
         css/components/sticky-header.module.css: css/system/components/sticky-header.module.css
+        css/components/system-status-counter.css: css/system/components/system-status-counter.css
+        css/components/system-status-report-counters.css: css/system/components/system-status-report-counters.css
+        css/components/system-status-report-general-info.css: css/system/components/system-status-report-general-info.css
         css/components/tabledrag.module.css: css/system/components/tabledrag.module.css
         css/components/tablesort.module.css: css/system/components/tablesort.module.css
         css/components/tree-child.module.css: css/system/components/tree-child.module.css
@@ -237,9 +246,3 @@ libraries-override:
       theme:
         css/views_ui.admin.theme.css: css/views_ui/views_ui.admin.theme.css
         css/views_ui.contextual.css: css/views_ui/views_ui.contextual.css
-
-# Information added by Drupal.org packaging script on 2016-11-02
-version: '8.2.2'
-core: '8.x'
-project: 'drupal'
-datestamp: 1478110098

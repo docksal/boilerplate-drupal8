@@ -5,6 +5,8 @@ migration_tags:
 source:
   plugin: d6_user
 process:
+  # If you are using this file to build a custom migration consider removing
+  # the uid field to allow incremental migrations.
   uid: uid
   name: name
   pass: pass
@@ -30,11 +32,11 @@ process:
     fallback_to_site_default: true
   init: init
   roles:
-    plugin: migration
+    plugin: migration_lookup
     migration: d6_user_role
     source: roles
   user_picture:
-    plugin: migration
+    plugin: migration_lookup
     migration: d6_user_picture_file
     source: uid
     no_stub: true

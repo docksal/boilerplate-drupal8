@@ -11,10 +11,13 @@
 
 namespace Psy;
 
+use Psy\CodeCleaner\NoReturnValue;
 use Psy\Exception\BreakException;
 use Psy\Exception\ErrorException;
 use Psy\Exception\Exception as PsyException;
 use Psy\Exception\ThrowUpException;
+use Psy\Input\ShellInput;
+use Psy\Input\SilentInput;
 use Psy\Output\ShellOutput;
 use Psy\TabCompletion\Matcher;
 use Psy\VarDumper\PresenterAware;
@@ -41,7 +44,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Shell extends Application
 {
-    const VERSION = 'v0.8.2';
+    const VERSION = 'v0.8.9';
 
     const PROMPT      = '>>> ';
     const BUFF_PROMPT = '... ';
@@ -76,6 +79,7 @@ class Shell extends Application
         $this->context  = new Context();
         $this->includes = array();
         $this->readline = $this->config->getReadline();
+        $this->inputBuffer = array();
 
         parent::__construct('Psy Shell', self::VERSION);
 
@@ -100,31 +104,8 @@ class Shell extends Application
     /**
      * Invoke a Psy Shell from the current context.
      *
-     * For example:
-     *
-     *     foreach ($items as $item) {
-     *         \Psy\Shell::debug(get_defined_vars());
-     *     }
-     *
-     * If you would like your shell interaction to affect the state of the
-     * current context, you can extract() the values returned from this call:
-     *
-     *     foreach ($items as $item) {
-     *         extract(\Psy\Shell::debug(get_defined_vars()));
-     *         var_dump($item); // will be whatever you set $item to in Psy Shell
-     *     }
-     *
-     * Optionally, supply an object as the `$boundObject` parameter. This
-     * determines the value `$this` will have in the shell, and sets up class
-     * scope so that private and protected members are accessible:
-     *
-     *     class Foo {
-     *         function bar() {
-     *             \Psy\Shell::debug(get_defined_vars(), $this);
-     *         }
-     *     }
-     *
-     * This only really works in PHP 5.4+ and HHVM 3.5+, so upgrade already.
+     * @see Psy\debug
+     * @deprecated will be removed in 1.0. Use \Psy\debug instead
      *
      * @param array  $vars        Scope variables from the calling context (default: array())
      * @param object $boundObject Bound object ($this) value for the shell
@@ -133,18 +114,7 @@ class Shell extends Application
      */
     public static function debug(array $vars = array(), $boundObject = null)
     {
-        echo PHP_EOL;
-
-        $sh = new \Psy\Shell();
-        $sh->setScopeVariables($vars);
-
-        if ($boundObject !== null) {
-            $sh->setBoundObject($boundObject);
-        }
-
-        $sh->run();
-
-        return $sh->getScopeVariables(false);
+        return \Psy\debug($vars, $boundObject);
     }
 
     /**
@@ -191,6 +161,9 @@ class Shell extends Application
      */
     protected function getDefaultCommands()
     {
+        $sudo = new Command\SudoCommand();
+        $sudo->setReadline($this->readline);
+
         $hist = new Command\HistoryCommand();
         $hist->setReadline($this->readline);
 
@@ -200,13 +173,14 @@ class Shell extends Application
             new Command\DumpCommand(),
             new Command\DocCommand(),
             new Command\ShowCommand($this->config->colorMode()),
-            new Command\WtfCommand(),
+            new Command\WtfCommand($this->config->colorMode()),
             new Command\WhereamiCommand($this->config->colorMode()),
             new Command\ThrowUpCommand(),
             new Command\TraceCommand(),
             new Command\BufferCommand(),
             new Command\ClearCommand(),
             // new Command\PsyVersionCommand(),
+            $sudo,
             $hist,
             new Command\ExitCommand(),
         );
@@ -549,7 +523,7 @@ class Shell extends Application
             $this->code         = $this->cleaner->clean($this->codeBuffer, $this->config->requireSemicolons());
         } catch (\Exception $e) {
             // Add failed code blocks to the readline history.
-            $this->readline->addHistory(implode("\n", $this->codeBuffer));
+            $this->addCodeBufferToHistory();
             throw $e;
         }
     }
@@ -583,7 +557,7 @@ class Shell extends Application
             throw new \InvalidArgumentException('Command not found: ' . $input);
         }
 
-        $input = new StringInput(str_replace('\\', '\\\\', rtrim($input, " \t\n\r\0\x0B;")));
+        $input = new ShellInput(str_replace('\\', '\\\\', rtrim($input, " \t\n\r\0\x0B;")));
 
         if ($input->hasParameterOption(array('--help', '-h'))) {
             $helpCommand = $this->get('help');
@@ -613,11 +587,12 @@ class Shell extends Application
      * This is useful for commands which want to replay history.
      *
      * @param string|array $input
+     * @param bool         $silent
      */
-    public function addInput($input)
+    public function addInput($input, $silent = false)
     {
         foreach ((array) $input as $line) {
-            $this->inputBuffer[] = $line;
+            $this->inputBuffer[] = $silent ? new SilentInput($line) : $line;
         }
     }
 
@@ -632,11 +607,27 @@ class Shell extends Application
     public function flushCode()
     {
         if ($this->hasValidCode()) {
-            $this->readline->addHistory(implode("\n", $this->codeBuffer));
+            $this->addCodeBufferToHistory();
             $code = $this->code;
             $this->resetCodeBuffer();
 
             return $code;
+        }
+    }
+
+    /**
+     * Filter silent input from code buffer, write the rest to readline history.
+     */
+    private function addCodeBufferToHistory()
+    {
+        $codeBuffer = array_filter($this->codeBuffer, function ($line) {
+            return !$line instanceof SilentInput;
+        });
+
+        $code = implode("\n", $codeBuffer);
+
+        if (trim($code) !== '') {
+            $this->readline->addHistory($code);
         }
     }
 
@@ -694,6 +685,10 @@ class Shell extends Application
      */
     public function writeReturnValue($ret)
     {
+        if ($ret instanceof NoReturnValue) {
+            return;
+        }
+
         $this->context->setReturnValue($ret);
         $ret    = $this->presentValue($ret);
         $indent = str_repeat(' ', strlen(static::RETVAL));
@@ -715,16 +710,29 @@ class Shell extends Application
     public function writeException(\Exception $e)
     {
         $this->context->setLastException($e);
+        $this->output->writeln($this->formatException($e));
+        $this->resetCodeBuffer();
+    }
 
+    /**
+     * Helper for formatting an exception for writeException().
+     *
+     * @todo extract this to somewhere it makes more sense
+     *
+     * @param \Exception $e
+     *
+     * @return string
+     */
+    public function formatException(\Exception $e)
+    {
         $message = $e->getMessage();
         if (!$e instanceof PsyException) {
             $message = sprintf('%s with message \'%s\'', get_class($e), $message);
         }
 
         $severity = ($e instanceof \ErrorException) ? $this->getSeverity($e) : 'error';
-        $this->output->writeln(sprintf('<%s>%s</%s>', $severity, OutputFormatter::escape($message), $severity));
 
-        $this->resetCodeBuffer();
+        return sprintf('<%s>%s</%s>', $severity, OutputFormatter::escape($message), $severity);
     }
 
     /**
@@ -864,7 +872,9 @@ class Shell extends Application
     {
         if (!empty($this->inputBuffer)) {
             $line = array_shift($this->inputBuffer);
-            $this->output->writeln(sprintf('<aside>%s %s</aside>', static::REPLAY, OutputFormatter::escape($line)));
+            if (!$line instanceof SilentInput) {
+                $this->output->writeln(sprintf('<aside>%s %s</aside>', static::REPLAY, OutputFormatter::escape($line)));
+            }
 
             return $line;
         }

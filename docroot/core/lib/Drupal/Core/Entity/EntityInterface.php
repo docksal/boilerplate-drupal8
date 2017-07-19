@@ -110,9 +110,10 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @deprecated in Drupal 8.0.0, intended to be removed in Drupal 9.0.0
    *   Use \Drupal\Core\Entity\EntityInterface::toUrl() instead.
    *
+   * @see https://www.drupal.org/node/2614344
    * @see \Drupal\Core\Entity\EntityInterface::toUrl
    */
-  public function urlInfo($rel = 'canonical', array $options = array());
+  public function urlInfo($rel = 'canonical', array $options = []);
 
   /**
    * Gets the URL object for the entity.
@@ -150,7 +151,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @throws \Drupal\Core\Entity\EntityMalformedException
    * @throws \Drupal\Core\Entity\Exception\UndefinedLinkTemplateException
    */
-  public function toUrl($rel = 'canonical', array $options = array());
+  public function toUrl($rel = 'canonical', array $options = []);
 
   /**
    * Gets the public URL for this entity.
@@ -167,9 +168,10 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @deprecated in Drupal 8.0.0, intended to be removed in Drupal 9.0.0
    *   Please use toUrl() instead.
    *
+   * @see https://www.drupal.org/node/2614344
    * @see \Drupal\Core\Entity\EntityInterface::toUrl
    */
-  public function url($rel = 'canonical', $options = array());
+  public function url($rel = 'canonical', $options = []);
 
   /**
    * Deprecated way of generating a link to the entity. See toLink().
@@ -189,6 +191,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @deprecated in Drupal 8.0.0, intended to be removed in Drupal 9.0.0
    *   Please use toLink() instead.
    *
+   * @see https://www.drupal.org/node/2614344
    * @see \Drupal\Core\Entity\EntityInterface::toLink
    */
   public function link($text = NULL, $rel = 'canonical', array $options = []);
@@ -264,7 +267,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @return static
    *   The entity object.
    */
-  public static function create(array $values = array());
+  public static function create(array $values = []);
 
   /**
    * Saves an entity permanently.

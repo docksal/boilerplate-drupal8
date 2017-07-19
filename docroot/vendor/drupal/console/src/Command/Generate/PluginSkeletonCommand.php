@@ -103,28 +103,28 @@ class PluginSkeletonCommand extends Command
             ->setHelp($this->trans('commands.generate.plugin.skeleton.help'))
             ->addOption(
                 'module',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.common.options.module')
             )
             ->addOption(
                 'plugin-id',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.options.plugin-id')
             )
             ->addOption(
                 'class',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.block.options.class')
             )
             ->addOption(
                 'services',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL| InputOption::VALUE_IS_ARRAY,
                 $this->trans('commands.common.options.services')
-            );
+            )->setAliases(['gps']);
     }
 
     /**
@@ -137,7 +137,7 @@ class PluginSkeletonCommand extends Command
 
         // @see use Drupal\Console\Command\ConfirmationTrait::confirmGeneration
         if (!$this->confirmGeneration($io)) {
-            return;
+            return 1;
         }
 
         $module = $input->getOption('module');
@@ -175,6 +175,8 @@ class PluginSkeletonCommand extends Command
         $this->generator->generate($module, $pluginId, $plugin, $className, $pluginMetaData, $buildServices);
 
         $this->chainQueue->addCommand('cache:rebuild', ['cache' => 'discovery']);
+
+        return 0;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

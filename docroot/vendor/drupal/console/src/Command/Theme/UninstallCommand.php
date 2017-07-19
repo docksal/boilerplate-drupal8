@@ -60,7 +60,12 @@ class UninstallCommand extends Command
         $this
             ->setName('theme:uninstall')
             ->setDescription($this->trans('commands.theme.uninstall.description'))
-            ->addArgument('theme', InputArgument::IS_ARRAY, $this->trans('commands.theme.uninstall.options.module'));
+            ->addArgument(
+                'theme',
+                InputArgument::IS_ARRAY,
+                $this->trans('commands.theme.uninstall.options.module')
+            )
+            ->setAliases(['thu']);
     }
 
     /**
@@ -93,7 +98,9 @@ class UninstallCommand extends Command
             while (true) {
                 $theme_name = $io->choiceNoList(
                     $this->trans('commands.theme.uninstall.questions.theme'),
-                    array_keys($theme_list)
+                    array_keys($theme_list),
+                    null,
+                    true
                 );
 
                 if (empty($theme_name)) {
@@ -146,7 +153,7 @@ class UninstallCommand extends Command
                             )
                         );
 
-                        return;
+                        return 1;
                     }
 
                     if ($themeKey === $config->get('admin')) {
@@ -156,7 +163,7 @@ class UninstallCommand extends Command
                                 implode(',', $themesAvailable)
                             )
                         );
-                        return;
+                        return 1;
                     }
                 }
 
@@ -185,6 +192,8 @@ class UninstallCommand extends Command
                     )
                 );
                 drupal_set_message($e->getTranslatedMessage($this->getStringTranslation(), $theme), 'error');
+
+                return 1;
             }
         } elseif (empty($themesAvailable) && count($themesUninstalled) > 0) {
             if (count($themesUninstalled) > 1) {
@@ -222,5 +231,7 @@ class UninstallCommand extends Command
 
         // Run cache rebuild to see changes in Web UI
         $this->chainQueue->addCommand('cache:rebuild', ['cache' => 'all']);
+
+        return 0;
     }
 }

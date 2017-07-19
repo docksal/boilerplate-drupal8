@@ -54,13 +54,6 @@ class DisableCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * @DrupalCommand(
-     *     dependencies = {
-     *         “rest"
-     *     }
-     * )
-     */
     protected function configure()
     {
         $this
@@ -70,7 +63,8 @@ class DisableCommand extends Command
                 'resource-id',
                 InputArgument::OPTIONAL,
                 $this->trans('commands.rest.debug.arguments.resource-id')
-            );
+            )
+            ->setAliases(['red']);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

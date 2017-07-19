@@ -21,22 +21,29 @@ class FieldSettings extends ProcessPluginBase {
    * Get the field default/mapped settings.
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    list($field_type, $global_settings) = $value;
-    return $this->getSettings($field_type, $global_settings);
+    // To maintain backwards compatibility, ensure that $value contains at least
+    // three elements.
+    if (count($value) == 2) {
+      $value[] = NULL;
+    }
+    list($field_type, $global_settings, $original_field_type) = $value;
+    return $this->getSettings($field_type, $global_settings, $original_field_type);
   }
 
   /**
    * Merge the default D8 and specified D6 settings.
    *
    * @param string $field_type
-   *   The field type.
+   *   The destination field type.
    * @param array $global_settings
    *   The field settings.
+   * @param string $original_field_type
+   *   (optional) The original field type before migration.
    *
    * @return array
    *   A valid array of settings.
    */
-  public function getSettings($field_type, $global_settings) {
+  public function getSettings($field_type, $global_settings, $original_field_type = NULL) {
     $max_length = isset($global_settings['max_length']) ? $global_settings['max_length'] : '';
     $max_length = empty($max_length) ? 255 : $max_length;
     $allowed_values = [];
@@ -59,26 +66,31 @@ class FieldSettings extends ProcessPluginBase {
       }
     }
 
-    $settings = array(
-      'text' => array(
+    $settings = [
+      'text' => [
         'max_length' => $max_length,
-      ),
-      'datetime' => array('datetime_type' => 'datetime'),
-      'list_string' => array(
+      ],
+      'datetime' => ['datetime_type' => 'datetime'],
+      'list_string' => [
         'allowed_values' => $allowed_values,
-      ),
-      'list_integer' => array(
+      ],
+      'list_integer' => [
         'allowed_values' => $allowed_values,
-      ),
-      'list_float' => array(
+      ],
+      'list_float' => [
         'allowed_values' => $allowed_values,
-      ),
-      'boolean' => array(
+      ],
+      'boolean' => [
         'allowed_values' => $allowed_values,
-      ),
-    );
+      ],
+    ];
 
-    return isset($settings[$field_type]) ? $settings[$field_type] : array();
+    if ($original_field_type == 'userreference') {
+      return ['target_type' => 'user'];
+    }
+    else {
+      return isset($settings[$field_type]) ? $settings[$field_type] : [];
+    }
   }
 
 }

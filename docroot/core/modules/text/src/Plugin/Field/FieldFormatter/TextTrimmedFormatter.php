@@ -33,24 +33,24 @@ class TextTrimmedFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'trim_length' => '600',
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $element['trim_length'] = array(
+    $element['trim_length'] = [
       '#title' => t('Trimmed limit'),
       '#type' => 'number',
       '#field_suffix' => t('characters'),
       '#default_value' => $this->getSetting('trim_length'),
-      '#description' => t('If the summary is not set, the trimmed %label field will end at the last full sentence before this character limit.', array('%label' => $this->fieldDefinition->getLabel())),
+      '#description' => t('If the summary is not set, the trimmed %label field will end at the last full sentence before this character limit.', ['%label' => $this->fieldDefinition->getLabel()]),
       '#min' => 1,
       '#required' => TRUE,
-    );
+    ];
     return $element;
   }
 
@@ -58,8 +58,8 @@ class TextTrimmedFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = array();
-    $summary[] = t('Trimmed limit: @trim_length characters', array('@trim_length' => $this->getSetting('trim_length')));
+    $summary = [];
+    $summary[] = t('Trimmed limit: @trim_length characters', ['@trim_length' => $this->getSetting('trim_length')]);
     return $summary;
   }
 
@@ -67,14 +67,14 @@ class TextTrimmedFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = array();
+    $elements = [];
 
     $render_as_summary = function (&$element) {
       // Make sure any default #pre_render callbacks are set on the element,
       // because text_pre_render_summary() must run last.
       $element += \Drupal::service('element_info')->getInfo($element['#type']);
       // Add the #pre_render callback that renders the text into a summary.
-      $element['#pre_render'][] = '\Drupal\text\Plugin\field\FieldFormatter\TextTrimmedFormatter::preRenderSummary';
+      $element['#pre_render'][] = [TextTrimmedFormatter::class, 'preRenderSummary'];
       // Pass on the trim length to the #pre_render callback via a property.
       $element['#text_summary_trim_length'] = $this->getSetting('trim_length');
     };
@@ -82,12 +82,12 @@ class TextTrimmedFormatter extends FormatterBase {
     // The ProcessedText element already handles cache context & tag bubbling.
     // @see \Drupal\filter\Element\ProcessedText::preRenderText()
     foreach ($items as $delta => $item) {
-      $elements[$delta] = array(
+      $elements[$delta] = [
         '#type' => 'processed_text',
         '#text' => NULL,
         '#format' => $item->format,
         '#langcode' => $item->getLangcode(),
-      );
+      ];
 
       if ($this->getPluginId() == 'text_summary_or_trimmed' && !empty($item->summary)) {
         $elements[$delta]['#text'] = $item->summary;

@@ -28,7 +28,7 @@ class FieldSettingsTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $result = $plugin->transform([$field_type, $field_settings], $executable, $row, 'foo');
+    $result = $plugin->transform([$field_type, $field_settings, NULL], $executable, $row, 'foo');
     $this->assertSame($allowed_values, $result['allowed_values']);
   }
 
@@ -36,32 +36,32 @@ class FieldSettingsTest extends UnitTestCase {
    * Provides field settings for testGetSettings().
    */
   public function getSettingsProvider() {
-    return array(
-      array(
+    return [
+      [
         'list_integer',
-        array('allowed_values' => "1|One\n2|Two\n3"),
-        array(
+        ['allowed_values' => "1|One\n2|Two\n3"],
+        [
           '1' => 'One',
           '2' => 'Two',
           '3' => '3',
-        ),
-      ),
-      array(
+        ],
+      ],
+      [
         'list_string',
-        array('allowed_values' => NULL),
-        array(),
-      ),
-      array(
+        ['allowed_values' => NULL],
+        [],
+      ],
+      [
         'list_float',
-        array('allowed_values' => ""),
-        array(),
-      ),
-      array(
+        ['allowed_values' => ""],
+        [],
+      ],
+      [
         'boolean',
-        array(),
-        array(),
-      ),
-    );
+        [],
+        [],
+      ],
+    ];
   }
 
 }

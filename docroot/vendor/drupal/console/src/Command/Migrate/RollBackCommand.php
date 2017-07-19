@@ -28,7 +28,6 @@ use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
  *     extensionType = "module"
  * )
  */
-
 class RollBackCommand extends Command
 {
     use MigrationTrait;
@@ -44,8 +43,9 @@ class RollBackCommand extends Command
      *
      * @param MigrationPluginManagerInterface $pluginManagerMigration
      */
-    public function __construct(MigrationPluginManagerInterface $pluginManagerMigration)
-    {
+    public function __construct(
+        MigrationPluginManagerInterface $pluginManagerMigration
+    ) {
         $this->pluginManagerMigration = $pluginManagerMigration;
         parent::__construct();
     }
@@ -58,10 +58,11 @@ class RollBackCommand extends Command
             ->addArgument('migration-ids', InputArgument::IS_ARRAY, $this->trans('commands.migrate.rollback.arguments.id'))
             ->addOption(
                 'source-base_path',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
-                $this->trans('commands.migrate.setup.options.source-base_path')
-            );
+                $this->trans('commands.migrate.setup.options.source-base-path')
+            )->setAliases(['mir']);
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -75,7 +76,7 @@ class RollBackCommand extends Command
         $migrations_list = array_keys($this->getMigrations($version_tag));
         // If migrations weren't provided finish execution
         if (empty($migration_id)) {
-            return;
+            return 1;
         }
 
 
@@ -129,6 +130,8 @@ class RollBackCommand extends Command
                 }
             }
         }
+
+        return 0;
     }
 
     /**
@@ -172,7 +175,7 @@ class RollBackCommand extends Command
         $sourceBasepath = $input->getOption('source-base_path');
         if (!$sourceBasepath) {
             $sourceBasepath = $io->ask(
-                $this->trans('commands.migrate.setup.questions.source-base_path'),
+                $this->trans('commands.migrate.setup.questions.source-base-path'),
                 ''
             );
             $input->setOption('source-base_path', $sourceBasepath);

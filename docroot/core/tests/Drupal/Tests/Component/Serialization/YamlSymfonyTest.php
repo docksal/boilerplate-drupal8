@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\Component\Serialization;
 
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\YamlSymfony;
 
 /**
@@ -56,10 +57,22 @@ class YamlSymfonyTest extends YamlTestBase {
    * Tests that invalid YAML throws an exception.
    *
    * @covers ::decode
-   * @expectedException \Drupal\Component\Serialization\Exception\InvalidDataTypeException
    */
   public function testError() {
+    $this->setExpectedException(InvalidDataTypeException::class);
     YamlSymfony::decode('foo: [ads');
+  }
+
+  /**
+   * Ensures that php object support is disabled.
+   *
+   * @covers ::encode
+   */
+  public function testObjectSupportDisabled() {
+    $this->setExpectedException(InvalidDataTypeException::class, 'Object support when dumping a YAML file has been disabled.');
+    $object = new \stdClass();
+    $object->foo = 'bar';
+    YamlSymfony::encode([$object]);
   }
 
 }

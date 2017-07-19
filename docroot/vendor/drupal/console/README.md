@@ -5,12 +5,9 @@
   - [Drupal Console](#drupal-console)
   - [Required PHP version](#required-php-version)
   - [Drupal Console documentation](#documentation)
-  - [Download as new dependency](#download-as-new-dependency)
-  - [Download using DrupalComposer](#download-using-drupalcomposer)
-  - [Update DrupalConsole](#update-drupalconsole)
-  - [Install Drupal Console Launcher](#install-drupal-console-launcher)
-  - [Update DrupalConsole Launcher](#update-drupalconsole-launcher)
-  - [Run Drupal Console](#running-drupal-console)
+  - [Download Drupal Console](#download)
+  - [Run Drupal Console](#run)
+  - [Contributors](#contributors)
   - [Supporting organizations](#supporting-organizations)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -19,7 +16,7 @@ Drupal Console
 =============================================
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hechoendrupal/DrupalConsole)
-[![Build Status](https://travis-ci.org/hechoendrupal/DrupalConsole.svg?branch=master)](https://travis-ci.org/hechoendrupal/DrupalConsole)
+[![Build Status](https://travis-ci.org/hechoendrupal/drupal-console.svg?branch=master)](https://travis-ci.org/hechoendrupal/drupal-console)
 [![Latest Stable Version](https://poser.pugx.org/drupal/console/v/stable.svg)](https://packagist.org/packages/drupal/console)
 [![Latest Unstable Version](https://poser.pugx.org/drupal/console/v/unstable.svg)](https://packagist.org/packages/drupal/console)
 [![Software License](https://img.shields.io/badge/license-GPL%202.0+-blue.svg)](https://packagist.org/packages/drupal/console)
@@ -41,59 +38,21 @@ More information about using this project at the [official documentation](http:/
 ## Required PHP Version
 PHP 5.5.9 or higher is required to use the Drupal Console application.
 
-## Download as new dependency
-```
-# Change directory to Drupal site
-cd /path/to/drupal8.dev
+## Download 
 
-# Download DrupalConsole
-composer require drupal/console:~1.0 \
---prefer-dist \
---optimize-autoloader \
---sort-packages
-```
+[Install Drupal Console Using Composer](https://docs.drupalconsole.com/en/getting/composer.html)
 
-## Download using DrupalComposer
-```
-composer create-project \
-drupal-composer/drupal-project:8.x-dev \
-drupal8.dev \
---prefer-dist \
---no-progress \
---no-interaction
-```
+[Install Drupal Console Launcher](https://docs.drupalconsole.com/en/getting/launcher.html)
 
-## Update DrupalConsole
+[Installing Drupal Console on Windows](https://docs.drupalconsole.com/en/getting/windows.html)
 
-```
-composer update drupal/console --with-dependencies
-```
-
-## Install Drupal Console Launcher
-```
-curl https://drupalconsole.com/installer -L -o drupal.phar
-mv drupal.phar /usr/local/bin/drupal
-chmod +x /usr/local/bin/drupal
-```
-NOTE: If you don't have curl you can try
-```
-php -r "readfile('https://drupalconsole.com/installer');" > drupal.phar
-```
-
-
-## Update DrupalConsole Launcher 
-```
-drupal self-update
-```
-> NOTE: `drupal` is the alias name you used when installed the DrupalConsole Launcher.
-
-## Run Drupal Console
+## Run
 Using the DrupalConsole Launcher
 ```
 drupal
 ``` 
 
-We highly recommend you to install the global executable, but if is not installed, then you can run DrupalConsole by:  
+We highly recommend you to install the global executable, but if is not installed, you can run Drupal Console depending on your installation by executing:
 
 ```
 vendor/bin/drupal
@@ -106,9 +65,9 @@ bin/drupal
 ## Drupal Console Support
 You can ask for support at Drupal Console gitter chat room [http://bit.ly/console-support](http://bit.ly/console-support).
 
-## Getting The Project To Contribute
-
-For information about how to run this project for development follow instructions at [setup instructions](https://gist.github.com/jmolivas/97bbd07f328217be3564a434c5bd2618).
+## Contribute to Drupal Console
+* [Getting the project](https://docs.drupalconsole.com/en/contributing/getting-the-project.html)
+* [Running the project](https://docs.drupalconsole.com/en/contributing/running-the-project.html)
 
 ## Enabling Autocomplete
 ```
@@ -127,14 +86,16 @@ source "$HOME/.console/console.rc" 2>/dev/null
 ln -s ~/.console/drupal.fish ~/.config/fish/completions/drupal.fish
 ```
 
+## Contributors
+
+[Full list of contributors](https://drupalconsole.com/contributors)
+
 ## Supporting Organizations
 
 [![weKnow](https://www.drupal.org/files/weKnow-logo_5.png)](http://weknowinc.com)
 
 [![Anexus](https://www.drupal.org/files/anexus-logo.png)](http://www.anexusit.com/)
 
-[![Indava](https://www.drupal.org/files/indava-logo.png)](http://www.indava.com/)
-
-[![FFW](https://www.drupal.org/files/ffw-logo.png)](https://ffwagency.com)
+[All supporting organizations](https://drupalconsole.com/supporting-organizations)
 
 > Drupal is a registered trademark of Dries Buytaert.

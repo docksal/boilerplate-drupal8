@@ -40,7 +40,7 @@ class UserData implements UserDataInterface {
       $query->condition('name', $name);
     }
     $result = $query->execute();
-    // If $module, $uid, and $name was passed, return the value.
+    // If $module, $uid, and $name were passed, return the value.
     if (isset($name) && isset($uid)) {
       $result = $result->fetchAllAssoc('uid');
       if (isset($result[$uid])) {
@@ -48,17 +48,17 @@ class UserData implements UserDataInterface {
       }
       return NULL;
     }
-    // If $module and $uid was passed, return the name/value pairs.
+    // If $module and $uid were passed, return data keyed by name.
     elseif (isset($uid)) {
-      $return = array();
+      $return = [];
       foreach ($result as $record) {
         $return[$record->name] = ($record->serialized ? unserialize($record->value) : $record->value);
       }
       return $return;
     }
-    // If $module and $name was passed, return the uid/value pairs.
+    // If $module and $name were passed, return data keyed by uid.
     elseif (isset($name)) {
-      $return = array();
+      $return = [];
       foreach ($result as $record) {
         $return[$record->uid] = ($record->serialized ? unserialize($record->value) : $record->value);
       }
@@ -66,7 +66,7 @@ class UserData implements UserDataInterface {
     }
     // If only $module was passed, return data keyed by uid and name.
     else {
-      $return = array();
+      $return = [];
       foreach ($result as $record) {
         $return[$record->uid][$record->name] = ($record->serialized ? unserialize($record->value) : $record->value);
       }
@@ -84,15 +84,15 @@ class UserData implements UserDataInterface {
       $serialized = 1;
     }
     $this->connection->merge('users_data')
-      ->keys(array(
+      ->keys([
         'uid' => $uid,
         'module' => $module,
         'name' => $name,
-      ))
-      ->fields(array(
+      ])
+      ->fields([
         'value' => $value,
         'serialized' => $serialized,
-      ))
+      ])
       ->execute();
   }
 

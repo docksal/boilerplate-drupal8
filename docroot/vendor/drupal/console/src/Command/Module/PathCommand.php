@@ -50,10 +50,10 @@ class PathCommand extends Command
             )
             ->addOption(
                 'absolute',
-                '',
+                null,
                 InputOption::VALUE_NONE,
                 $this->trans('commands.module.path.options.absolute')
-            );
+            )->setAliases(['mop']);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

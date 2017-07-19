@@ -2,10 +2,12 @@
 
 namespace Drupal\datetime\Tests;
 
+@trigger_error('\Drupal\datetime\Tests\DateTestBase is deprecated in Drupal 8.4.0 and will be removed before Drupal 9.0.0. Use \Drupal\Tests\BrowserTestBase instead. See https://www.drupal.org/node/2780063.', E_USER_DEPRECATED);
+
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
-use Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -13,6 +15,9 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Provides a base class for testing Datetime field functionality.
+ *
+ * @deprecated in Drupal 8.4.0 and will be removed before Drupal 9.0.0.
+ *   Use \Drupal\Tests\BrowserTestBase instead.
  */
 abstract class DateTestBase extends WebTestBase {
 
@@ -114,12 +119,13 @@ abstract class DateTestBase extends WebTestBase {
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
       'type' => $type,
-      'settings' => ['datetime_type' => DateRangeItem::DATETIME_TYPE_DATE],
+      'settings' => ['datetime_type' => DateTimeItem::DATETIME_TYPE_DATE],
     ]);
     $this->fieldStorage->save();
     $this->field = FieldConfig::create([
       'field_storage' => $this->fieldStorage,
       'bundle' => 'entity_test',
+      'description' => 'Description for ' . $field_name,
       'required' => TRUE,
     ]);
     $this->field->save();

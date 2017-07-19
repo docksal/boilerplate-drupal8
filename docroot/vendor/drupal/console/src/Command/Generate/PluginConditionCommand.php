@@ -83,43 +83,44 @@ class PluginConditionCommand extends Command
             ->setName('generate:plugin:condition')
             ->setDescription($this->trans('commands.generate.plugin.condition.description'))
             ->setHelp($this->trans('commands.generate.plugin.condition.help'))
-            ->addOption('module', '', InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
+            ->addOption('module', null, InputOption::VALUE_REQUIRED, $this->trans('commands.common.options.module'))
             ->addOption(
                 'class',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.condition.options.class')
             )
             ->addOption(
                 'label',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.condition.options.label')
             )
             ->addOption(
                 'plugin-id',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.condition.options.plugin-id')
             )
             ->addOption(
                 'context-definition-id',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.condition.options.context-definition-id')
             )
             ->addOption(
                 'context-definition-label',
-                '',
+                null,
                 InputOption::VALUE_REQUIRED,
                 $this->trans('commands.generate.plugin.condition.options.context-definition-label')
             )
             ->addOption(
                 'context-definition-required',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.generate.plugin.condition.options.context-definition-required')
-            );
+            )
+            ->setAliases(['gpco']);
     }
 
     /**
@@ -131,7 +132,7 @@ class PluginConditionCommand extends Command
 
         // @see use Drupal\Console\Command\Shared\ConfirmationTrait::confirmGeneration
         if (!$this->confirmGeneration($io)) {
-            return;
+            return 1;
         }
 
         $module = $input->getOption('module');
@@ -147,6 +148,8 @@ class PluginConditionCommand extends Command
             ->generate($module, $class_name, $label, $plugin_id, $context_definition_id, $context_definition_label, $context_definition_required);
 
         $this->chainQueue->addCommand('cache:rebuild', ['cache' => 'discovery']);
+
+        return 0;
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

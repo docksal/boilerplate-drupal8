@@ -3,6 +3,7 @@
 namespace Drupal\rest\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\rest\RestResourceConfigInterface;
 
@@ -243,24 +244,34 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
   }
 
   /**
-   * Normalizes the method to upper case and check validity.
+   * Normalizes the method.
    *
    * @param string $method
    *   The request method.
    *
    * @return string
-   *   The normalised request method.
-   *
-   * @throws \InvalidArgumentException
-   *   If the method is not supported.
+   *   The normalized request method.
    */
   protected function normalizeRestMethod($method) {
-    $valid_methods = ['GET', 'POST', 'PATCH', 'DELETE'];
-    $normalised_method = strtoupper($method);
-    if (!in_array($normalised_method, $valid_methods)) {
-      throw new \InvalidArgumentException('The method is not supported.');
-    }
-    return $normalised_method;
+    return strtoupper($method);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    \Drupal::service('router.builder')->setRebuildNeeded();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    \Drupal::service('router.builder')->setRebuildNeeded();
   }
 
 }

@@ -52,22 +52,23 @@ class LogClearCommand extends Command
             )
             ->addOption(
                 'type',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.database.log.clear.options.type')
             )
             ->addOption(
                 'severity',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.database.log.clear.options.severity')
             )
             ->addOption(
                 'user-id',
-                '',
+                null,
                 InputOption::VALUE_OPTIONAL,
                 $this->trans('commands.database.log.clear.options.user-id')
-            );
+            )
+            ->setAliases(['dblc']);
     }
 
     /**
