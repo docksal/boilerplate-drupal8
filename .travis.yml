@@ -1,0 +1,20 @@
+sudo: required
+
+language: generic
+
+env:
+  OS: linux
+
+services:
+  - docker
+
+install:
+  - curl -fsSL get.docksal.io | sh
+  - fin version
+  - fin sysinfo
+
+before_script:
+  - fin init
+
+script:
+  - fin test
