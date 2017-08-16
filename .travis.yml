@@ -2,9 +2,6 @@ sudo: required
 
 language: generic
 
-env:
-  OS: linux
-
 services:
   - docker
 
