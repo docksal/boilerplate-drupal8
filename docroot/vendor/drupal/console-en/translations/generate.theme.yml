@@ -11,6 +11,7 @@ options:
   composer: 'Add a composer.json file'
   base-theme: 'Base theme (i.e. classy, stable)'
   global-library: 'Global styling library name'
+  libraries: 'Libraries'
   regions: Regions
   breakpoints: Breakpoints
 questions:
@@ -37,6 +38,9 @@ questions:
   breakpoint-weight: 'Enter breakpoint weight'
   breakpoint-multipliers: 'Enter breakpoint multipliers'
   breakpoint-add: 'Do you want to add another breakpoint'
+suggestions:
+  my-awesome-theme: 'My Awesome theme'
+  other: 'Other'
 warnings:
   module-unavailable: 'Warning The following modules are not already available in your local environment "%s"'
 errors:

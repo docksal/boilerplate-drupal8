@@ -7,6 +7,7 @@ options:
   description: 'Profile description'
   core: 'Core version'
   dependencies: 'Module dependencies separated by commas (i.e. context, panels)'
+  themes: 'the theme name'
   distribution: 'The distribution name'
 questions:
   profile: 'Enter the name of the new profile'
@@ -14,7 +15,11 @@ questions:
   description: 'Enter the description'
   core: 'Enter Drupal Core version'
   dependencies: 'Would you like to add module dependencies?'
+  themes: 'Enter theme name'
   distribution: 'Is this install profile intended to be a distribution?'
+suggestions:
+  my-useful-profile: 'My Useful Profile'
+  my-kick-ass-distribution: 'My Kick-ass Distribution'
 warnings:
   module-unavailable: 'Warning: The following modules are not already available in your local environment "%s"'
 errors:

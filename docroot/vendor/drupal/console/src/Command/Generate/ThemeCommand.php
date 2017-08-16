@@ -14,12 +14,11 @@ use Drupal\Console\Command\Shared\ThemeRegionTrait;
 use Drupal\Console\Command\Shared\ThemeBreakpointTrait;
 use Drupal\Console\Generator\ThemeGenerator;
 use Drupal\Console\Command\Shared\ConfirmationTrait;
-use Symfony\Component\Console\Command\Command;
+use Drupal\Console\Core\Command\Command;
 use Drupal\Console\Core\Style\DrupalStyle;
 use Drupal\Console\Extension\Manager;
 use Drupal\Console\Utils\Site;
 use Drupal\Console\Core\Utils\StringConverter;
-use Drupal\Console\Core\Command\Shared\CommandTrait;
 use Drupal\Console\Utils\Validator;
 use Drupal\Core\Extension\ThemeHandler;
 
@@ -33,7 +32,6 @@ class ThemeCommand extends Command
     use ConfirmationTrait;
     use ThemeRegionTrait;
     use ThemeBreakpointTrait;
-    use CommandTrait;
 
     /**
  * @var Manager
@@ -114,7 +112,7 @@ class ThemeCommand extends Command
                 'theme',
                 null,
                 InputOption::VALUE_REQUIRED,
-                $this->trans('commands.generate.theme.options.module')
+                $this->trans('commands.generate.theme.options.theme')
             )
             ->addOption(
                 'machine-name',
@@ -126,7 +124,7 @@ class ThemeCommand extends Command
                 'theme-path',
                 null,
                 InputOption::VALUE_REQUIRED,
-                $this->trans('commands.generate.theme.options.module-path')
+                $this->trans('commands.generate.theme.options.theme-path')
             )
             ->addOption(
                 'description',
@@ -291,7 +289,7 @@ class ThemeCommand extends Command
         if (!$description) {
             $description = $io->ask(
                 $this->trans('commands.generate.theme.questions.description'),
-                'My Awesome theme'
+                $this->trans('commands.generate.theme.suggestions.my-awesome-theme')
             );
             $input->setOption('description', $description);
         }
@@ -300,7 +298,7 @@ class ThemeCommand extends Command
         if (!$package) {
             $package = $io->ask(
                 $this->trans('commands.generate.theme.questions.package'),
-                'Other'
+                $this->trans('commands.generate.theme.suggestions.other')
             );
             $input->setOption('package', $package);
         }

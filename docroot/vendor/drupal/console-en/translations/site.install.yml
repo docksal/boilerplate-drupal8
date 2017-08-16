@@ -9,6 +9,7 @@ arguments:
   account-name: 'Drupal administrator account name'
   account-mail: 'Drupal administrator account mail'
   account-pass: 'Drupal administrator account password'
+  force: 'Force to reinstall the site'
 questions:
   profile: 'Select Drupal profile to be installed'
   langcode: 'Select language for your Drupal installation'
@@ -18,6 +19,8 @@ questions:
   account-name: 'Provide your Drupal administrator account name'
   account-mail: 'Provide your Drupal administrator account mail'
   account-pass: 'Provide your Drupal administrator account password'
+suggestions:
+  site-name: 'My awesome site'
 messages:
   installing: 'Starting Drupal 8 install process'
   installed: 'Your Drupal 8 installation was completed successfully'
