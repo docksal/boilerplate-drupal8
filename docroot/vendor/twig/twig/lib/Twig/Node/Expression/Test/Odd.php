@@ -30,5 +30,3 @@ class Twig_Node_Expression_Test_Odd extends Twig_Node_Expression_Test
         ;
     }
 }
-
-class_alias('Twig_Node_Expression_Test_Odd', 'Twig\Node\Expression\Test\OddTest', false);

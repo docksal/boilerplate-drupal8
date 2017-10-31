@@ -28,5 +28,3 @@ class Twig_Node_Expression_Binary_EndsWith extends Twig_Node_Expression_Binary
         return $compiler->raw('');
     }
 }
-
-class_alias('Twig_Node_Expression_Binary_EndsWith', 'Twig\Node\Expression\Binary\EndsWithBinary', false);

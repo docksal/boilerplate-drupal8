@@ -94,9 +94,8 @@ class MemcachedCache extends CacheProvider
      */
     protected function doContains($id)
     {
-        $this->memcached->get($id);
-
-        return $this->memcached->getResultCode() === Memcached::RES_SUCCESS;
+        return false !== $this->memcached->get($id)
+            || $this->memcached->getResultCode() !== Memcached::RES_NOTFOUND;
     }
 
     /**

@@ -64,5 +64,3 @@ class Twig_TokenParser_Use extends Twig_TokenParser
         return 'use';
     }
 }
-
-class_alias('Twig_TokenParser_Use', 'Twig\TokenParser\UseTokenParser', false);

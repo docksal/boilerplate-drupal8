@@ -76,5 +76,3 @@ class Twig_Node_CheckSecurity extends Twig_Node
         ;
     }
 }
-
-class_alias('Twig_Node_CheckSecurity', 'Twig\Node\CheckSecurityNode', false);

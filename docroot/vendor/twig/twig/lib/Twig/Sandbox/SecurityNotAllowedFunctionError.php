@@ -29,5 +29,3 @@ class Twig_Sandbox_SecurityNotAllowedFunctionError extends Twig_Sandbox_Security
         return $this->functionName;
     }
 }
-
-class_alias('Twig_Sandbox_SecurityNotAllowedFunctionError', 'Twig\Sandbox\SecurityNotAllowedFunctionError', false);

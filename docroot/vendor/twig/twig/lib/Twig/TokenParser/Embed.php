@@ -63,5 +63,3 @@ class Twig_TokenParser_Embed extends Twig_TokenParser_Include
         return 'embed';
     }
 }
-
-class_alias('Twig_TokenParser_Embed', 'Twig\TokenParser\EmbedTokenParser', false);

@@ -117,5 +117,3 @@ class Twig_SimpleFilter
         return $this->options['alternative'];
     }
 }
-
-class_alias('Twig_SimpleFilter', 'Twig\TwigFilter', false);

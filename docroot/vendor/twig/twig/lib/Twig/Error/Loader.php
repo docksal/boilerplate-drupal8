@@ -36,5 +36,3 @@ class Twig_Error_Loader extends Twig_Error
         $this->setTemplateLine(false);
     }
 }
-
-class_alias('Twig_Error_Loader', 'Twig\Error\LoaderError', false);

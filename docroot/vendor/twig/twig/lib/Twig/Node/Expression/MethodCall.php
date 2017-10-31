@@ -39,5 +39,3 @@ class Twig_Node_Expression_MethodCall extends Twig_Node_Expression
         $compiler->raw(')');
     }
 }
-
-class_alias('Twig_Node_Expression_MethodCall', 'Twig\Node\Expression\MethodCallExpression', false);

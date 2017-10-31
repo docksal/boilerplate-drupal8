@@ -107,5 +107,3 @@ class Twig_SimpleFunction
         return $this->options['alternative'];
     }
 }
-
-class_alias('Twig_SimpleFunction', 'Twig\TwigFunction', false);

@@ -49,8 +49,8 @@ $config['system.logging']['error_level'] = 'verbose';
 /**
  * Disable CSS and JS aggregation.
  */
-# $config['system.performance']['css']['preprocess'] = FALSE;
-# $config['system.performance']['js']['preprocess'] = FALSE;
+$config['system.performance']['css']['preprocess'] = FALSE;
+$config['system.performance']['js']['preprocess'] = FALSE;
 
 /**
  * Disable the render cache (this includes the page cache).
@@ -106,21 +106,9 @@ $settings['rebuild_access'] = TRUE;
  */
 $settings['skip_permissions_hardening'] = TRUE;
 
-/**
- * Access control for update.php script.
- *
- * If you are updating your Drupal installation using the update.php script but
- * are not logged in using either an account with the "Administer software
- * updates" permission or the site maintenance account (the account that was
- * created during installation), you will need to modify the access check
- * statement below. Change the FALSE to a TRUE to disable the access check.
- * After finishing the upgrade, be sure to open this file again and change the
- * TRUE back to a FALSE!
- */
-$settings['update_free_access'] = TRUE;
 
 
-# Docker DB connection settings.
+# Docksal DB connection settings.
 $databases['default']['default'] = array (
   'database' => 'default',
   'username' => 'user',
@@ -136,7 +124,7 @@ $settings['file_chmod_file'] = 0666;
 # File system settings.
 $config['system.file']['path']['temporary'] = '/tmp';
 
-# Reverse proxy configuration (Docksal's vhost-proxy)
+# Reverse proxy configuration (Docksal vhost-proxy)
 if (PHP_SAPI !== 'cli') {
   $settings['reverse_proxy'] = TRUE;
   $settings['reverse_proxy_addresses'] = array($_SERVER['REMOTE_ADDR']);

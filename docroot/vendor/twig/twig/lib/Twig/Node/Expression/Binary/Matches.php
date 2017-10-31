@@ -26,5 +26,3 @@ class Twig_Node_Expression_Binary_Matches extends Twig_Node_Expression_Binary
         return $compiler->raw('');
     }
 }
-
-class_alias('Twig_Node_Expression_Binary_Matches', 'Twig\Node\Expression\Binary\MatchesBinary', false);

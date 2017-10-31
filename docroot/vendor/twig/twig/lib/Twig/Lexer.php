@@ -420,5 +420,3 @@ class Twig_Lexer implements Twig_LexerInterface
         $this->state = array_pop($this->states);
     }
 }
-
-class_alias('Twig_Lexer', 'Twig\Lexer', false);

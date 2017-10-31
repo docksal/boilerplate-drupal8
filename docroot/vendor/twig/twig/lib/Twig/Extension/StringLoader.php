@@ -43,5 +43,3 @@ function twig_template_from_string(Twig_Environment $env, $template)
 {
     return $env->createTemplate((string) $template);
 }
-
-class_alias('Twig_Extension_StringLoader', 'Twig\Extension\StringLoaderExtension', false);

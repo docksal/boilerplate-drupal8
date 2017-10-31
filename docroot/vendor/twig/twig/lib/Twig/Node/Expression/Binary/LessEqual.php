@@ -15,5 +15,3 @@ class Twig_Node_Expression_Binary_LessEqual extends Twig_Node_Expression_Binary
         return $compiler->raw('<=');
     }
 }
-
-class_alias('Twig_Node_Expression_Binary_LessEqual', 'Twig\Node\Expression\Binary\LessEqualBinary', false);

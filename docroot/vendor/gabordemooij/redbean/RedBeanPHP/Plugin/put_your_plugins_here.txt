@@ -1,2 +1,0 @@
-This folder has been reserved for your plugins
-

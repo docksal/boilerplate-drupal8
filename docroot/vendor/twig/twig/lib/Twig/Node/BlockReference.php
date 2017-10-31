@@ -30,5 +30,3 @@ class Twig_Node_BlockReference extends Twig_Node implements Twig_NodeOutputInter
         ;
     }
 }
-
-class_alias('Twig_Node_BlockReference', 'Twig\Node\BlockReferenceNode', false);

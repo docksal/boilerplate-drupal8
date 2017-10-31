@@ -287,5 +287,3 @@ abstract class Twig_Node_Expression_Call extends Twig_Node_Expression
         return $this->reflector = array($r, $callable);
     }
 }
-
-class_alias('Twig_Node_Expression_Call', 'Twig\Node\Expression\CallExpression', false);

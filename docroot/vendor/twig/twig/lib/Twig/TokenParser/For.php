@@ -123,5 +123,3 @@ class Twig_TokenParser_For extends Twig_TokenParser
         return 'for';
     }
 }
-
-class_alias('Twig_TokenParser_For', 'Twig\TokenParser\ForTokenParser', false);

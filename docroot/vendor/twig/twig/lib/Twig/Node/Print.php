@@ -32,5 +32,3 @@ class Twig_Node_Print extends Twig_Node implements Twig_NodeOutputInterface
         ;
     }
 }
-
-class_alias('Twig_Node_Print', 'Twig\Node\PrintNode', false);

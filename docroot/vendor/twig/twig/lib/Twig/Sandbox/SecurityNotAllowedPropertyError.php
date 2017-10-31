@@ -36,5 +36,3 @@ class Twig_Sandbox_SecurityNotAllowedPropertyError extends Twig_Sandbox_Security
         return $this->propertyName;
     }
 }
-
-class_alias('Twig_Sandbox_SecurityNotAllowedPropertyError', 'Twig\Sandbox\SecurityNotAllowedPropertyError', false);

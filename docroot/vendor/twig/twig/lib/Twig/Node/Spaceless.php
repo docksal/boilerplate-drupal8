@@ -33,5 +33,3 @@ class Twig_Node_Spaceless extends Twig_Node
         ;
     }
 }
-
-class_alias('Twig_Node_Spaceless', 'Twig\Node\SpacelessNode', false);

@@ -29,5 +29,3 @@ class Twig_Sandbox_SecurityNotAllowedFilterError extends Twig_Sandbox_SecurityEr
         return $this->filterName;
     }
 }
-
-class_alias('Twig_Sandbox_SecurityNotAllowedFilterError', 'Twig\Sandbox\SecurityNotAllowedFilterError', false);

@@ -60,5 +60,3 @@ class Twig_Node_With extends Twig_Node
         ;
     }
 }
-
-class_alias('Twig_Node_With', 'Twig\Node\WithNode', false);

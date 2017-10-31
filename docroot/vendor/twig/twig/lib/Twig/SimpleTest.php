@@ -69,5 +69,3 @@ class Twig_SimpleTest
         return $this->options['alternative'];
     }
 }
-
-class_alias('Twig_SimpleTest', 'Twig\TwigTest', false);

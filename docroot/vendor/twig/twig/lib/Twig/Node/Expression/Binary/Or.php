@@ -16,5 +16,3 @@ class Twig_Node_Expression_Binary_Or extends Twig_Node_Expression_Binary
         return $compiler->raw('||');
     }
 }
-
-class_alias('Twig_Node_Expression_Binary_Or', 'Twig\Node\Expression\Binary\OrBinary', false);

@@ -80,5 +80,3 @@ class Twig_NodeTraverser
         return $visitor->leaveNode($node, $this->env);
     }
 }
-
-class_alias('Twig_NodeTraverser', 'Twig\NodeTraverser', false);

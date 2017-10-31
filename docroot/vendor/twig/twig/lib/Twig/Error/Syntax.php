@@ -51,5 +51,3 @@ class Twig_Error_Syntax extends Twig_Error
         return array_keys($alternatives);
     }
 }
-
-class_alias('Twig_Error_Syntax', 'Twig\Error\SyntaxError', false);

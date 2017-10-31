@@ -56,5 +56,3 @@ class Twig_TokenParser_Macro extends Twig_TokenParser
         return 'macro';
     }
 }
-
-class_alias('Twig_TokenParser_Macro', 'Twig\TokenParser\MacroTokenParser', false);

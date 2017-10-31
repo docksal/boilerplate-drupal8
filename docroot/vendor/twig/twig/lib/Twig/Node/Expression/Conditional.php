@@ -29,5 +29,3 @@ class Twig_Node_Expression_Conditional extends Twig_Node_Expression
         ;
     }
 }
-
-class_alias('Twig_Node_Expression_Conditional', 'Twig\Node\Expression\ConditionalExpression', false);

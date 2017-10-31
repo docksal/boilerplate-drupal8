@@ -79,5 +79,3 @@ class Twig_Node_Expression_Array extends Twig_Node_Expression
         $compiler->raw(')');
     }
 }
-
-class_alias('Twig_Node_Expression_Array', 'Twig\Node\Expression\ArrayExpression', false);

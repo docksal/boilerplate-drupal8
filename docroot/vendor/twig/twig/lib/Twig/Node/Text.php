@@ -32,5 +32,3 @@ class Twig_Node_Text extends Twig_Node implements Twig_NodeOutputInterface
         ;
     }
 }
-
-class_alias('Twig_Node_Text', 'Twig\Node\TextNode', false);

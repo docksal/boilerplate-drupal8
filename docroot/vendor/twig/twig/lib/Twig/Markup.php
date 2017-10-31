@@ -35,5 +35,3 @@ class Twig_Markup implements Countable
         return function_exists('mb_get_info') ? mb_strlen($this->content, $this->charset) : strlen($this->content);
     }
 }
-
-class_alias('Twig_Markup', 'Twig\Markup', false);

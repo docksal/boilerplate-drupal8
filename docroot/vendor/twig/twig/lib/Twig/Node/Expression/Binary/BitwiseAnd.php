@@ -16,5 +16,3 @@ class Twig_Node_Expression_Binary_BitwiseAnd extends Twig_Node_Expression_Binary
         return $compiler->raw('&');
     }
 }
-
-class_alias('Twig_Node_Expression_Binary_BitwiseAnd', 'Twig\Node\Expression\Binary\BitwiseAndBinary', false);

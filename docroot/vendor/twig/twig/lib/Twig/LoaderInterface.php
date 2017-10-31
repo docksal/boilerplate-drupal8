@@ -53,5 +53,3 @@ interface Twig_LoaderInterface
      */
     public function isFresh($name, $time);
 }
-
-class_alias('Twig_LoaderInterface', 'Twig\Loader\LoaderInterface', false);

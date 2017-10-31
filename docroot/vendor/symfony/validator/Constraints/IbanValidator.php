@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -34,7 +33,7 @@ class IbanValidator extends ConstraintValidator
      * a BBAN (Basic Bank Account Number) which has a fixed length per country and,
      * included within it, a bank identifier with a fixed position and a fixed length per country
      *
-     * @see https://www.swift.com/sites/default/files/resources/iban_registry.pdf
+     * @see http://www.swift.com/dsp/resources/documents/IBAN_Registry.pdf
      *
      * @var array
      */
@@ -130,7 +129,7 @@ class IbanValidator extends ConstraintValidator
         'TL' => 'TL\d{2}\d{3}\d{14}\d{2}', // Timor-Leste
         'TN' => 'TN59\d{2}\d{3}\d{13}\d{2}', // Tunisia
         'TR' => 'TR\d{2}\d{5}[\dA-Z]{1}[\dA-Z]{16}', // Turkey
-        'UA' => 'UA\d{2}\d{6}[\dA-Z]{19}', // Ukraine
+        'UA' => 'UA\d{2}[A-Z]{6}[\dA-Z]{19}', // Ukraine
         'VG' => 'VG\d{2}[A-Z]{4}\d{16}', // Virgin Islands, British
         'WF' => 'FR\d{2}\d{5}\d{5}[\dA-Z]{11}\d{2}', // Wallis and Futuna Islands
         'XK' => 'XK\d{2}\d{4}\d{10}\d{2}', // Republic of Kosovo
@@ -161,17 +160,10 @@ class IbanValidator extends ConstraintValidator
 
         // The IBAN must contain only digits and characters...
         if (!ctype_alnum($canonicalized)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::INVALID_CHARACTERS_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::INVALID_CHARACTERS_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::INVALID_CHARACTERS_ERROR)
+                ->addViolation();
 
             return;
         }
@@ -180,34 +172,20 @@ class IbanValidator extends ConstraintValidator
         $countryCode = substr($canonicalized, 0, 2);
 
         if (!ctype_alpha($countryCode)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::INVALID_COUNTRY_CODE_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::INVALID_COUNTRY_CODE_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::INVALID_COUNTRY_CODE_ERROR)
+                ->addViolation();
 
             return;
         }
 
         // ...have a format available
         if (!array_key_exists($countryCode, self::$formats)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR)
+                ->addViolation();
 
             return;
         }
@@ -215,17 +193,10 @@ class IbanValidator extends ConstraintValidator
         // ...and have a valid format
         if (!preg_match('/^'.self::$formats[$countryCode].'$/', $canonicalized)
         ) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::INVALID_FORMAT_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::INVALID_FORMAT_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::INVALID_FORMAT_ERROR)
+                ->addViolation();
 
             return;
         }
@@ -246,17 +217,10 @@ class IbanValidator extends ConstraintValidator
         // We cannot use PHP's modulo operator, so we calculate the
         // modulo step-wisely instead
         if (1 !== self::bigModulo97($checkSum)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::CHECKSUM_FAILED_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Iban::CHECKSUM_FAILED_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Iban::CHECKSUM_FAILED_ERROR)
+                ->addViolation();
         }
     }
 

@@ -29,5 +29,3 @@ class Twig_Profiler_Node_LeaveProfile extends Twig_Node
         ;
     }
 }
-
-class_alias('Twig_Profiler_Node_LeaveProfile', 'Twig\Profiler\Node\LeaveProfileNode', false);

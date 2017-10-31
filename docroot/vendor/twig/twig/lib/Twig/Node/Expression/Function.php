@@ -41,5 +41,3 @@ class Twig_Node_Expression_Function extends Twig_Node_Expression_Call
         $this->compileCallable($compiler);
     }
 }
-
-class_alias('Twig_Node_Expression_Function', 'Twig\Node\Expression\FunctionExpression', false);

@@ -85,6 +85,3 @@ interface Twig_ExtensionInterface
      */
     public function getName();
 }
-
-class_alias('Twig_ExtensionInterface', 'Twig\Extension\ExtensionInterface', false);
-class_exists('Twig_Environment');

@@ -27,5 +27,3 @@ class Twig_Node_Expression_Test_Sameas extends Twig_Node_Expression_Test
         ;
     }
 }
-
-class_alias('Twig_Node_Expression_Test_Sameas', 'Twig\Node\Expression\Test\SameasTest', false);

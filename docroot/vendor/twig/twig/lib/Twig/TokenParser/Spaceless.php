@@ -47,5 +47,3 @@ class Twig_TokenParser_Spaceless extends Twig_TokenParser
         return 'spaceless';
     }
 }
-
-class_alias('Twig_TokenParser_Spaceless', 'Twig\TokenParser\SpacelessTokenParser', false);

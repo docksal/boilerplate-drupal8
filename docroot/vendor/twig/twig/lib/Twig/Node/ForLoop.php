@@ -48,5 +48,3 @@ class Twig_Node_ForLoop extends Twig_Node
         }
     }
 }
-
-class_alias('Twig_Node_ForLoop', 'Twig\Node\ForLoopNode', false);

@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.4.1 - 2017-08-17
+
+### Added
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- [#260](https://github.com/zendframework/zend-diactoros/pull/260) removes
+  support for HHVM, as tests have failed against it for some time.
+
+### Fixed
+
+- [#247](https://github.com/zendframework/zend-diactoros/pull/247) fixes the
+  `Stream` and `RelativeStream` `__toString()` method implementations to check
+  if the stream `isSeekable()` before attempting to `rewind()` it, ensuring that
+  the method does not raise exceptions (PHP does not allow exceptions in that
+  method). In particular, this fixes an issue when using AWS S3 streams.
+
+- [#252](https://github.com/zendframework/zend-diactoros/pull/252) provides a
+  fix to the `SapiEmitterTrait` to ensure that any `Set-Cookie` headers in the
+  response instance do not override those set by PHP when a session is created
+  and/or regenerated.
+
+- [#257](https://github.com/zendframework/zend-diactoros/pull/257) provides a
+  fix for the `PhpInputStream::read()` method to ensure string content that
+  evaluates as empty (including `0`) is still cached.
+
+- [#258](https://github.com/zendframework/zend-diactoros/pull/258) updates the
+  `Uri::filterPath()` method to allow parens within a URI path, per [RFC 3986
+  section 3.3](https://tools.ietf.org/html/rfc3986#section-3.3) (parens are
+  within the character set "sub-delims").
+
 ## 1.4.0 - 2017-04-06
 
 ### Added

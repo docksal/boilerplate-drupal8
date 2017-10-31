@@ -26,5 +26,3 @@ class Twig_Node_Expression_Binary_In extends Twig_Node_Expression_Binary
         return $compiler->raw('in');
     }
 }
-
-class_alias('Twig_Node_Expression_Binary_In', 'Twig\Node\Expression\Binary\InBinary', false);

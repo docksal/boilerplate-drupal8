@@ -2,12 +2,13 @@ name: Classy
 type: theme
 description: 'A base theme with sensible default CSS classes added. Learn how to use Classy as a base theme in the <a href="https://www.drupal.org/docs/8/theming">Drupal 8 Theming Guide</a>.'
 package: Core
-version: VERSION
-core: 8.x
+# version: VERSION
+# core: 8.x
 hidden: true
 
 libraries:
   - classy/base
+  - classy/messages
   - core/normalize
 
 libraries-extend:
@@ -21,3 +22,9 @@ libraries-extend:
     - classy/file
   core/drupal.progress:
     - classy/progress
+
+# Information added by Drupal.org packaging script on 2017-10-04
+version: '8.4.0'
+core: '8.x'
+project: 'drupal'
+datestamp: 1507146289

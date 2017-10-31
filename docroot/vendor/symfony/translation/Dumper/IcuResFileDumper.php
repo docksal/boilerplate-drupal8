@@ -28,16 +28,6 @@ class IcuResFileDumper extends FileDumper
     /**
      * {@inheritdoc}
      */
-    public function format(MessageCatalogue $messages, $domain = 'messages')
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use the formatCatalogue() method instead.', E_USER_DEPRECATED);
-
-        return $this->formatCatalogue($messages, $domain);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         $data = $indexes = $resources = '';
@@ -62,7 +52,7 @@ class IcuResFileDumper extends FileDumper
 
         $resOffset = $this->getPosition($data);
 
-        $data .= pack('v', count($messages->all($domain)))
+        $data .= pack('v', count($messages))
             .$indexes
             .$this->writePadding($data)
             .$resources
@@ -73,11 +63,11 @@ class IcuResFileDumper extends FileDumper
         $root = pack('V7',
             $resOffset + (2 << 28), // Resource Offset + Resource Type
             6,                      // Index length
-            $keyTop,                        // Index keys top
-            $bundleTop,                     // Index resources top
-            $bundleTop,                     // Index bundle top
-            count($messages->all($domain)), // Index max table length
-            0                               // Index attributes
+            $keyTop,                // Index keys top
+            $bundleTop,             // Index resources top
+            $bundleTop,             // Index bundle top
+            count($messages),       // Index max table length
+            0                       // Index attributes
         );
 
         $header = pack('vC2v4C12@32',
