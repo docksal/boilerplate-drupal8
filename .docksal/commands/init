@@ -23,12 +23,9 @@ echo-yellow () { echo -e "${yellow}$1${NC}"; }
 
 # Convert version string like 1.2.3 to integer for comparison
 # param $1 version string of 3 components max (e.g. 1.10.3)
-# TODO: remove this once minimal version compatibility checking for commands is implemented in fin
 ver_to_int ()
 {
-	local leading_zeros=$(printf "%03d%03d%03d" $(echo "$1" | tr -d '[:alpha:]' | tr -d '-' | tr '.' ' '))
-	# Remove leading zeroes because otherwise bash tried to handle the number as octal which leads to errors if version contains 9
-	echo "$leading_zeros" | sed "s/^0*//"
+	echo "$@" | awk -F. '{ printf("%d%03d%03d", $1,$2,$3); }'
 }
 
 #-------------------------- Execution --------------------------------
