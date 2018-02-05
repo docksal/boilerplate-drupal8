@@ -108,7 +108,7 @@ $settings['skip_permissions_hardening'] = TRUE;
 
 
 
-# Docksal DB connection settings.
+// Docksal DB connection settings.
 $databases['default']['default'] = array (
   'database' => 'default',
   'username' => 'user',
@@ -117,14 +117,14 @@ $databases['default']['default'] = array (
   'driver' => 'mysql',
 );
 
-# Workaround for permission issues with NFS shares
+// Workaround for permission issues with NFS shares
 $settings['file_chmod_directory'] = 0777;
 $settings['file_chmod_file'] = 0666;
 
 # File system settings.
 $config['system.file']['path']['temporary'] = '/tmp';
 
-# Reverse proxy configuration (Docksal vhost-proxy)
+// Reverse proxy configuration (Docksal vhost-proxy)
 if (PHP_SAPI !== 'cli') {
   $settings['reverse_proxy'] = TRUE;
   $settings['reverse_proxy_addresses'] = array($_SERVER['REMOTE_ADDR']);
