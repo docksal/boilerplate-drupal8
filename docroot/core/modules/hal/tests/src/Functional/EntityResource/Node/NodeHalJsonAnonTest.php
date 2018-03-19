@@ -33,26 +33,13 @@ class NodeHalJsonAnonTest extends NodeResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $patchProtectedFieldNames = [
-    'revision_timestamp',
-    'created',
-    'changed',
-    'promote',
-    'sticky',
-    'path',
-    'revision_uid',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function getExpectedNormalizedEntity() {
     $default_normalization = parent::getExpectedNormalizedEntity();
 
     $normalization = $this->applyHalFieldNormalization($default_normalization);
 
     $author = User::load($this->entity->getOwnerId());
-    return  $normalization + [
+    return $normalization + [
       '_links' => [
         'self' => [
           'href' => $this->baseUrl . '/llama?_format=hal_json',

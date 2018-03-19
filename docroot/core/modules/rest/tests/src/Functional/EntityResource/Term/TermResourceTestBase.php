@@ -2,10 +2,12 @@
 
 namespace Drupal\Tests\rest\Functional\EntityResource\Term;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\rest\Functional\BcTimestampNormalizerUnixTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
+use GuzzleHttp\RequestOptions;
 
 abstract class TermResourceTestBase extends EntityResourceTestBase {
 
@@ -41,16 +43,23 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access content']);
         break;
+
       case 'POST':
+        $this->grantPermissionsToTestedRole(['create terms in camelids']);
+        break;
+
       case 'PATCH':
-      case 'DELETE':
         // Grant the 'create url aliases' permission to test the case when
         // the path field is accessible, see
         // \Drupal\Tests\rest\Functional\EntityResource\Node\NodeResourceTestBase
         // for a negative test.
-        // @todo Update once https://www.drupal.org/node/2824408 lands.
-        $this->grantPermissionsToTestedRole(['administer taxonomy', 'create url aliases']);
+        $this->grantPermissionsToTestedRole(['edit terms in camelids', 'create url aliases']);
         break;
+
+      case 'DELETE':
+        $this->grantPermissionsToTestedRole(['delete terms in camelids']);
+        break;
+
     }
   }
 
@@ -71,6 +80,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
     // Create a "Llama" taxonomy term.
     $term = Term::create(['vid' => $vocabulary->id()])
       ->setName('Llama')
+      ->setDescription("It is a little known fact that llamas cannot count higher than seven.")
       ->setChangedTime(123456789)
       ->set('path', '/llama');
     $term->save();
@@ -101,8 +111,9 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       ],
       'description' => [
         [
-          'value' => NULL,
+          'value' => 'It is a little known fact that llamas cannot count higher than seven.',
           'format' => NULL,
+          'processed' => "<p>It is a little known fact that llamas cannot count higher than seven.</p>\n",
         ],
       ],
       'parent' => [],
@@ -168,7 +179,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       case 'GET':
         return "The 'access content' permission is required.";
       case 'POST':
-        return "The 'administer taxonomy' permission is required.";
+        return "The following permissions are required: 'create terms in camelids' OR 'administer taxonomy'.";
       case 'PATCH':
         return "The following permissions are required: 'edit terms in camelids' OR 'administer taxonomy'.";
       case 'DELETE':
@@ -176,6 +187,55 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
       default:
         return parent::getExpectedUnauthorizedAccessMessage($method);
     }
+  }
+
+  /**
+   * Tests PATCHing a term's path.
+   *
+   * For a negative test, see the similar test coverage for Node.
+   *
+   * @see \Drupal\Tests\rest\Functional\EntityResource\Node\NodeResourceTestBase::testPatchPath()
+   */
+  public function testPatchPath() {
+    $this->initAuthentication();
+    $this->provisionEntityResource();
+    $this->setUpAuthorization('GET');
+    $this->setUpAuthorization('PATCH');
+
+    $url = $this->getEntityResourceUrl()->setOption('query', ['_format' => static::$format]);
+
+    // GET term's current normalization.
+    $response = $this->request('GET', $url, $this->getAuthenticationRequestOptions('GET'));
+    $normalization = $this->serializer->decode((string) $response->getBody(), static::$format);
+
+    // Change term's path alias.
+    $normalization['path'][0]['alias'] .= 's-rule-the-world';
+
+    // Create term PATCH request.
+    $request_options = [];
+    $request_options[RequestOptions::HEADERS]['Content-Type'] = static::$mimeType;
+    $request_options = array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('PATCH'));
+    $request_options[RequestOptions::BODY] = $this->serializer->encode($normalization, static::$format);
+
+    // PATCH request: 200.
+    $response = $this->request('PATCH', $url, $request_options);
+    $this->assertResourceResponse(200, FALSE, $response);
+    $updated_normalization = $this->serializer->decode((string) $response->getBody(), static::$format);
+    $this->assertSame($normalization['path'], $updated_normalization['path']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getExpectedCacheTags() {
+    return Cache::mergeTags(parent::getExpectedCacheTags(), ['config:filter.format.plain_text', 'config:filter.settings']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getExpectedCacheContexts() {
+    return Cache::mergeContexts(['url.site'], $this->container->getParameter('renderer.config')['required_cache_contexts']);
   }
 
 }

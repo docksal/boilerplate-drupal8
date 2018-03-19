@@ -113,6 +113,9 @@ class FormTest extends FieldTestBase {
     // Check that hook_field_widget_form_alter() does not believe this is the
     // default value form.
     $this->assertNoText('From hook_field_widget_form_alter(): Default form is true.', 'Not default value form in hook_field_widget_form_alter().');
+    // Check that hook_field_widget_form_alter() does not believe this is the
+    // default value form.
+    $this->assertNoText('From hook_field_widget_multivalue_form_alter(): Default form is true.', 'Not default value form in hook_field_widget_form_alter().');
 
     // Submit with invalid value (field-level validation).
     $edit = [
@@ -389,62 +392,6 @@ class FormTest extends FieldTestBase {
     $this->assertNoField("{$field_name}[2][value]", 'No extraneous widget is displayed');
   }
 
-  public function testFieldFormJSAddMore() {
-    $field_storage = $this->fieldStorageUnlimited;
-    $field_name = $field_storage['field_name'];
-    $this->field['field_name'] = $field_name;
-    FieldStorageConfig::create($field_storage)->save();
-    FieldConfig::create($this->field)->save();
-    entity_get_form_display($this->field['entity_type'], $this->field['bundle'], 'default')
-      ->setComponent($field_name)
-      ->save();
-
-    // Display creation form -> 1 widget.
-    $this->drupalGet('entity_test/add');
-
-    // Press 'add more' button a couple times -> 3 widgets.
-    // drupalPostAjaxForm() will not work iteratively, so we add those through
-    // non-JS submission.
-    $this->drupalPostForm(NULL, [], t('Add another item'));
-    $this->drupalPostForm(NULL, [], t('Add another item'));
-
-    // Prepare values and weights.
-    $count = 3;
-    $delta_range = $count - 1;
-    $values = $weights = $pattern = $expected_values = $edit = [];
-    for ($delta = 0; $delta <= $delta_range; $delta++) {
-      // Assign unique random values and weights.
-      do {
-        $value = mt_rand(1, 127);
-      } while (in_array($value, $values));
-      do {
-        $weight = mt_rand(-$delta_range, $delta_range);
-      } while (in_array($weight, $weights));
-      $edit["{$field_name}[$delta][value]"] = $value;
-      $edit["{$field_name}[$delta][_weight]"] = $weight;
-      // We'll need three slightly different formats to check the values.
-      $values[$delta] = $value;
-      $weights[$delta] = $weight;
-      $field_values[$weight]['value'] = (string) $value;
-      $pattern[$weight] = "<input [^>]*value=\"$value\" [^>]*";
-    }
-    // Press 'add more' button through Ajax, and place the expected HTML result
-    // as the tested content.
-    $commands = $this->drupalPostAjaxForm(NULL, $edit, $field_name . '_add_more');
-    $this->setRawContent($commands[2]['data']);
-
-    for ($delta = 0; $delta <= $delta_range; $delta++) {
-      $this->assertFieldByName("{$field_name}[$delta][value]", $values[$delta], "Widget $delta is displayed and has the right value");
-      $this->assertFieldByName("{$field_name}[$delta][_weight]", $weights[$delta], "Widget $delta has the right weight");
-    }
-    ksort($pattern);
-    $pattern = implode('.*', array_values($pattern));
-    $this->assertPattern("|$pattern|s", 'Widgets are displayed in the correct order');
-    $this->assertFieldByName("{$field_name}[$delta][value]", '', "New widget is displayed");
-    $this->assertFieldByName("{$field_name}[$delta][_weight]", $delta, "New widget has the right weight");
-    $this->assertNoField("{$field_name}[" . ($delta + 1) . '][value]', 'No extraneous widget is displayed');
-  }
-
   /**
    * Tests widgets handling multiple values.
    */
@@ -688,6 +635,66 @@ class FormTest extends FieldTestBase {
     $this->assertText('A field with multiple values');
     // Test if labels were XSS filtered.
     $this->assertEscaped("<script>alert('a configurable field');</script>");
+  }
+
+  /**
+   * Tests hook_field_widget_multivalue_form_alter().
+   */
+  public function testFieldFormMultipleWidgetAlter() {
+    $this->widgetAlterTest('hook_field_widget_multivalue_form_alter', 'test_field_widget_multiple');
+  }
+
+  /**
+   * Tests hook_field_widget_multivalue_form_alter() with single value elements.
+   */
+  public function testFieldFormMultipleWidgetAlterSingleValues() {
+    $this->widgetAlterTest('hook_field_widget_multivalue_form_alter', 'test_field_widget_multiple_single_value');
+  }
+
+  /**
+   * Tests hook_field_widget_multivalue_WIDGET_TYPE_form_alter().
+   */
+  public function testFieldFormMultipleWidgetTypeAlter() {
+    $this->widgetAlterTest('hook_field_widget_multivalue_WIDGET_TYPE_form_alter', 'test_field_widget_multiple');
+  }
+
+  /**
+   * Tests hook_field_widget_multivalue_WIDGET_TYPE_form_alter() with single value elements.
+   */
+  public function testFieldFormMultipleWidgetTypeAlterSingleValues() {
+    $this->widgetAlterTest('hook_field_widget_multivalue_WIDGET_TYPE_form_alter', 'test_field_widget_multiple_single_value');
+  }
+
+  /**
+   * Tests widget alter hooks for a given hook name.
+   */
+  protected function widgetAlterTest($hook, $widget) {
+    // Create a field with fixed cardinality, configure the form to use a
+    // "multiple" widget.
+    $field_storage = $this->fieldStorageMultiple;
+    $field_name = $field_storage['field_name'];
+    $this->field['field_name'] = $field_name;
+    FieldStorageConfig::create($field_storage)->save();
+    FieldConfig::create($this->field)->save();
+
+    // Set a flag in state so that the hook implementations will run.
+    \Drupal::state()->set("field_test.widget_alter_test", [
+      'hook' => $hook,
+      'field_name' => $field_name,
+      'widget' => $widget,
+    ]);
+    entity_get_form_display($this->field['entity_type'], $this->field['bundle'], 'default')
+      ->setComponent($field_name, [
+        'type' => $widget,
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+    $this->assertUniqueText("From $hook(): prefix on $field_name parent element.");
+    if ($widget === 'test_field_widget_multiple_single_value') {
+      $suffix_text = "From $hook(): suffix on $field_name child element.";
+      $this->assertEqual($field_storage['cardinality'], substr_count($this->getTextContent(), $suffix_text), "'$suffix_text' was found {$field_storage['cardinality']} times  using widget $widget");
+    }
   }
 
 }

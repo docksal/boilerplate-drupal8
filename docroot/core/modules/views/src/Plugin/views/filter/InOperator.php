@@ -88,7 +88,8 @@ class InOperator extends FilterPluginBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Limit list to selected items'),
       '#description' => $this->t('If checked, the only items presented to the user will be the ones selected here.'),
-      '#default_value' => !empty($this->options['expose']['reduce']), // safety
+      // Safety.
+      '#default_value' => !empty($this->options['expose']['reduce']),
     ];
   }
 
@@ -228,7 +229,9 @@ class InOperator extends FilterPluginBase {
         '#default_value' => $default_value,
         // These are only valid for 'select' type, but do no harm to checkboxes.
         '#multiple' => TRUE,
-        '#size' => count($options) > 8 ? 8 : count($options),
+        // The value options can be a multidimensional array if the value form
+        // type is a select list, so make sure that they are counted correctly.
+        '#size' => min(count($options, COUNT_RECURSIVE), 8),
       ];
       $user_input = $form_state->getUserInput();
       if ($exposed && !isset($user_input[$identifier])) {

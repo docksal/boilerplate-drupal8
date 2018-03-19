@@ -68,6 +68,57 @@ use Drupal\node\Entity\NodeType;
  * - During many operations, static methods are called on the entity class,
  *   which implements \Drupal\Entity\EntityInterface.
  *
+ * @section entities_revisions_translations Entities, revisions and translations
+ * A content entity can have multiple stored variants: based on its definition,
+ * it can be revisionable, translatable, or both.
+ *
+ * A revisionable entity can keep track of the changes that affect its data. In
+ * fact all previous revisions of the entity can be stored and made available as
+ * "historical" information. The "default" revision is the canonical variant of
+ * the entity, the one that is loaded when no specific revision is requested.
+ * Only changes to the default revision may be performed without triggering the
+ * creation of a new revision, in any other case revision data is not supposed
+ * to change. Aside from historical revisions, there can be "pending" revisions,
+ * that contain changes that did not make their way into the default revision.
+ * Typically these revisions contain data that is waiting for some form of
+ * approval, before being accepted as canonical.
+ * @see \Drupal\Core\Entity\RevisionableInterface
+ * @see \Drupal\Core\Entity\RevisionableStorageInterface
+ *
+ * A translatable entity can contain multiple translations of the same content.
+ * Content entity data is stored via fields, and each field can have one version
+ * for each enabled language. Some fields may be defined as untranslatable,
+ * which means that their values are shared among all translations. The
+ * "default" translation is the canonical variant of the entity, the one whose
+ * content will be accessible in the entity field data. Other translations
+ * can be instantiated from the default one. Every translation has an "active
+ * language" that is used to determine which field translation values should be
+ * handled. Typically the default translation's active language is the language
+ * of the content that was originally entered and served as source for the other
+ * translations.
+ * @see \Drupal\Core\Entity\TranslatableInterface
+ * @see \Drupal\Core\Entity\TranslatableStorageInterface
+ *
+ * An entity that is both revisionable and translatable has all the features
+ * described above: every revision can contain one or more translations. The
+ * canonical variant of the entity is the default translation of the default
+ * revision. Any revision will be initially loaded as the default translation,
+ * the other revision translations can be instantiated from this one. If a
+ * translation has changes in a certain revision, the translation is considered
+ * "affected" by that revision, and will be flagged as such via the
+ * "revision_translation_affected" field. With the built-in UI, every time a new
+ * revision is saved, the changes for the edited translations will be stored,
+ * while all field values for the other translations will be copied as-is.
+ * However, if multiple translations of the default revision are being
+ * subsequently modified without creating a new revision when saving, they will
+ * all be affected by the default revision. Additionally, all revision
+ * translations will be affected when saving a revision containing changes for
+ * untranslatable fields. On the other hand, pending revisions are not supposed
+ * to contain multiple affected translations, even when they are being
+ * manipulated via the API.
+ * @see \Drupal\Core\Entity\TranslatableRevisionableInterface
+ * @see \Drupal\Core\Entity\TranslatableRevisionableStorageInterface
+ *
  * @section create Create operations
  * To create an entity:
  * @code
@@ -84,6 +135,10 @@ use Drupal\node\Entity\NodeType;
  * Hooks invoked during the create operation:
  * - hook_ENTITY_TYPE_create()
  * - hook_entity_create()
+ * - When handling content entities, if a new translation is added to the entity
+ *   object:
+ *   - hook_ENTITY_TYPE_translation_create()
+ *   - hook_entity_translation_create()
  *
  * See @ref save below for the save portion of the operation.
  *
@@ -112,6 +167,35 @@ use Drupal\node\Entity\NodeType;
  * $entity = $storage->loadRevision($revision_id);
  * @endcode
  * This involves the same hooks and operations as regular entity loading.
+ *
+ * The "latest revision" of an entity is the most recently created one,
+ * regardless of it being default or pending. If the entity is translatable,
+ * revision translations are not taken into account either. In other words, any
+ * time a new revision is created, that becomes the latest revision for the
+ * entity overall, regardless of the affected translations. To load the latest
+ * revision of an entity:
+ * @code
+ * $revision_id = $storage->getLatestRevisionId($entity_id);
+ * $entity = $storage->loadRevision($revision_id);
+ * @endcode
+ * As usual, if the entity is translatable, this code instantiates into $entity
+ * the default translation of the revision, even if the latest revision contains
+ * only changes to a different translation:
+ * @code
+ * $is_default = $entity->isDefaultTranslation(); // returns TRUE
+ * @endcode
+ *
+ * The "latest translation-affected revision" is the most recently created one
+ * that affects the specified translation. For example, when a new revision
+ * introducing some changes to an English translation is saved, that becomes the
+ * new "latest revision". However, if an existing Italian translation was not
+ * affected by those changes, then the "latest translation-affected revision"
+ * for Italian remains what it was. To load the Italian translation at its
+ * latest translation-affected revision:
+ * @code
+ * $revision_id = $storage->getLatestTranslationAffectedRevisionId($entity_id, 'it');
+ * $it_translation = $storage->loadRevision($revision_id)->getTranslation('it');
+ * @endcode
  *
  * @section save Save operations
  * To update an existing entity, you will need to load it, change properties,
@@ -142,6 +226,10 @@ use Drupal\node\Entity\NodeType;
  *   hook_entity_bundle_create()
  * - Comment: hook_comment_publish() and hook_comment_unpublish() as
  *   appropriate.
+ *
+ * Note that all translations available for the entity are stored during a save
+ * operation. When saving a new revision, a copy of every translation is stored,
+ * regardless of it being affected by the revision.
  *
  * @section edit Editing operations
  * When an entity's add/edit form is used to add or edit an entity, there
@@ -276,11 +364,11 @@ use Drupal\node\Entity\NodeType;
  *   out-of-the-box support for Entity API's revisioning and publishing
  *   features, which will allow your entity type to be used with Drupal's
  *   editorial workflow provided by the Content Moderation module.
- * - The 'id' annotation gives the entity type ID, and the 'label' annotation
- *   gives the human-readable name of the entity type. If you are defining a
- *   content entity type that uses bundles, the 'bundle_label' annotation gives
- *   the human-readable name to use for a bundle of this entity type (for
- *   example, "Content type" for the Node entity).
+ * - In the annotation, the 'id' property gives the entity type ID, and the
+ *   'label' property gives the human-readable name of the entity type. If you
+ *   are defining a content entity type that uses bundles, the 'bundle_label'
+ *   property gives the human-readable name to use for a bundle of this entity
+ *   type (for example, "Content type" for the Node entity).
  * - The annotation will refer to several handler classes, which you will also
  *   need to define:
  *   - list_builder: Define a class that extends
@@ -299,16 +387,17 @@ use Drupal\node\Entity\NodeType;
  *     \Drupal\Core\Entity\EntityViewBuilderInterface (usually extending
  *     \Drupal\Core\Entity\EntityViewBuilder), to display a single entity.
  *   - translation: For translatable content entities (if the 'translatable'
- *     annotation has value TRUE), define a class that extends
+ *     annotation property has value TRUE), define a class that extends
  *     \Drupal\content_translation\ContentTranslationHandler, to translate
  *     the content. Configuration translation is handled automatically by the
  *     Configuration Translation module, without the need of a handler class.
  *   - access: If your configuration entity has complex permissions, you might
  *     need an access control handling, implementing
- *     \Drupal\Core\Entity\EntityAccessControlHandlerInterface, but most entities
- *     can just use the 'admin_permission' annotation instead. Note that if you
- *     are creating your own access control handler, you should override the
- *     checkAccess() and checkCreateAccess() methods, not access().
+ *     \Drupal\Core\Entity\EntityAccessControlHandlerInterface, but most
+ *     entities can just use the 'admin_permission' annotation property
+ *     instead. Note that if you are creating your own access control handler,
+ *     you should override the checkAccess() and checkCreateAccess() methods,
+ *     not access().
  *   - storage: A class implementing
  *     \Drupal\Core\Entity\EntityStorageInterface. If not specified, content
  *     entities will use \Drupal\Core\Entity\Sql\SqlContentEntityStorage, and
@@ -341,25 +430,26 @@ use Drupal\node\Entity\NodeType;
  *   - delete-form: Confirmation form to delete the entity.
  *   - edit-form: Editing form.
  *   - Other link types specific to your entity type can also be defined.
- * - If your content entity is fieldable, provide 'field_ui_base_route'
- *   annotation, giving the name of the route that the Manage Fields, Manage
- *   Display, and Manage Form Display pages from the Field UI module will be
- *   attached to. This is usually the bundle settings edit page, or an entity
- *   type settings page if there are no bundles.
+ * - If your content entity is fieldable, provide the 'field_ui_base_route'
+ *   annotation property, giving the name of the route that the Manage Fields,
+ *   Manage Display, and Manage Form Display pages from the Field UI module
+ *   will be attached to. This is usually the bundle settings edit page, or an
+ *   entity type settings page if there are no bundles.
  * - If your content entity has bundles, you will also need to define a second
  *   plugin to handle the bundles. This plugin is itself a configuration entity
  *   type, so follow the steps here to define it. The machine name ('id'
- *   annotation) of this configuration entity class goes into the
- *   'bundle_entity_type' annotation on the entity type class. For example, for
- *   the Node entity, the bundle class is \Drupal\node\Entity\NodeType, whose
- *   machine name is 'node_type'. This is the annotation value for
- *   'bundle_entity_type' on the \Drupal\node\Entity\Node class. Also, the
- *   bundle config entity type annotation must have a 'bundle_of' entry,
+ *   annotation property) of this configuration entity class goes into the
+ *   'bundle_entity_type' annotation property on the entity type class. For
+ *   example, for the Node entity, the bundle class is
+ *   \Drupal\node\Entity\NodeType, whose machine name is 'node_type'. This is
+ *   the annotation property 'bundle_entity_type' on the
+ *   \Drupal\node\Entity\Node class. Also, the
+ *   bundle config entity type annotation must have a 'bundle_of' property,
  *   giving the machine name of the entity type it is acting as a bundle for.
  *   These machine names are considered permanent, they may not be renamed.
- * - Additional annotations can be seen on entity class examples such as
- *   \Drupal\node\Entity\Node (content) and \Drupal\user\Entity\Role
- *   (configuration). These annotations are documented on
+ * - Additional annotation properties can be seen on entity class examples such
+ *   as \Drupal\node\Entity\Node (content) and \Drupal\user\Entity\Role
+ *   (configuration). These annotation properties are documented on
  *   \Drupal\Core\Entity\EntityType.
  *
  * @section sec_routes Entity routes
@@ -445,8 +535,8 @@ use Drupal\node\Entity\NodeType;
  * $storage = $container->get('entity.manager')->getStorage('your_entity_type');
  * @endcode
  * Here, 'your_entity_type' is the machine name of your entity type ('id'
- * annotation on the entity class), and note that you should use dependency
- * injection to retrieve this object if possible. See the
+ * annotation property on the entity class), and note that you should use
+ * dependency injection to retrieve this object if possible. See the
  * @link container Services and Dependency Injection topic @endlink for more
  * about how to properly retrieve services.
  *

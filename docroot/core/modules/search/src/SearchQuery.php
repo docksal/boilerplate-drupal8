@@ -571,10 +571,9 @@ class SearchQuery extends SelectExtender {
       }
     }
 
-
     // Add arguments for the keyword relevance normalization number.
     $normalization = 1.0 / $this->normalize;
-    for ($i = 0; $i < $this->relevance_count; $i++ ) {
+    for ($i = 0; $i < $this->relevance_count; $i++) {
       $this->scoresArguments[':normalization_' . $i] = $normalization;
     }
 

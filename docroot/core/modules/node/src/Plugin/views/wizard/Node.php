@@ -22,22 +22,10 @@ class Node extends WizardPluginBase {
 
   /**
    * Set the created column.
+   *
+   * @var string
    */
   protected $createdColumn = 'node_field_data-created';
-
-  /**
-   * Set default values for the filters.
-   */
-  protected $filters = [
-    'status' => [
-      'value' => TRUE,
-      'table' => 'node_field_data',
-      'field' => 'status',
-      'plugin_id' => 'boolean',
-      'entity_type' => 'node',
-      'entity_field' => 'status',
-    ]
-  ];
 
   /**
    * Overrides Drupal\views\Plugin\views\wizard\WizardPluginBase::getAvailableSorts().

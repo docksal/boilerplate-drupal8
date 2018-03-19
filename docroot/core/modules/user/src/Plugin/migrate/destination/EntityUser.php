@@ -39,7 +39,7 @@ class EntityUser extends EntityContentBase {
    *   The plugin implementation definition.
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   The migration.
-   * @param EntityStorageInterface $storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The storage for this entity type.
    * @param array $bundles
    *   The list of bundles this entity type has.
@@ -125,6 +125,20 @@ class EntityUser extends EntityContentBase {
     if (Unicode::strlen($name) > USERNAME_MAX_LENGTH) {
       $row->setDestinationProperty('name', Unicode::substr($name, 0, USERNAME_MAX_LENGTH));
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getHighestId() {
+    $highest_id = parent::getHighestId();
+
+    // Every Drupal site must have a user with UID of 1 and it's normal for
+    // migrations to overwrite this user.
+    if ($highest_id === 1) {
+      return 0;
+    }
+    return $highest_id;
   }
 
 }

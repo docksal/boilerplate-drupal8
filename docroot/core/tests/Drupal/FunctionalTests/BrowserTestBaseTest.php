@@ -188,7 +188,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests legacy text asserts.
    */
-  public function testLegacyTextAsserts() {
+  public function testTextAsserts() {
     $this->drupalGet('test-encoded');
     $dangerous = 'Bad html <script>alert(123);</script>';
     $sanitized = Html::escape($dangerous);
@@ -202,7 +202,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests legacy field asserts which use xpath directly.
    */
-  public function testLegacyXpathAsserts() {
+  public function testXpathAsserts() {
     $this->drupalGet('test-field-xpath');
     $this->assertFieldsByValue($this->xpath("//h1[@class = 'page-title']"), NULL);
     $this->assertFieldsByValue($this->xpath('//table/tbody/tr[2]/td[1]'), 'one');
@@ -245,7 +245,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests legacy field asserts using textfields.
    */
-  public function testLegacyFieldAssertsForTextfields() {
+  public function testFieldAssertsForTextfields() {
     $this->drupalGet('test-field-xpath');
 
     // *** 1. assertNoField().
@@ -387,7 +387,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests legacy field asserts for options field type.
    */
-  public function testLegacyFieldAssertsForOptions() {
+  public function testFieldAssertsForOptions() {
     $this->drupalGet('test-field-xpath');
 
     // Option field type.
@@ -443,7 +443,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests legacy field asserts for button field type.
    */
-  public function testLegacyFieldAssertsForButton() {
+  public function testFieldAssertsForButton() {
     $this->drupalGet('test-field-xpath');
 
     $this->assertFieldById('edit-save', NULL);
@@ -485,7 +485,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests legacy field asserts for checkbox field type.
    */
-  public function testLegacyFieldAssertsForCheckbox() {
+  public function testFieldAssertsForCheckbox() {
     $this->drupalGet('test-field-xpath');
 
     // Part 1 - Test by name.
@@ -631,6 +631,12 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $this->checkForMetaRefresh();
     // Check that we are now on the test page.
     $this->assertSession()->pageTextContains('Test page text.');
+  }
+
+  public function testGetDefaultDriveInstance() {
+    putenv('MINK_DRIVER_ARGS=' . json_encode([NULL, ['key1' => ['key2' => ['key3' => 3, 'key3.1' => 3.1]]]]));
+    $this->getDefaultDriverInstance();
+    $this->assertEquals([NULL, ['key1' => ['key2' => ['key3' => 3, 'key3.1' => 3.1]]]], $this->minkDefaultDriverArgs);
   }
 
 }

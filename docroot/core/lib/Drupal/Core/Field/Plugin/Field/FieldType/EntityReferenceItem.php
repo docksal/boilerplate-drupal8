@@ -4,6 +4,7 @@ namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\ContentEntityStorageInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -296,6 +297,37 @@ class EntityReferenceItem extends FieldItemBase implements OptionsProviderInterf
       $values['target_id'] = array_rand($referenceable[$group]);
       return $values;
     }
+
+    // Attempt to create a sample entity, avoiding recursion.
+    $entity_storage = \Drupal::entityTypeManager()->getStorage($options['target_type']);
+    if ($options['target_type'] !== $field_definition->getTargetEntityTypeId() && $entity_storage instanceof ContentEntityStorageInterface) {
+      $bundle = static::getRandomBundle($entity_type, $options['handler_settings']);
+      $values['entity'] = $entity_storage->createWithSampleValues($bundle);
+      return $values;
+    }
+  }
+
+  /**
+   * Gets a bundle for a given entity type and selection options.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type.
+   * @param array $selection_settings
+   *   An array of selection settings.
+   *
+   * @return string|null
+   *   Either the bundle string, or NULL if there is no bundle.
+   */
+  protected static function getRandomBundle(EntityTypeInterface $entity_type, array $selection_settings) {
+    if ($bundle_key = $entity_type->getKey('bundle')) {
+      if (!empty($selection_settings['target_bundles'])) {
+        $bundle_ids = $selection_settings['target_bundles'];
+      }
+      else {
+        $bundle_ids = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type->id());
+      }
+      return array_rand($bundle_ids);
+    }
   }
 
   /**
@@ -503,19 +535,6 @@ class EntityReferenceItem extends FieldItemBase implements OptionsProviderInterf
               }
 
               $bundles_changed = TRUE;
-
-              // In case we deleted the only target bundle allowed by the field
-              // we have to log a critical message because the field will not
-              // function correctly anymore.
-              if ($handler_settings['target_bundles'] === []) {
-                \Drupal::logger('entity_reference')->critical('The %target_bundle bundle (entity type: %target_entity_type) was deleted. As a result, the %field_name entity reference field (entity_type: %entity_type, bundle: %bundle) no longer has any valid bundle it can reference. The field is not working correctly anymore and has to be adjusted.', [
-                  '%target_bundle' => $bundle->label(),
-                  '%target_entity_type' => $bundle->getEntityType()->getBundleOf(),
-                  '%field_name' => $field_definition->getName(),
-                  '%entity_type' => $field_definition->getTargetEntityTypeId(),
-                  '%bundle' => $field_definition->getTargetBundle()
-                ]);
-              }
             }
           }
         }

@@ -11,7 +11,9 @@ use Drupal\migrate_drupal\Plugin\migrate\field\FieldPluginBase;
  *   core = {6},
  *   type_map = {
  *     "link_field" = "link"
- *   }
+ *   },
+ *   source_module = "link",
+ *   destination_module = "link"
  * )
  */
 class LinkField extends FieldPluginBase {
@@ -39,7 +41,7 @@ class LinkField extends FieldPluginBase {
    */
   public function processFieldValues(MigrationInterface $migration, $field_name, $data) {
     $process = [
-      'plugin' => 'd6_field_link',
+      'plugin' => 'field_link',
       'source' => $field_name,
     ];
     $migration->mergeProcessOfProperty($field_name, $process);

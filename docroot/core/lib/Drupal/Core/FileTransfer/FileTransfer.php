@@ -207,7 +207,8 @@ abstract class FileTransfer {
    */
   final protected function checkPath($path) {
     $full_jail = $this->chroot . $this->jail;
-    $full_path = drupal_realpath(substr($this->chroot . $path, 0, strlen($full_jail)));
+    $full_path = \Drupal::service('file_system')
+      ->realpath(substr($this->chroot . $path, 0, strlen($full_jail)));
     $full_path = $this->fixRemotePath($full_path, FALSE);
     if ($full_jail !== $full_path) {
       throw new FileTransferException('@directory is outside of the @jail', NULL, ['@directory' => $path, '@jail' => $this->jail]);
@@ -231,7 +232,8 @@ abstract class FileTransfer {
    */
   final protected function fixRemotePath($path, $strip_chroot = TRUE) {
     $path = $this->sanitizePath($path);
-    $path = preg_replace('|^([a-z]{1}):|i', '', $path); // Strip out windows driveletter if its there.
+    // Strip out windows driveletter if its there.
+    $path = preg_replace('|^([a-z]{1}):|i', '', $path);
     if ($strip_chroot) {
       if ($this->chroot && strpos($path, $this->chroot) === 0) {
         $path = ($path == $this->chroot) ? '' : substr($path, strlen($this->chroot));
@@ -250,7 +252,8 @@ abstract class FileTransfer {
    *   The modified path.
    */
   public function sanitizePath($path) {
-    $path = str_replace('\\', '/', $path); // Windows path sanitization.
+    // Windows path sanitization.
+    $path = str_replace('\\', '/', $path);
     if (substr($path, -1) == '/') {
       $path = substr($path, 0, -1);
     }

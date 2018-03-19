@@ -7,6 +7,8 @@ use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Form constructor for the Ajax Command display form.
+ *
+ * @internal
  */
 class AjaxFormsTestCommandsForm extends FormBase {
 
@@ -52,7 +54,6 @@ class AjaxFormsTestCommandsForm extends FormBase {
       '#suffix' => '<div id="append_div">Append inside this div</div>',
     ];
 
-
     // Shows the 'before' command.
     $form['before_command_example'] = [
       '#value' => $this->t("AJAX 'before': Click to put something before the div"),
@@ -90,7 +91,6 @@ class AjaxFormsTestCommandsForm extends FormBase {
       ],
       '#suffix' => '<div id="css_div" style="height: 50px; width: 50px; border: 1px solid black"> box</div>',
     ];
-
 
     // Shows the Ajax 'data' command. But there is no use of this information,
     // as this would require a javascript client to use the data.

@@ -137,7 +137,7 @@ class MenuLinkTreeTest extends UnitTestCase {
       ]
     ];
 
-    $get_built_element = function(MenuLinkTreeElement $element) {
+    $get_built_element = function (MenuLinkTreeElement $element) {
       $return = [
         'attributes' => new Attribute(),
         'title' => $element->link->getTitle(),
@@ -181,7 +181,6 @@ class MenuLinkTreeTest extends UnitTestCase {
         MenuLinkMock::create(['id' => 'test.example2', 'route_name' => 'example1', 'title' => 'Example 2', 'metadata' => ['cache_contexts' => ['bar']] + $cache_defaults]),
       ],
     ];
-
 
     $data = [];
 

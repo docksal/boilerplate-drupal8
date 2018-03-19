@@ -59,7 +59,6 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
     $menu_tree = \Drupal::menuTree();
     $renderer = \Drupal::service('renderer');
 
-
     $default_menu_cacheability = (new BubbleableMetadata())
       ->setCacheMaxAge(Cache::PERMANENT)
       ->setCacheTags(['config:system.menu.tools'])
@@ -109,6 +108,7 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
       $menu_link_content = MenuLinkContent::create([
         'link' => ['uri' => $expectation['uri']],
         'menu_name' => 'tools',
+        'title' => 'Link test',
       ]);
       $menu_link_content->save();
       $tree = $menu_tree->load('tools', new MenuTreeParameters());
@@ -129,6 +129,7 @@ class MenuLinkContentCacheabilityBubblingTest extends KernelTestBase {
       $menu_link_content = MenuLinkContent::create([
         'link' => ['uri' => $expectation['uri']],
         'menu_name' => 'tools',
+        'title' => 'Link test',
       ]);
       $menu_link_content->save();
       $expected_cacheability = $expected_cacheability->merge($expectation['cacheability']);

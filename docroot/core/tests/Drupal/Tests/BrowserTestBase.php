@@ -35,6 +35,10 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  * Drupal\Tests\yourmodule\Functional namespace and live in the
  * modules/yourmodule/tests/src/Functional directory.
  *
+ * Tests extending this base class should only translate text when testing
+ * translation functionality. For example, avoid wrapping test text with t()
+ * or TranslatableMarkup().
+ *
  * @ingroup testing
  */
 abstract class BrowserTestBase extends TestCase {
@@ -62,6 +66,7 @@ abstract class BrowserTestBase extends TestCase {
     createUser as drupalCreateUser;
   }
   use XdebugRequestTrait;
+  use PhpunitCompatibilityTrait;
 
   /**
    * The database prefix of this test run.
@@ -340,12 +345,12 @@ abstract class BrowserTestBase extends TestCase {
    *   When provided default Mink driver class can't be instantiated.
    */
   protected function getDefaultDriverInstance() {
-    // Get default driver params from environment if availables.
-    if ($arg_json = getenv('MINK_DRIVER_ARGS')) {
-      $this->minkDefaultDriverArgs = json_decode($arg_json);
+    // Get default driver params from environment if available.
+    if ($arg_json = $this->getMinkDriverArgs()) {
+      $this->minkDefaultDriverArgs = json_decode($arg_json, TRUE);
     }
 
-    // Get and check default driver class from environment if availables.
+    // Get and check default driver class from environment if available.
     if ($minkDriverClass = getenv('MINK_DRIVER_CLASS')) {
       if (class_exists($minkDriverClass)) {
         $this->minkDefaultDriverClass = $minkDriverClass;
@@ -388,6 +393,18 @@ abstract class BrowserTestBase extends TestCase {
         $this->htmlOutputCounter = max(1, (int) file_get_contents($this->htmlOutputCounterStorage)) + 1;
       }
     }
+  }
+
+  /**
+   * Get the Mink driver args from an environment variable, if it is set. Can
+   * be overridden in a derived class so it is possible to use a different
+   * value for a subset of tests, e.g. the JavaScript tests.
+   *
+   *  @return string|false
+   *   The JSON-encoded argument string. False if it is not set.
+   */
+  protected function getMinkDriverArgs() {
+    return getenv('MINK_DRIVER_ARGS');
   }
 
   /**
@@ -446,6 +463,15 @@ abstract class BrowserTestBase extends TestCase {
    * {@inheritdoc}
    */
   protected function setUp() {
+    // Installing Drupal creates 1000s of objects. Garbage collection of these
+    // objects is expensive. This appears to be causing random segmentation
+    // faults in PHP 5.x due to https://bugs.php.net/bug.php?id=72286. Once
+    // Drupal is installed is rebuilt, garbage collection is re-enabled.
+    $disable_gc = version_compare(PHP_VERSION, '7', '<') && gc_enabled();
+    if ($disable_gc) {
+      gc_collect_cycles();
+      gc_disable();
+    }
     parent::setUp();
 
     $this->setupBaseUrl();
@@ -466,6 +492,16 @@ abstract class BrowserTestBase extends TestCase {
 
     // Set up the browser test output file.
     $this->initBrowserOutputFile();
+    // If garbage collection was disabled prior to rebuilding container,
+    // re-enable it.
+    if ($disable_gc) {
+      gc_enable();
+    }
+
+    // Ensure that the test is not marked as risky because of no assertions. In
+    // PHPUnit 6 tests that only make assertions using $this->assertSession()
+    // can be marked as risky.
+    $this->addToAssertionCount(1);
   }
 
   /**
@@ -777,10 +813,10 @@ abstract class BrowserTestBase extends TestCase {
    *   be unchecked.
    * @param string $submit
    *   Value of the submit button whose click is to be emulated. For example,
-   *   t('Save'). The processing of the request depends on this value. For
-   *   example, a form may have one button with the value t('Save') and another
-   *   button with the value t('Delete'), and execute different code depending
-   *   on which one is clicked.
+   *   'Save'. The processing of the request depends on this value. For example,
+   *   a form may have one button with the value 'Save' and another button with
+   *   the value 'Delete', and execute different code depending on which one is
+   *   clicked.
    * @param string $form_html_id
    *   (optional) HTML ID of the form to be submitted. On some pages
    *   there are many identical forms, so just using the value of the submit
@@ -859,11 +895,11 @@ abstract class BrowserTestBase extends TestCase {
    *   @code
    *   // First step in form.
    *   $edit = array(...);
-   *   $this->drupalPostForm('some_url', $edit, t('Save'));
+   *   $this->drupalPostForm('some_url', $edit, 'Save');
    *
    *   // Second step in form.
    *   $edit = array(...);
-   *   $this->drupalPostForm(NULL, $edit, t('Save'));
+   *   $this->drupalPostForm(NULL, $edit, 'Save');
    *   @endcode
    * @param array $edit
    *   Field data in an associative array. Changes the current input fields
@@ -893,10 +929,10 @@ abstract class BrowserTestBase extends TestCase {
    *     https://www.drupal.org/node/2802401
    * @param string $submit
    *   Value of the submit button whose click is to be emulated. For example,
-   *   t('Save'). The processing of the request depends on this value. For
-   *   example, a form may have one button with the value t('Save') and another
-   *   button with the value t('Delete'), and execute different code depending
-   *   on which one is clicked.
+   *   'Save'. The processing of the request depends on this value. For example,
+   *   a form may have one button with the value 'Save' and another button with
+   *   the value 'Delete', and execute different code depending on which one is
+   *   clicked.
    *
    *   This function can also be called to emulate an Ajax submission. In this
    *   case, this value needs to be an array with the following keys:
@@ -1070,7 +1106,7 @@ abstract class BrowserTestBase extends TestCase {
    *   The formatted HTML string.
    */
   protected function formatHtmlOutputHeaders(array $headers) {
-    $flattened_headers = array_map(function($header) {
+    $flattened_headers = array_map(function ($header) {
       if (is_array($header)) {
         return implode(';', array_map('trim', $header));
       }

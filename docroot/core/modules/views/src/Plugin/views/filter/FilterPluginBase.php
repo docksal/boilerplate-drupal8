@@ -53,6 +53,8 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
 
   /**
    * Contains the operator which is used on the query.
+   *
+   * @var string
    */
   public $operator = '=';
 
@@ -103,7 +105,6 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       $this->group_info = array_filter($options['group_info']['default_group_multiple']);
       $this->options['expose']['multiple'] = TRUE;
     }
-
 
     // If there are relationships in the view, allow empty should be true
     // so that we can do IS NULL checks on items. Not all filters respect
@@ -995,7 +996,9 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       '#default_value' => $this->options['group_info']['remember'],
     ];
 
-    $groups = ['All' => $this->t('- Any -')]; // The string '- Any -' will not be rendered see @theme_views_ui_build_group_filter_form
+    // The string '- Any -' will not be rendered.
+    // @see theme_views_ui_build_group_filter_form()
+    $groups = ['All' => $this->t('- Any -')];
 
     // Provide 3 options to start when we are in a new group.
     if (count($this->options['group_info']['group_items']) == 0) {

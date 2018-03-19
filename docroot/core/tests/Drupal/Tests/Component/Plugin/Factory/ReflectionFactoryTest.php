@@ -123,7 +123,12 @@ class ReflectionFactoryTest extends TestCase {
     // us to use one data set for this test method as well as
     // testCreateInstance().
     if ($plugin_id == 'arguments_no_constructor') {
-      $this->setExpectedException('\ReflectionException');
+      if (method_exists($this, 'expectException')) {
+        $this->expectException('\ReflectionException');
+      }
+      else {
+        $this->setExpectedException('\ReflectionException');
+      }
     }
 
     // Finally invoke getInstanceArguments() on our mocked factory.
@@ -172,9 +177,7 @@ class ArgumentsPluginId {
  */
 class ArgumentsMany {
 
-  public function __construct(
-  $configuration, $plugin_definition, $plugin_id, $foo = 'default_value', $what_am_i_doing_here = 'what_default'
-  ) {
+  public function __construct($configuration, $plugin_definition, $plugin_id, $foo = 'default_value', $what_am_i_doing_here = 'what_default') {
     // No-op.
   }
 

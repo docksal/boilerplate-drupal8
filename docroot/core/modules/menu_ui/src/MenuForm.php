@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base form for menu edit forms.
+ *
+ * @internal
  */
 class MenuForm extends EntityForm {
 
@@ -221,7 +223,7 @@ class MenuForm extends EntityForm {
     $this->getRequest()->attributes->set('_menu_admin', FALSE);
 
     // Determine the delta; the number of weights to be made available.
-    $count = function(array $tree) {
+    $count = function (array $tree) {
       $sum = function ($carry, MenuLinkTreeElement $item) {
         return $carry + $item->count();
       };

@@ -77,7 +77,6 @@ class EntityReferenceFileUploadTest extends WebTestBase {
       ],
     ])->save();
 
-
     // Create a file field.
     $file_field_name = 'file_field';
     $field_storage = FieldStorageConfig::create([
@@ -115,7 +114,7 @@ class EntityReferenceFileUploadTest extends WebTestBase {
     $this->drupalLogin($user1);
 
     $test_file = current($this->drupalGetTestFiles('text'));
-    $edit['files[file_field_0]'] = drupal_realpath($test_file->uri);
+    $edit['files[file_field_0]'] = \Drupal::service('file_system')->realpath($test_file->uri);
     $this->drupalPostForm('node/add/' . $this->referencingType, $edit, 'Upload');
     $this->assertResponse(200);
     $edit = [

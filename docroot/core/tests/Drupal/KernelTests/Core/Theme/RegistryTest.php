@@ -164,11 +164,11 @@ class RegistryTest extends KernelTestBase {
    */
   public function testThemeSuggestions() {
     // Mock the current page as the front page.
-    /** @var PathMatcherInterface $path_matcher */
+    /** @var \Drupal\Core\Path\PathMatcherInterface $path_matcher */
     $path_matcher = $this->prophesize(PathMatcherInterface::class);
     $path_matcher->isFrontPage()->willReturn(TRUE);
     $this->container->set('path.matcher', $path_matcher->reveal());
-    /** @var CurrentPathStack $path_matcher */
+    /** @var \Drupal\Core\Path\CurrentPathStack $path_matcher */
     $path_current = $this->prophesize(CurrentPathStack::class);
     $path_current->getPath()->willReturn('/node/1');
     $this->container->set('path.current', $path_current->reveal());
@@ -190,6 +190,25 @@ class RegistryTest extends KernelTestBase {
       'page__node__1',
       'page__front',
     ], $suggestions, 'Found expected page node suggestions.');
+  }
+
+  /**
+   * Tests theme-provided templates that are registered by modules.
+   */
+  public function testThemeTemplatesRegisteredByModules() {
+    $theme_handler = \Drupal::service('theme_handler');
+    $theme_handler->install(['test_theme']);
+
+    $registry_theme = new Registry(\Drupal::root(), \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $theme_handler, \Drupal::service('theme.initialization'), 'test_theme');
+    $registry_theme->setThemeManager(\Drupal::theme());
+
+    $expected = [
+      'template_preprocess',
+      'template_preprocess_container',
+      'template_preprocess_theme_test_registered_by_module'
+    ];
+    $registry = $registry_theme->get();
+    $this->assertEquals($expected, array_values($registry['theme_test_registered_by_module']['preprocess functions']));
   }
 
 }

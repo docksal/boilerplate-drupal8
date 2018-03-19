@@ -13,7 +13,8 @@ use Drupal\migrate\Plugin\MigrationInterface;
  * example for any normal source class returning multiple rows.
  *
  * @MigrateSource(
- *   id = "variable"
+ *   id = "variable",
+ *   source_module = "system",
  * )
  */
 class Variable extends DrupalSqlBase {
@@ -58,7 +59,7 @@ class Variable extends DrupalSqlBase {
   /**
    * {@inheritdoc}
    */
-  public function count() {
+  public function count($refresh = FALSE) {
     return intval($this->query()->countQuery()->execute()->fetchField() > 0);
   }
 

@@ -13,7 +13,9 @@ use Drupal\migrate_drupal\Plugin\migrate\cckfield\CckFieldPluginBase;
  *   type_map = {
  *     "taxonomy_term_reference" = "entity_reference"
  *   },
- *   core = {6,7}
+ *   core = {6,7},
+ *   source_module = "taxonomy",
+ *   destination_module = "core",
  * )
  *
  * @deprecated in Drupal 8.4.x, to be removed before Drupal 9.0.x. Use
@@ -28,7 +30,7 @@ class TaxonomyTermReference extends CckFieldPluginBase {
    */
   public function processCckFieldValues(MigrationInterface $migration, $field_name, $data) {
     $process = [
-      'plugin' => 'iterator',
+      'plugin' => 'sub_process',
       'source' => $field_name,
       'process' => [
         'target_id' => 'tid',

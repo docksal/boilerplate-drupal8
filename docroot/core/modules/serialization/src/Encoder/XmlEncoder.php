@@ -12,6 +12,10 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder as BaseXmlEncoder;
  *
  * This acts as a wrapper class for Symfony's XmlEncoder so that it is not
  * implementing NormalizationAwareInterface, and can be normalized externally.
+ *
+ * @internal
+ *   This encoder should not be used directly. Rather, use the `serializer`
+ *   service.
  */
 class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface {
 
@@ -56,7 +60,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
   /**
    * {@inheritdoc}
    */
-  public function encode($data, $format, array $context = []){
+  public function encode($data, $format, array $context = []) {
     return $this->getBaseEncoder()->encode($data, $format, $context);
   }
 
@@ -70,7 +74,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
   /**
    * {@inheritdoc}
    */
-  public function decode($data, $format, array $context = []){
+  public function decode($data, $format, array $context = []) {
     return $this->getBaseEncoder()->decode($data, $format, $context);
   }
 

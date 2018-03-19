@@ -121,9 +121,9 @@ class ThemeInstaller implements ThemeInstallerInterface {
         return TRUE;
       }
 
-      while (list($theme) = each($theme_list)) {
+      foreach ($theme_list as $theme => $value) {
         // Add dependencies to the list. The new themes will be processed as
-        // the while loop continues.
+        // the parent foreach loop continues.
         foreach (array_keys($theme_data[$theme]->requires) as $dependency) {
           if (!isset($theme_data[$dependency])) {
             // The dependency does not exist.
@@ -264,7 +264,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
     // keys.
     $extension_config->save(TRUE);
     $this->state->set('system.theme.data', $current_theme_data);
-
 
     // @todo Remove system_list().
     $this->themeHandler->refreshInfo();

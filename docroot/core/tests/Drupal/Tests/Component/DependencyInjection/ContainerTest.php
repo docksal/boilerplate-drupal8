@@ -70,7 +70,12 @@ class ContainerTest extends TestCase {
   public function testConstruct() {
     $container_definition = $this->getMockContainerDefinition();
     $container_definition['machine_format'] = !$this->machineFormat;
-    $this->setExpectedException(InvalidArgumentException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(InvalidArgumentException::class);
+    }
+    else {
+      $this->setExpectedException(InvalidArgumentException::class);
+    }
     $container = new $this->containerClass($container_definition);
   }
 
@@ -93,7 +98,12 @@ class ContainerTest extends TestCase {
    * @covers ::getAlternatives
    */
   public function testGetParameterIfNotFound() {
-    $this->setExpectedException(ParameterNotFoundException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(ParameterNotFoundException::class);
+    }
+    else {
+      $this->setExpectedException(ParameterNotFoundException::class);
+    }
     $this->container->getParameter('parameter_that_does_not_exist');
   }
 
@@ -103,7 +113,12 @@ class ContainerTest extends TestCase {
    * @covers ::getParameter
    */
   public function testGetParameterIfNotFoundBecauseNull() {
-    $this->setExpectedException(ParameterNotFoundException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(ParameterNotFoundException::class);
+    }
+    else {
+      $this->setExpectedException(ParameterNotFoundException::class);
+    }
     $this->container->getParameter(NULL);
   }
 
@@ -137,7 +152,12 @@ class ContainerTest extends TestCase {
    */
   public function testSetParameterWithFrozenContainer() {
     $this->container = new $this->containerClass($this->containerDefinition);
-    $this->setExpectedException(LogicException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(LogicException::class);
+    }
+    else {
+      $this->setExpectedException(LogicException::class);
+    }
     $this->container->setParameter('some_config', 'new_value');
   }
 
@@ -242,7 +262,12 @@ class ContainerTest extends TestCase {
    * @covers ::createService
    */
   public function testGetForCircularServices() {
-    $this->setExpectedException(ServiceCircularReferenceException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(ServiceCircularReferenceException::class);
+    }
+    else {
+      $this->setExpectedException(ServiceCircularReferenceException::class);
+    }
     $this->container->get('circular_dependency');
   }
 
@@ -255,7 +280,12 @@ class ContainerTest extends TestCase {
    * @covers ::getServiceAlternatives
    */
   public function testGetForNonExistantService() {
-    $this->setExpectedException(ServiceNotFoundException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(ServiceNotFoundException::class);
+    }
+    else {
+      $this->setExpectedException(ServiceNotFoundException::class);
+    }
     $this->container->get('service_not_exists');
   }
 
@@ -304,7 +334,12 @@ class ContainerTest extends TestCase {
 
     // Reset the service.
     $this->container->set('service_parameter_not_exists', NULL);
-    $this->setExpectedException(InvalidArgumentException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(InvalidArgumentException::class);
+    }
+    else {
+      $this->setExpectedException(InvalidArgumentException::class);
+    }
     $this->container->get('service_parameter_not_exists');
   }
 
@@ -316,7 +351,12 @@ class ContainerTest extends TestCase {
    * @covers ::resolveServicesAndParameters
    */
   public function testGetForNonExistantParameterDependencyWithException() {
-    $this->setExpectedException(InvalidArgumentException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(InvalidArgumentException::class);
+    }
+    else {
+      $this->setExpectedException(InvalidArgumentException::class);
+    }
     $this->container->get('service_parameter_not_exists');
   }
 
@@ -341,7 +381,12 @@ class ContainerTest extends TestCase {
    * @covers ::getAlternatives
    */
   public function testGetForNonExistantServiceDependencyWithException() {
-    $this->setExpectedException(ServiceNotFoundException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(ServiceNotFoundException::class);
+    }
+    else {
+      $this->setExpectedException(ServiceNotFoundException::class);
+    }
     $this->container->get('service_dependency_not_exists');
   }
 
@@ -361,7 +406,12 @@ class ContainerTest extends TestCase {
    * @covers ::createService
    */
   public function testGetForNonExistantNULLService() {
-    $this->setExpectedException(ServiceNotFoundException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(ServiceNotFoundException::class);
+    }
+    else {
+      $this->setExpectedException(ServiceNotFoundException::class);
+    }
     $this->container->get(NULL);
   }
 
@@ -387,7 +437,12 @@ class ContainerTest extends TestCase {
    */
   public function testGetForNonExistantServiceWithExceptionOnSecondCall() {
     $this->assertNull($this->container->get('service_not_exists', ContainerInterface::NULL_ON_INVALID_REFERENCE), 'Not found service does nto throw exception.');
-    $this->setExpectedException(ServiceNotFoundException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(ServiceNotFoundException::class);
+    }
+    else {
+      $this->setExpectedException(ServiceNotFoundException::class);
+    }
     $this->container->get('service_not_exists');
   }
 
@@ -423,7 +478,12 @@ class ContainerTest extends TestCase {
    * @covers ::createService
    */
   public function testGetForSyntheticServiceWithException() {
-    $this->setExpectedException(RuntimeException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(RuntimeException::class);
+    }
+    else {
+      $this->setExpectedException(RuntimeException::class);
+    }
     $this->container->get('synthetic');
   }
 
@@ -462,7 +522,12 @@ class ContainerTest extends TestCase {
    * @covers ::createService
    */
   public function testGetForWrongFactory() {
-    $this->setExpectedException(RuntimeException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(RuntimeException::class);
+    }
+    else {
+      $this->setExpectedException(RuntimeException::class);
+    }
     $this->container->get('wrong_factory');
   }
 
@@ -500,7 +565,12 @@ class ContainerTest extends TestCase {
    * @covers ::createService
    */
   public function testGetForConfiguratorWithException() {
-    $this->setExpectedException(InvalidArgumentException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(InvalidArgumentException::class);
+    }
+    else {
+      $this->setExpectedException(InvalidArgumentException::class);
+    }
     $this->container->get('configurable_service_exception');
   }
 
@@ -517,7 +587,7 @@ class ContainerTest extends TestCase {
     $configurator = $this->prophesize('\Drupal\Tests\Component\DependencyInjection\MockConfiguratorInterface');
     $configurator->configureService(Argument::type('object'))
       ->shouldBeCalled(1)
-      ->will(function($args) use ($container) {
+      ->will(function ($args) use ($container) {
         $args[0]->setContainer($container);
       });
     $container->set('configurator', $configurator->reveal());
@@ -598,7 +668,12 @@ class ContainerTest extends TestCase {
    * @covers ::resolveServicesAndParameters
    */
   public function testResolveServicesAndParametersForInvalidArgument() {
-    $this->setExpectedException(InvalidArgumentException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(InvalidArgumentException::class);
+    }
+    else {
+      $this->setExpectedException(InvalidArgumentException::class);
+    }
     $this->container->get('invalid_argument_service');
   }
 
@@ -612,7 +687,12 @@ class ContainerTest extends TestCase {
   public function testResolveServicesAndParametersForInvalidArguments() {
     // In case the machine-optimized format is not used, we need to simulate the
     // test failure.
-    $this->setExpectedException(InvalidArgumentException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(InvalidArgumentException::class);
+    }
+    else {
+      $this->setExpectedException(InvalidArgumentException::class);
+    }
     if (!$this->machineFormat) {
       throw new InvalidArgumentException('Simulating the test failure.');
     }
@@ -778,7 +858,8 @@ class ContainerTest extends TestCase {
     $services['invalid_argument_service'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
       'arguments' => $this->getCollection([
-        1, // Test passing non-strings, too.
+        // Test passing non-strings, too.
+        1,
         (object) [
           'type' => 'invalid',
         ],
@@ -1042,7 +1123,7 @@ class MockInstantiationService {
 class MockService {
 
   /**
-   * @var ContainerInterface
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
   protected $container;
 
@@ -1080,7 +1161,7 @@ class MockService {
   /**
    * Sets the container object.
    *
-   * @param ContainerInterface $container
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   The container to inject via setter injection.
    */
   public function setContainer(ContainerInterface $container) {
@@ -1090,7 +1171,7 @@ class MockService {
   /**
    * Gets the container object.
    *
-   * @return ContainerInterface
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface
    *   The internally set container.
    */
   public function getContainer() {

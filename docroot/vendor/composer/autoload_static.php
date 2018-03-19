@@ -8,10 +8,11 @@ class ComposerStaticInitDrupal8
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
+        '023d27dca8066ef29e6739335ea73bad' => __DIR__ . '/..' . '/symfony/polyfill-php70/bootstrap.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
     );
 
@@ -27,8 +28,13 @@ class ComposerStaticInitDrupal8
         array (
             'Wikimedia\\Composer\\' => 19,
         ),
+        'T' => 
+        array (
+            'Twig\\' => 5,
+        ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Php70\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
             'Symfony\\Component\\Yaml\\' => 23,
@@ -51,6 +57,7 @@ class ComposerStaticInitDrupal8
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Psr\\Container\\' => 14,
         ),
         'M' => 
         array (
@@ -67,6 +74,28 @@ class ComposerStaticInitDrupal8
             'Drupal\\Driver\\' => 14,
             'Drupal\\Core\\Composer\\' => 21,
             'Drupal\\Core\\' => 12,
+            'Drupal\\Component\\Uuid\\' => 22,
+            'Drupal\\Component\\Utility\\' => 25,
+            'Drupal\\Component\\Transliteration\\' => 33,
+            'Drupal\\Component\\Serialization\\' => 31,
+            'Drupal\\Component\\Render\\' => 24,
+            'Drupal\\Component\\ProxyBuilder\\' => 30,
+            'Drupal\\Component\\Plugin\\' => 24,
+            'Drupal\\Component\\PhpStorage\\' => 28,
+            'Drupal\\Component\\HttpFoundation\\' => 32,
+            'Drupal\\Component\\Graph\\' => 23,
+            'Drupal\\Component\\Gettext\\' => 25,
+            'Drupal\\Component\\FileSystem\\' => 28,
+            'Drupal\\Component\\FileCache\\' => 27,
+            'Drupal\\Component\\EventDispatcher\\' => 33,
+            'Drupal\\Component\\Discovery\\' => 27,
+            'Drupal\\Component\\Diff\\' => 22,
+            'Drupal\\Component\\DependencyInjection\\' => 37,
+            'Drupal\\Component\\Datetime\\' => 26,
+            'Drupal\\Component\\ClassFinder\\' => 29,
+            'Drupal\\Component\\Bridge\\' => 24,
+            'Drupal\\Component\\Assertion\\' => 27,
+            'Drupal\\Component\\Annotation\\' => 28,
             'Drupal\\Component\\' => 17,
             'Doctrine\\Common\\Cache\\' => 22,
             'Doctrine\\Common\\' => 16,
@@ -102,6 +131,14 @@ class ComposerStaticInitDrupal8
         'Wikimedia\\Composer\\' => 
         array (
             0 => __DIR__ . '/..' . '/wikimedia/composer-merge-plugin/src',
+        ),
+        'Twig\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/twig/twig/src',
+        ),
+        'Symfony\\Polyfill\\Php70\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php70',
         ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
@@ -179,6 +216,10 @@ class ComposerStaticInitDrupal8
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
+        'Psr\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
         'Masterminds\\' => 
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
@@ -206,6 +247,94 @@ class ComposerStaticInitDrupal8
         'Drupal\\Core\\' => 
         array (
             0 => __DIR__ . '/../..' . '/core/lib/Drupal/Core',
+        ),
+        'Drupal\\Component\\Uuid\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Uuid',
+        ),
+        'Drupal\\Component\\Utility\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Utility',
+        ),
+        'Drupal\\Component\\Transliteration\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Transliteration',
+        ),
+        'Drupal\\Component\\Serialization\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Serialization',
+        ),
+        'Drupal\\Component\\Render\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Render',
+        ),
+        'Drupal\\Component\\ProxyBuilder\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/ProxyBuilder',
+        ),
+        'Drupal\\Component\\Plugin\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Plugin',
+        ),
+        'Drupal\\Component\\PhpStorage\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/PhpStorage',
+        ),
+        'Drupal\\Component\\HttpFoundation\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/HttpFoundation',
+        ),
+        'Drupal\\Component\\Graph\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Graph',
+        ),
+        'Drupal\\Component\\Gettext\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Gettext',
+        ),
+        'Drupal\\Component\\FileSystem\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/FileSystem',
+        ),
+        'Drupal\\Component\\FileCache\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/FileCache',
+        ),
+        'Drupal\\Component\\EventDispatcher\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/EventDispatcher',
+        ),
+        'Drupal\\Component\\Discovery\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Discovery',
+        ),
+        'Drupal\\Component\\Diff\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Diff',
+        ),
+        'Drupal\\Component\\DependencyInjection\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/DependencyInjection',
+        ),
+        'Drupal\\Component\\Datetime\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Datetime',
+        ),
+        'Drupal\\Component\\ClassFinder\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/ClassFinder',
+        ),
+        'Drupal\\Component\\Bridge\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Bridge',
+        ),
+        'Drupal\\Component\\Assertion\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Assertion',
+        ),
+        'Drupal\\Component\\Annotation\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Annotation',
         ),
         'Drupal\\Component\\' => 
         array (
@@ -281,6 +410,9 @@ class ComposerStaticInitDrupal8
     );
 
     public static $classMap = array (
+        'ArithmeticError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/ArithmeticError.php',
+        'AssertionError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/AssertionError.php',
+        'DivisionByZeroError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/DivisionByZeroError.php',
         'Drupal' => __DIR__ . '/../..' . '/core/lib/Drupal.php',
         'Drupal\\Component\\Utility\\Timer' => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Utility/Timer.php',
         'Drupal\\Component\\Utility\\Unicode' => __DIR__ . '/../..' . '/core/lib/Drupal/Component/Utility/Unicode.php',
@@ -288,6 +420,9 @@ class ComposerStaticInitDrupal8
         'Drupal\\Core\\DrupalKernel' => __DIR__ . '/../..' . '/core/lib/Drupal/Core/DrupalKernel.php',
         'Drupal\\Core\\DrupalKernelInterface' => __DIR__ . '/../..' . '/core/lib/Drupal/Core/DrupalKernelInterface.php',
         'Drupal\\Core\\Site\\Settings' => __DIR__ . '/../..' . '/core/lib/Drupal/Core/Site/Settings.php',
+        'Error' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/Error.php',
+        'ParseError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/ParseError.php',
+        'SessionUpdateTimestampHandlerInterface' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/SessionUpdateTimestampHandlerInterface.php',
         'Symfony\\Component\\HttpFoundation\\FileBag' => __DIR__ . '/..' . '/symfony/http-foundation/FileBag.php',
         'Symfony\\Component\\HttpFoundation\\HeaderBag' => __DIR__ . '/..' . '/symfony/http-foundation/HeaderBag.php',
         'Symfony\\Component\\HttpFoundation\\ParameterBag' => __DIR__ . '/..' . '/symfony/http-foundation/ParameterBag.php',
@@ -296,6 +431,7 @@ class ComposerStaticInitDrupal8
         'Symfony\\Component\\HttpKernel\\HttpKernel' => __DIR__ . '/..' . '/symfony/http-kernel/HttpKernel.php',
         'Symfony\\Component\\HttpKernel\\HttpKernelInterface' => __DIR__ . '/..' . '/symfony/http-kernel/HttpKernelInterface.php',
         'Symfony\\Component\\HttpKernel\\TerminableInterface' => __DIR__ . '/..' . '/symfony/http-kernel/TerminableInterface.php',
+        'TypeError' => __DIR__ . '/..' . '/symfony/polyfill-php70/Resources/stubs/TypeError.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

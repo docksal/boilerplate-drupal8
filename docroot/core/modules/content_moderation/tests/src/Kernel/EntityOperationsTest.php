@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\content_moderation\Kernel;
 
-
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -70,7 +69,7 @@ class EntityOperationsTest extends KernelTestBase {
 
     // Verify the entity saved correctly, and that the presence of pending
     // revisions doesn't affect the default node load.
-    /** @var Node $page */
+    /** @var \Drupal\node\Entity\Node $page */
     $page = Node::load($id);
     $this->assertEquals('A', $page->getTitle());
     $this->assertTrue($page->isDefaultRevision());
@@ -143,7 +142,7 @@ class EntityOperationsTest extends KernelTestBase {
     $id = $page->id();
 
     // Verify the entity saved correctly.
-    /** @var Node $page */
+    /** @var \Drupal\node\Entity\Node $page */
     $page = Node::load($id);
     $this->assertEquals('A', $page->getTitle());
     $this->assertTrue($page->isDefaultRevision());

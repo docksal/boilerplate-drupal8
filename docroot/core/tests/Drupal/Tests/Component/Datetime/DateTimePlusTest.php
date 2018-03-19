@@ -87,7 +87,13 @@ class DateTimePlusTest extends TestCase {
    * @dataProvider providerTestInvalidDateDiff
    */
   public function testInvalidDateDiff($input1, $input2, $absolute) {
-    $this->setExpectedException(\BadMethodCallException::class, 'Method Drupal\Component\Datetime\DateTimePlus::diff expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object');
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(\BadMethodCallException::class);
+      $this->expectExceptionMessage('Method Drupal\Component\Datetime\DateTimePlus::diff expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object');
+    }
+    else {
+      $this->setExpectedException(\BadMethodCallException::class, 'Method Drupal\Component\Datetime\DateTimePlus::diff expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object');
+    }
     $interval = $input1->diff($input2, $absolute);
   }
 
@@ -104,7 +110,12 @@ class DateTimePlusTest extends TestCase {
    * @dataProvider providerTestInvalidDateArrays
    */
   public function testInvalidDateArrays($input, $timezone, $class) {
-    $this->setExpectedException($class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException($class);
+    }
+    else {
+      $this->setExpectedException($class);
+    }
     $this->assertInstanceOf(
       '\Drupal\Component\DateTimePlus',
       DateTimePlus::createFromArray($input, $timezone)
@@ -167,7 +178,7 @@ class DateTimePlusTest extends TestCase {
    * Assertion helper for testTimestamp and testDateTimestamp since they need
    * different dataProviders.
    *
-   * @param DateTimePlus $date
+   * @param \Drupal\Component\Datetime\DateTimePlus $date
    *   DateTimePlus to test.
    * @input mixed $input
    *   The original input passed to the test method.
@@ -242,7 +253,12 @@ class DateTimePlusTest extends TestCase {
    * @dataProvider providerTestInvalidDates
    */
   public function testInvalidDates($input, $timezone, $format, $message, $class) {
-    $this->setExpectedException($class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException($class);
+    }
+    else {
+      $this->setExpectedException($class);
+    }
     DateTimePlus::createFromFormat($format, $input, $timezone);
   }
 
@@ -800,8 +816,79 @@ class DateTimePlusTest extends TestCase {
 
     // Parse the same date with ['validate_format' => TRUE] and make sure we
     // get the expected exception.
-    $this->setExpectedException(\UnexpectedValueException::class);
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(\UnexpectedValueException::class);
+    }
+    else {
+      $this->setExpectedException(\UnexpectedValueException::class);
+    }
     $date = DateTimePlus::createFromFormat('Y-m-d H:i:s', '11-03-31 17:44:00', 'UTC', ['validate_format' => TRUE]);
+  }
+
+  /**
+   * Tests setting the default time for date-only objects.
+   */
+  public function testDefaultDateTime() {
+    $utc = new \DateTimeZone('UTC');
+
+    $date = DateTimePlus::createFromFormat('Y-m-d H:i:s', '2017-05-23 22:58:00', $utc);
+    $this->assertEquals('22:58:00', $date->format('H:i:s'));
+    $date->setDefaultDateTime();
+    $this->assertEquals('12:00:00', $date->format('H:i:s'));
+  }
+
+  /**
+   * Tests that object methods are chainable.
+   *
+   * @covers ::__call
+   */
+  public function testChainable() {
+    $date = new DateTimePlus('now', 'Australia/Sydney');
+
+    $date->setTimestamp(12345678);
+    $rendered = $date->render();
+    $this->assertEquals('1970-05-24 07:21:18 Australia/Sydney', $rendered);
+
+    $date->setTimestamp(23456789);
+    $rendered = $date->setTimezone(new \DateTimeZone('America/New_York'))->render();
+    $this->assertEquals('1970-09-29 07:46:29 America/New_York', $rendered);
+
+    $date = DateTimePlus::createFromFormat('Y-m-d H:i:s', '1970-05-24 07:21:18', new \DateTimeZone('Australia/Sydney'))
+      ->setTimezone(new \DateTimeZone('America/New_York'));
+    $rendered = $date->render();
+    $this->assertInstanceOf(DateTimePlus::class, $date);
+    $this->assertEquals(12345678, $date->getTimestamp());
+    $this->assertEquals('1970-05-23 17:21:18 America/New_York', $rendered);
+  }
+
+  /**
+   * Tests that non-chainable methods work.
+   *
+   * @covers ::__call
+   */
+  public function testChainableNonChainable() {
+    $datetime1 = new DateTimePlus('2009-10-11 12:00:00');
+    $datetime2 = new DateTimePlus('2009-10-13 12:00:00');
+    $interval = $datetime1->diff($datetime2);
+    $this->assertInstanceOf(\DateInterval::class, $interval);
+    $this->assertEquals('+2 days', $interval->format('%R%a days'));
+  }
+
+  /**
+   * Tests that chained calls to non-existent functions throw an exception.
+   *
+   * @covers ::__call
+   */
+  public function testChainableNonCallable() {
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(\BadMethodCallException::class);
+      $this->expectExceptionMessage('Call to undefined method Drupal\Component\Datetime\DateTimePlus::nonexistent()');
+    }
+    else {
+      $this->setExpectedException(\BadMethodCallException::class, 'Call to undefined method Drupal\Component\Datetime\DateTimePlus::nonexistent()');
+    }
+    $date = new DateTimePlus('now', 'Australia/Sydney');
+    $date->setTimezone(new \DateTimeZone('America/New_York'))->nonexistent();
   }
 
 }

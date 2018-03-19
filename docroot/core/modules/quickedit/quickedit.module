@@ -77,7 +77,7 @@ function quickedit_library_info_alter(&$libraries, $extension) {
     $theme = Drupal::config('system.theme')->get('admin');
 
     // First let the base theme modify the library, then the actual theme.
-    $alter_library = function(&$library, $theme) use (&$alter_library) {
+    $alter_library = function (&$library, $theme) use (&$alter_library) {
       if (isset($theme) && $theme_path = drupal_get_path('theme', $theme)) {
         $info = system_get_info('theme', $theme);
         // Recurse to process base theme(s) first.
@@ -129,13 +129,13 @@ function quickedit_preprocess_page_title(&$variables) {
  */
 function quickedit_preprocess_field(&$variables) {
   $variables['#cache']['contexts'][] = 'user.permissions';
-  if (!\Drupal::currentUser()->hasPermission('access in-place editing')) {
+  $element = $variables['element'];
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+  $entity = $element['#object'];
+
+  if (!\Drupal::currentUser()->hasPermission('access in-place editing') || !$entity->isLatestRevision()) {
     return;
   }
-
-  $element = $variables['element'];
-  /** @var $entity \Drupal\Core\Entity\EntityInterface */
-  $entity = $element['#object'];
 
   // Quick Edit module only supports view modes, not dynamically defined
   // "display options" (which \Drupal\Core\Field\FieldItemListInterface::view()
@@ -157,8 +157,9 @@ function quickedit_preprocess_field(&$variables) {
  * Implements hook_entity_view_alter().
  */
 function quickedit_entity_view_alter(&$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
   $build['#cache']['contexts'][] = 'user.permissions';
-  if (!\Drupal::currentUser()->hasPermission('access in-place editing') || !_quickedit_entity_is_latest_revision($entity)) {
+  if (!\Drupal::currentUser()->hasPermission('access in-place editing') || !$entity->isLatestRevision()) {
     return;
   }
 
@@ -174,24 +175,14 @@ function quickedit_entity_view_alter(&$build, EntityInterface $entity, EntityVie
  * @return bool
  *   TRUE if the loaded entity is the latest revision, FALSE otherwise.
  *
- * @todo Remove this method once better support for pending revisions is added
- * to core https://www.drupal.org/node/2784201.
+ * @deprecated in Drupal 8.5.0 and will be removed before Drupal 9.0.0. Use
+ *   \Drupal\Core\Entity\RevisionableInterface::isLatestRevision() instead.
+ *   As internal API, _quickedit_entity_is_latest_revision() may also be removed
+ *   in a minor release.
  *
  * @internal
  */
 function _quickedit_entity_is_latest_revision(ContentEntityInterface $entity) {
-  $entity_type_manager = \Drupal::entityTypeManager();
-  $entity_definition = $entity_type_manager->getDefinition($entity->getEntityTypeId());
-  if (!$entity_definition->isRevisionable()) {
-    return TRUE;
-  }
-  $revision_ids = $entity_type_manager
-    ->getStorage($entity->getEntityTypeId())
-    ->getQuery()
-    ->allRevisions()
-    ->condition($entity_definition->getKey('id'), $entity->id())
-    ->sort($entity_definition->getKey('revision'), 'DESC')
-    ->range(0, 1)
-    ->execute();
-  return $entity->getLoadedRevisionId() == array_keys($revision_ids)[0];
+  @trigger_error('_quickedit_entity_is_latest_revision() is deprecated in Drupal 8.5.0 and will be removed before Drupal 9.0.0. Use \Drupal\Core\Entity\RevisionableInterface::isLatestRevision() instead. As internal API, _quickedit_entity_is_latest_revision() may also be removed in a minor release.', E_USER_DEPRECATED);
+  return $entity->isLatestRevision();
 }

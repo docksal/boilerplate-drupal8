@@ -59,7 +59,13 @@ class FileCacheFactoryTest extends TestCase {
    */
   public function testGetNoPrefix() {
     FileCacheFactory::setPrefix(NULL);
-    $this->setExpectedException(\InvalidArgumentException::class, 'Required prefix configuration is missing');
+    if (method_exists($this, 'expectException')) {
+      $this->expectException(\InvalidArgumentException::class);
+      $this->expectExceptionMessage('Required prefix configuration is missing');
+    }
+    else {
+      $this->setExpectedException(\InvalidArgumentException::class, 'Required prefix configuration is missing');
+    }
     FileCacheFactory::get('test_foo_settings', []);
   }
 
@@ -124,7 +130,6 @@ class FileCacheFactoryTest extends TestCase {
       [],
       $class,
     ];
-
 
     // Test default configuration plus specific per collection setting.
     $data['default-plus-collection-setting'] = [

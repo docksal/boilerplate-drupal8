@@ -60,7 +60,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    *   - type: The field type.
    *   - bundles: The bundles in which the field appears.
    *
-   * @return array
+   * @var array
    */
   protected $fieldMap = [];
 
@@ -190,8 +190,10 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    *   flagged as translatable.
    */
   protected function buildBaseFieldDefinitions($entity_type_id) {
+    /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $class = $entity_type->getClass();
+    /** @var string[] $keys */
     $keys = array_filter($entity_type->getKeys());
 
     // Fail with an exception for non-fieldable entity types.
@@ -221,6 +223,21 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     }
 
     // Make sure that revisionable entity types are correctly defined.
+    if ($entity_type->isRevisionable()) {
+      // Disable the BC layer to prevent a recursion, this only needs the
+      // revision_default key that is always set.
+      $field_name = $entity_type->getRevisionMetadataKeys(FALSE)['revision_default'];
+      $base_field_definitions[$field_name] = BaseFieldDefinition::create('boolean')
+        ->setLabel($this->t('Default revision'))
+        ->setDescription($this->t('A flag indicating whether this was a default revision when it was saved.'))
+        ->setStorageRequired(TRUE)
+        ->setInternal(TRUE)
+        ->setTranslatable(FALSE)
+        ->setRevisionable(TRUE);
+    }
+
+    // Make sure that revisionable and translatable entity types are correctly
+    // defined.
     if ($entity_type->isRevisionable() && $entity_type->isTranslatable()) {
       // The 'revision_translation_affected' field should always be defined.
       // This field has been added unconditionally in Drupal 8.4.0 and it is
@@ -346,7 +363,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
 
     // Load base field overrides from configuration. These take precedence over
     // base field overrides returned above.
-    $base_field_override_ids = array_map(function($field_name) use ($entity_type_id, $bundle) {
+    $base_field_override_ids = array_map(function ($field_name) use ($entity_type_id, $bundle) {
       return $entity_type_id . '.' . $bundle . '.' . $field_name;
     }, array_keys($base_field_definitions));
     $base_field_overrides = $this->entityTypeManager->getStorage('base_field_override')->loadMultiple($base_field_override_ids);

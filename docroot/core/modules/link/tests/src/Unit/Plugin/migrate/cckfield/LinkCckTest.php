@@ -37,7 +37,7 @@ class LinkCckTest extends UnitTestCase {
     // process pipeline created by the plugin, we need to ensure that
     // getProcess() always returns the last input to mergeProcessOfProperty().
     $migration->mergeProcessOfProperty(Argument::type('string'), Argument::type('array'))
-      ->will(function($arguments) use ($migration) {
+      ->will(function ($arguments) use ($migration) {
         $migration->getProcess()->willReturn($arguments[1]);
       });
 
@@ -46,6 +46,7 @@ class LinkCckTest extends UnitTestCase {
 
   /**
    * @covers ::processCckFieldValues
+   * @expectedDeprecation LinkField is deprecated in Drupal 8.3.x and will be be removed before Drupal 9.0.x. Use \Drupal\link\Plugin\migrate\field\d6\LinkField instead.
    */
   public function testProcessCckFieldValues() {
     $this->plugin->processCckFieldValues($this->migration, 'somefieldname', []);

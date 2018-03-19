@@ -14,6 +14,8 @@ use Drupal\Core\Form\ConfigFormBaseTrait;
 
 /**
  * Configure cron settings for this site.
+ *
+ * @internal
  */
 class CronForm extends FormBase {
 
@@ -43,7 +45,7 @@ class CronForm extends FormBase {
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 

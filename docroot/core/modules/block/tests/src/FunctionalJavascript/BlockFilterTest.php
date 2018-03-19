@@ -78,13 +78,13 @@ class BlockFilterTest extends JavascriptTestBase {
   /**
    * Removes any non-visible elements from the passed array.
    *
-   * @param NodeElement[] $elements
+   * @param \Behat\Mink\Element\NodeElement[] $elements
    *   An array of node elements.
    *
-   * @return NodeElement[]
+   * @return \Behat\Mink\Element\NodeElement[]
    */
   protected function filterVisibleElements(array $elements) {
-    $elements = array_filter($elements, function(NodeElement $element) {
+    $elements = array_filter($elements, function (NodeElement $element) {
       return $element->isVisible();
     });
     return $elements;

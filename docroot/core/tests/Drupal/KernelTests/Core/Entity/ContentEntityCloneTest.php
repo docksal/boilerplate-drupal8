@@ -131,7 +131,6 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
     }
     $this->assertTrue($different_references, 'The entity object and the cloned entity object reference different field item list objects.');
 
-
     // Reload the entity, initialize one translation, clone it and check that
     // both entity objects reference different field instances.
     $entity = $this->reloadEntity($entity);
@@ -298,7 +297,7 @@ class ContentEntityCloneTest extends EntityKernelTestBase {
     // Retrieve the entity properties.
     $reflection = new \ReflectionClass($entity);
     $properties = $reflection->getProperties(~\ReflectionProperty::IS_STATIC);
-    $translation_unique_properties = ['activeLangcode', 'translationInitialize', 'fieldDefinitions', 'languages', 'langcodeKey', 'defaultLangcode', 'defaultLangcodeKey', 'validated', 'validationRequired', 'entityTypeId', 'typedData', 'cacheContexts', 'cacheTags', 'cacheMaxAge', '_serviceIds'];
+    $translation_unique_properties = ['activeLangcode', 'translationInitialize', 'fieldDefinitions', 'languages', 'langcodeKey', 'defaultLangcode', 'defaultLangcodeKey', 'revisionTranslationAffectedKey', 'validated', 'validationRequired', 'entityTypeId', 'typedData', 'cacheContexts', 'cacheTags', 'cacheMaxAge', '_serviceIds'];
 
     foreach ($properties as $property) {
       // Modify each entity property on the clone and assert that the change is

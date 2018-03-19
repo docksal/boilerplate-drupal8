@@ -70,7 +70,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *
    * @var string
    */
-  protected $mimeType;
+  protected $mimeType = 'application/json';
 
   /**
    * The renderer.
@@ -87,11 +87,34 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
   protected $authenticationCollector;
 
   /**
-   * The authentication providers, keyed by ID.
+   * The authentication providers, like 'cookie' and 'basic_auth'.
+   *
+   * @var string[]
+   */
+  protected $authenticationProviderIds;
+
+  /**
+   * The authentication providers' modules, keyed by provider ID.
+   *
+   * Authentication providers like 'cookie' and 'basic_auth' are the array
+   * keys. The array values are the module names, e.g.:
+   * @code
+   *   ['cookie' => 'user', 'basic_auth' => 'basic_auth']
+   * @endcode
+   *
+   * @deprecated as of 8.4.x, will be removed in before Drupal 9.0.0, see
+   *   https://www.drupal.org/node/2825204.
    *
    * @var string[]
    */
   protected $authenticationProviders;
+
+  /**
+   * The serialization format providers, keyed by format.
+   *
+   * @var string[]
+   */
+  protected $formatProviders;
 
   /**
    * Constructs a RestExport object.
@@ -110,12 +133,22 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *   The renderer.
    * @param string[] $authentication_providers
    *   The authentication providers, keyed by ID.
+   * @param string[] $serializer_format_providers
+   *   The serialization format providers, keyed by format.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, RendererInterface $renderer, array $authentication_providers) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, RendererInterface $renderer, array $authentication_providers, array $serializer_format_providers) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_provider, $state);
 
     $this->renderer = $renderer;
+    // $authentication_providers as defined in
+    // \Drupal\Core\DependencyInjection\Compiler\AuthenticationProviderPass
+    // and as such it is an array, with authentication providers (cookie,
+    // basic_auth) as keys and modules providing those as values (user,
+    // basic_auth).
+    $this->authenticationProviderIds = array_keys($authentication_providers);
+    // For BC reasons we keep around authenticationProviders as before.
     $this->authenticationProviders = $authentication_providers;
+    $this->formatProviders = $serializer_format_providers;
   }
 
   /**
@@ -129,8 +162,8 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
       $container->get('router.route_provider'),
       $container->get('state'),
       $container->get('renderer'),
-      $container->getParameter('authentication_providers')
-
+      $container->getParameter('authentication_providers'),
+      $container->getParameter('serializer.format_providers')
     );
   }
   /**
@@ -139,21 +172,22 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
   public function initDisplay(ViewExecutable $view, array &$display, array &$options = NULL) {
     parent::initDisplay($view, $display, $options);
 
-    $request_content_type = $this->view->getRequest()->getRequestFormat();
-    // Only use the requested content type if it's not 'html'. If it is then
-    // default to 'json' to aid debugging.
-    // @todo Remove the need for this when we have better content negotiation.
-    if ($request_content_type != 'html') {
-      $this->setContentType($request_content_type);
-    }
-    // If the requested content type is 'html' and the default 'json' is not
-    // selected as a format option in the view display, fallback to the first
-    // format in the array.
-    elseif (!empty($options['style']['options']['formats']) && !isset($options['style']['options']['formats'][$this->getContentType()])) {
-      $this->setContentType(reset($options['style']['options']['formats']));
+    // If the default 'json' format is not selected as a format option in the
+    // view display, fallback to the first format available for the default.
+    if (!empty($options['style']['options']['formats']) && !isset($options['style']['options']['formats'][$this->getContentType()])) {
+      $default_format = reset($options['style']['options']['formats']);
+      $this->setContentType($default_format);
     }
 
-    $this->setMimeType($this->view->getRequest()->getMimeType($this->contentType));
+    // Only use the requested content type if it's not 'html'. This allows
+    // still falling back to the default for things like views preview.
+    $request_content_type = $this->view->getRequest()->getRequestFormat();
+
+    if ($request_content_type !== 'html') {
+      $this->setContentType($request_content_type);
+    }
+
+    $this->setMimeType($this->view->getRequest()->getMimeType($this->getContentType()));
   }
 
   /**
@@ -227,7 +261,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *   An array to use as value for "#options" in the form element.
    */
   public function getAuthOptions() {
-    return array_combine($this->authenticationProviders, $this->authenticationProviders);
+    return array_combine($this->authenticationProviderIds, $this->authenticationProviderIds);
   }
 
   /**
@@ -327,17 +361,21 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
 
     if ($route = $collection->get("view.$view_id.$display_id")) {
       $style_plugin = $this->getPlugin('style');
-      // REST exports should only respond to get methods.
+
+      // REST exports should only respond to GET methods.
       $route->setMethods(['GET']);
 
-      // Format as a string using pipes as a delimiter.
-      if ($formats = $style_plugin->getFormats()) {
-        // Allow a REST Export View to be returned with an HTML-only accept
-        // format. That allows browsers or other non-compliant systems to access
-        // the view, as it is unlikely to have a conflicting HTML representation
-        // anyway.
-        $route->setRequirement('_format', implode('|', $formats + ['html']));
+      $formats = $style_plugin->getFormats();
+
+      // If there are no configured formats, add all formats that serialization
+      // is known to support.
+      if (!$formats) {
+        $formats = $this->getFormatOptions();
       }
+
+      // Format as a string using pipes as a delimiter.
+      $route->setRequirement('_format', implode('|', $formats));
+
       // Add authentication to the route if it was set. If no authentication was
       // set, the default authentication will be used, which is cookie based by
       // default.
@@ -407,7 +445,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    */
   public function render() {
     $build = [];
-    $build['#markup'] = $this->renderer->executeInRenderContext(new RenderContext(), function() {
+    $build['#markup'] = $this->renderer->executeInRenderContext(new RenderContext(), function () {
       return $this->view->style_plugin->render();
     });
 
@@ -421,15 +459,15 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
       $build['#suffix'] = '</pre>';
       unset($build['#markup']);
     }
-    elseif ($this->view->getRequest()->getFormat($this->view->element['#content_type']) !== 'html') {
-      // This display plugin is primarily for returning non-HTML formats.
-      // However, we still invoke the renderer to collect cacheability metadata.
-      // Because the renderer is designed for HTML rendering, it filters
-      // #markup for XSS unless it is already known to be safe, but that filter
-      // only works for HTML. Therefore, we mark the contents as safe to bypass
-      // the filter. So long as we are returning this in a non-HTML response
-      // (checked above), this is safe, because an XSS attack only works when
-      // executed by an HTML agent.
+    else {
+      // This display plugin is for returning non-HTML formats. However, we
+      // still invoke the renderer to collect cacheability metadata. Because the
+      // renderer is designed for HTML rendering, it filters #markup for XSS
+      // unless it is already known to be safe, but that filter only works for
+      // HTML. Therefore, we mark the contents as safe to bypass the filter. So
+      // long as we are returning this in a non-HTML response,
+      // this is safe, because an XSS attack only works when executed by an HTML
+      // agent.
       // @todo Decide how to support non-HTML in the render API in
       //   https://www.drupal.org/node/2501313.
       $build['#markup'] = ViewsRenderPipelineMarkup::create($build['#markup']);
@@ -457,12 +495,27 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
     $dependencies = parent::calculateDependencies();
 
     $dependencies += ['module' => []];
-    $modules = array_map(function ($authentication_provider) {
-      return $this->authenticationProviders[$authentication_provider];
-    }, $this->getOption('auth'));
-    $dependencies['module'] = array_merge($dependencies['module'], $modules);
+    $dependencies['module'] = array_merge($dependencies['module'], array_filter(array_map(function ($provider) {
+      // During the update path the provider options might be wrong. This can
+      // happen when any update function, like block_update_8300() triggers a
+      // view to be saved.
+      return isset($this->authenticationProviderIds[$provider])
+        ? $this->authenticationProviderIds[$provider]
+        : NULL;
+    }, $this->getOption('auth'))));
 
     return $dependencies;
+  }
+
+  /**
+   * Returns an array of format options.
+   *
+   * @return string[]
+   *   An array of format options. Both key and value are the same.
+   */
+  protected function getFormatOptions() {
+    $formats = array_keys($this->formatProviders);
+    return array_combine($formats, $formats);
   }
 
 }

@@ -8,6 +8,8 @@ use Drupal\views\ViewExecutable;
 
 /**
  * Provides a rearrange form for Views filters.
+ *
+ * @internal
  */
 class RearrangeFilter extends ViewsFormBase {
 
@@ -119,7 +121,8 @@ class RearrangeFilter extends ViewsFormBase {
         ],
       ];
 
-      $form['remove_groups'][$id] = []; // to prevent a notice
+      // To prevent a notice.
+      $form['remove_groups'][$id] = [];
       if ($id != 1) {
         $form['remove_groups'][$id] = [
           '#type' => 'submit',

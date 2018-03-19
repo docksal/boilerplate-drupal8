@@ -39,6 +39,8 @@ class BreadcrumbTest extends BrowserTestBase {
 
   /**
    * Test paths in the Standard profile.
+   *
+   * @var string
    */
   protected $profile = 'standard';
 
@@ -79,7 +81,7 @@ class BreadcrumbTest extends BrowserTestBase {
     ];
     $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags', $trail);
     $trail += [
-      'admin/structure/taxonomy/manage/tags' => t('Tags'),
+      'admin/structure/taxonomy/manage/tags' => t('Edit Tags'),
     ];
     $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags/overview', $trail);
     $this->assertBreadcrumb('admin/structure/taxonomy/manage/tags/add', $trail);

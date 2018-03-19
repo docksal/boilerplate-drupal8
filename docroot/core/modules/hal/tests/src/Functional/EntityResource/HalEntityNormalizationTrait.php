@@ -73,30 +73,11 @@ trait HalEntityNormalizationTrait {
   /**
    * {@inheritdoc}
    */
-  protected function removeFieldsFromNormalization(array $normalization, $field_names) {
-    $normalization = parent::removeFieldsFromNormalization($normalization, $field_names);
-    foreach ($field_names as $field_name) {
-      $relation_url = Url::fromUri('base:rest/relation/' . static::$entityTypeId . '/' . $this->entity->bundle() . '/' . $field_name)
-        ->setAbsolute(TRUE)
-        ->toString();
-      $normalization['_links'] = array_diff_key($normalization['_links'], [$relation_url => TRUE]);
-      if (isset($normalization['_embedded'])) {
-        $normalization['_embedded'] = array_diff_key($normalization['_embedded'], [$relation_url => TRUE]);
-      }
-    }
-
-    return array_diff_key($normalization, array_flip($field_names));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function assertNormalizationEdgeCases($method, Url $url, array $request_options) {
     // \Drupal\hal\Normalizer\EntityNormalizer::denormalize(): entity
     // types with bundles MUST send their bundle field to be denormalizable.
     if ($this->entity->getEntityType()->hasKey('bundle')) {
       $normalization = $this->getNormalizedPostEntity();
-
 
       $normalization['_links']['type'] = Url::fromUri('base:rest/type/' . static::$entityTypeId . '/bad_bundle_name');
       $request_options[RequestOptions::BODY] = $this->serializer->encode($normalization, static::$format);
@@ -105,10 +86,8 @@ trait HalEntityNormalizationTrait {
       $response = $this->request($method, $url, $request_options);
       $this->assertResourceErrorResponse(422, 'No entity type(s) specified', $response);
 
-
       unset($normalization['_links']['type']);
       $request_options[RequestOptions::BODY] = $this->serializer->encode($normalization, static::$format);
-
 
       // DX: 422 when no entity type bundle is specified.
       $response = $this->request($method, $url, $request_options);

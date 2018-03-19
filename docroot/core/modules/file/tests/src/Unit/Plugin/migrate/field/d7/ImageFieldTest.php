@@ -10,6 +10,7 @@ use Prophecy\Argument;
 /**
  * @coversDefaultClass \Drupal\file\Plugin\migrate\field\d7\ImageField
  * @group file
+ * @group legacy
  */
 class ImageFieldTest extends UnitTestCase {
 
@@ -36,7 +37,7 @@ class ImageFieldTest extends UnitTestCase {
     // process pipeline created by the plugin, we need to ensure that
     // getProcess() always returns the last input to mergeProcessOfProperty().
     $migration->mergeProcessOfProperty(Argument::type('string'), Argument::type('array'))
-      ->will(function($arguments) use ($migration) {
+      ->will(function ($arguments) use ($migration) {
         $migration->getProcess()->willReturn($arguments[1]);
       });
     $this->migration = $migration->reveal();
@@ -44,12 +45,13 @@ class ImageFieldTest extends UnitTestCase {
 
   /**
    * @covers ::processFieldValues
+   * @expectedDeprecation ImageField is deprecated in Drupal 8.5.x and will be removed before Drupal 9.0.x. Use \Drupal\image\Plugin\migrate\field\d7\ImageField instead. See https://www.drupal.org/node/2936061.
    */
   public function testProcessFieldValues() {
     $this->plugin->processFieldValues($this->migration, 'somefieldname', []);
 
     $expected = [
-      'plugin' => 'iterator',
+      'plugin' => 'sub_process',
       'source' => 'somefieldname',
       'process' => [
         'target_id' => 'fid',

@@ -26,7 +26,7 @@ class MenuLinkTreeTest extends KernelTestBase {
   /**
    * The menu link plugin manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
+   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
    */
   protected $menuLinkManager;
 
@@ -62,9 +62,9 @@ class MenuLinkTreeTest extends KernelTestBase {
     \Drupal::entityManager()->getStorage('menu')->create(['id' => 'menu1'])->save();
     \Drupal::entityManager()->getStorage('menu')->create(['id' => 'menu2'])->save();
 
-    \Drupal::entityManager()->getStorage('menu_link_content')->create(['link' => ['uri' => 'internal:/menu_name_test'], 'menu_name' => 'menu1', 'bundle' => 'menu_link_content'])->save();
-    \Drupal::entityManager()->getStorage('menu_link_content')->create(['link' => ['uri' => 'internal:/menu_name_test'], 'menu_name' => 'menu1', 'bundle' => 'menu_link_content'])->save();
-    \Drupal::entityManager()->getStorage('menu_link_content')->create(['link' => ['uri' => 'internal:/menu_name_test'], 'menu_name' => 'menu2', 'bundle' => 'menu_link_content'])->save();
+    \Drupal::entityManager()->getStorage('menu_link_content')->create(['link' => ['uri' => 'internal:/menu_name_test'], 'menu_name' => 'menu1', 'bundle' => 'menu_link_content', 'title' => 'Link test'])->save();
+    \Drupal::entityManager()->getStorage('menu_link_content')->create(['link' => ['uri' => 'internal:/menu_name_test'], 'menu_name' => 'menu1', 'bundle' => 'menu_link_content', 'title' => 'Link test'])->save();
+    \Drupal::entityManager()->getStorage('menu_link_content')->create(['link' => ['uri' => 'internal:/menu_name_test'], 'menu_name' => 'menu2', 'bundle' => 'menu_link_content', 'title' => 'Link test'])->save();
 
     $output = $this->linkTree->load('menu1', new MenuTreeParameters());
     $this->assertEqual(count($output), 2);
@@ -111,7 +111,7 @@ class MenuLinkTreeTest extends KernelTestBase {
     $parameters = new MenuTreeParameters();
     $tree = $this->linkTree->load('mock', $parameters);
 
-    $count = function(array $tree) {
+    $count = function (array $tree) {
       $sum = function ($carry, MenuLinkTreeElement $item) {
         return $carry + $item->count();
       };

@@ -44,7 +44,7 @@ class LinkCckTest extends KernelTestBase {
     // process pipeline created by the plugin, we need to ensure that
     // getProcess() always returns the last input to mergeProcessOfProperty().
     $migration->mergeProcessOfProperty(Argument::type('string'), Argument::type('array'))
-      ->will(function($arguments) use ($migration) {
+      ->will(function ($arguments) use ($migration) {
         $migration->getProcess()->willReturn($arguments[1]);
       });
 
@@ -53,6 +53,8 @@ class LinkCckTest extends KernelTestBase {
 
   /**
    * @covers ::processCckFieldValues
+   * @expectedDeprecation CckFieldPluginBase is deprecated in Drupal 8.3.x and will be be removed before Drupal 9.0.x. Use \Drupal\migrate_drupal\Plugin\migrate\field\FieldPluginBase instead.
+   * @expectedDeprecation MigrateCckFieldInterface is deprecated in Drupal 8.3.x and will be removed before Drupal 9.0.x. Use \Drupal\migrate_drupal\Annotation\MigrateField instead.
    */
   public function testProcessCckFieldValues() {
     $this->plugin->processFieldInstance($this->migration);

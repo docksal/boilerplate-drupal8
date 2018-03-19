@@ -38,8 +38,8 @@ class FieldUITest extends FieldTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
-    parent::setUp();
+  protected function setUp($import_test_views = TRUE) {
+    parent::setUp($import_test_views);
 
     $this->account = $this->drupalCreateUser(['administer views']);
     $this->drupalLogin($this->account);
@@ -57,7 +57,7 @@ class FieldUITest extends FieldTestBase {
 
     // Tests the available formatter options.
     $result = $this->xpath('//select[@id=:id]/option', [':id' => 'edit-options-type']);
-    $options = array_map(function($item) {
+    $options = array_map(function ($item) {
       return (string) $item->attributes()->value[0];
     }, $result);
     // @todo Replace this sort by assertArray once it's in.
@@ -111,7 +111,7 @@ class FieldUITest extends FieldTestBase {
     // Test the click sort column options.
     // Tests the available formatter options.
     $result = $this->xpath('//select[@id=:id]/option', [':id' => 'edit-options-click-sort-column']);
-    $options = array_map(function($item) {
+    $options = array_map(function ($item) {
       return (string) $item->attributes()->value[0];
     }, $result);
     sort($options, SORT_STRING);

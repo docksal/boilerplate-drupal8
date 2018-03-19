@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Tests\System;
 
-
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -199,7 +198,6 @@ class UncaughtExceptionTest extends WebTestBase {
     $this->expectedExceptionMessage = 'Thrown exception during Container::get';
     $this->drupalGet('');
     $this->assertResponse(500);
-
 
     $this->assertRaw('The website encountered an unexpected error');
     $this->assertRaw($this->expectedExceptionMessage);

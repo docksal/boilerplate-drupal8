@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Builds a form to test disabled elements.
+ *
+ * @internal
  */
 class FormTestDisabledElementsForm extends FormBase {
 
@@ -145,7 +147,6 @@ class FormTestDisabledElementsForm extends FormBase {
       '#test_hijack_value' => '2013-01-01',
       '#date_timezone' => 'Europe/Berlin',
     ];
-
 
     // Try to hijack the email field with a valid email.
     $form['disabled_container']['disabled_container_email'] = [

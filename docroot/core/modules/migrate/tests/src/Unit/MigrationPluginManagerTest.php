@@ -15,7 +15,7 @@ class MigrationPluginManagerTest extends UnitTestCase {
   /**
    * A plugin manager.
    *
-   * @param \Drupal\migrate\Plugin\MigrationPluginManager $pluginManager
+   * @var \Drupal\migrate\Plugin\MigrationPluginManager
    */
   protected $pluginManager;
 
@@ -183,7 +183,7 @@ class TestMigrationMock extends Migration {
   /**
    * The values passed into set().
    *
-   * @var array $set
+   * @var array
    */
   public $set = [];
 

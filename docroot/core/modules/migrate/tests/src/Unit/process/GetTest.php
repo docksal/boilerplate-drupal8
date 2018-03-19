@@ -34,7 +34,7 @@ class GetTest extends MigrateProcessTestCase {
       ->will($this->returnValue('source_value'));
     $this->plugin->setSource('test');
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destinationproperty');
-    $this->assertSame($value, 'source_value');
+    $this->assertSame('source_value', $value);
   }
 
   /**
@@ -48,11 +48,11 @@ class GetTest extends MigrateProcessTestCase {
     $this->plugin->setSource(['test1', 'test2']);
     $this->row->expects($this->exactly(2))
       ->method('getSourceProperty')
-      ->will($this->returnCallback(function ($argument)  use ($map) {
+      ->will($this->returnCallback(function ($argument) use ($map) {
         return $map[$argument];
       }));
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destinationproperty');
-    $this->assertSame($value, ['source_value1', 'source_value2']);
+    $this->assertSame(['source_value1', 'source_value2'], $value);
   }
 
   /**
@@ -65,7 +65,7 @@ class GetTest extends MigrateProcessTestCase {
       ->will($this->returnValue('source_value'));
     $this->plugin->setSource('@@test');
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destinationproperty');
-    $this->assertSame($value, 'source_value');
+    $this->assertSame('source_value', $value);
   }
 
   /**
@@ -81,11 +81,11 @@ class GetTest extends MigrateProcessTestCase {
     $this->plugin->setSource(['test1', '@@test2', '@@test3', 'test4']);
     $this->row->expects($this->exactly(4))
       ->method('getSourceProperty')
-      ->will($this->returnCallback(function ($argument)  use ($map) {
+      ->will($this->returnCallback(function ($argument) use ($map) {
         return $map[$argument];
       }));
     $value = $this->plugin->transform(NULL, $this->migrateExecutable, $this->row, 'destinationproperty');
-    $this->assertSame($value, ['source_value1', 'source_value2', 'source_value3', 'source_value4']);
+    $this->assertSame(['source_value1', 'source_value2', 'source_value3', 'source_value4'], $value);
   }
 
   /**

@@ -26,25 +26,6 @@ abstract class CommentHalJsonTestBase extends CommentResourceTestBase {
    */
   protected static $mimeType = 'application/hal+json';
 
-  /**
-   * {@inheritdoc}
-   *
-   * The HAL+JSON format causes different PATCH-protected fields. For some
-   * reason, the 'pid' and 'homepage' fields are NOT PATCH-protected, even
-   * though they are for non-HAL+JSON serializations.
-   *
-   * @todo fix in https://www.drupal.org/node/2824271
-   */
-  protected static $patchProtectedFieldNames = [
-    'status',
-    'created',
-    'changed',
-    'thread',
-    'entity_type',
-    'field_name',
-    'entity_id',
-    'uid',
-  ];
 
   /**
    * {@inheritdoc}
@@ -58,7 +39,7 @@ abstract class CommentHalJsonTestBase extends CommentResourceTestBase {
     // User entity without a UUID, we cannot use it.
     $author = User::load($this->entity->getOwnerId());
     $commented_entity = EntityTest::load(1);
-    return  $normalization + [
+    return $normalization + [
       '_links' => [
         'self' => [
           'href' => $this->baseUrl . '/comment/1?_format=hal_json',

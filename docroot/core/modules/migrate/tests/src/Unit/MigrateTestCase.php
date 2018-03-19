@@ -61,12 +61,12 @@ abstract class MigrateTestCase extends UnitTestCase {
     // on the test class and use a return callback.
     $migration->expects($this->any())
       ->method('getStatus')
-      ->willReturnCallback(function() {
+      ->willReturnCallback(function () {
         return $this->migrationStatus;
       });
     $migration->expects($this->any())
       ->method('setStatus')
-      ->willReturnCallback(function($status) {
+      ->willReturnCallback(function ($status) {
         $this->migrationStatus = $status;
       });
 
@@ -77,11 +77,6 @@ abstract class MigrateTestCase extends UnitTestCase {
       ]);
 
     $configuration = &$this->migrationConfiguration;
-
-    $migration->method('getHighWaterProperty')
-      ->willReturnCallback(function () use ($configuration) {
-        return isset($configuration['high_water_property']) ? $configuration['high_water_property'] : '';
-      });
 
     $migration->method('set')
       ->willReturnCallback(function ($argument, $value) use (&$configuration) {
@@ -147,7 +142,7 @@ abstract class MigrateTestCase extends UnitTestCase {
   protected function createSchemaFromRow(array $row) {
     // SQLite uses loose ("affinity") typing, so it is OK for every column to be
     // a text field.
-    $fields = array_map(function() {
+    $fields = array_map(function () {
       return ['type' => 'text'];
     }, $row);
     return ['fields' => $fields];

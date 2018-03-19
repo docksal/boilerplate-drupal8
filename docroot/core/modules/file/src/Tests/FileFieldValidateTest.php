@@ -71,8 +71,10 @@ class FileFieldValidateTest extends FileFieldTestBase {
     $field_name = strtolower($this->randomMachineName());
     $this->createFileField($field_name, 'node', $type_name, [], ['required' => '1']);
 
-    $small_file = $this->getTestFile('text', 131072); // 128KB.
-    $large_file = $this->getTestFile('text', 1310720); // 1.2MB
+    // 128KB.
+    $small_file = $this->getTestFile('text', 131072);
+    // 1.2MB
+    $large_file = $this->getTestFile('text', 1310720);
 
     // Test uploading both a large and small file with different increments.
     $sizes = [
@@ -183,6 +185,27 @@ class FileFieldValidateTest extends FileFieldTestBase {
     $this->removeNodeFile($nid);
     $this->assertNoText('Only files with the following extensions are allowed: txt.');
     $this->assertText('Article ' . $node->getTitle() . ' has been updated.');
+  }
+
+  /**
+   * Test the validation message is displayed only once for ajax uploads.
+   */
+  public function testAJAXValidationMessage() {
+    $field_name = strtolower($this->randomMachineName());
+    $this->createFileField($field_name, 'node', 'article');
+
+    $this->drupalGet('node/add/article');
+    /** @var \Drupal\file\FileInterface $image_file */
+    $image_file = $this->getTestFile('image');
+    $edit = [
+      'files[' . $field_name . '_0]' => $this->container->get('file_system')->realpath($image_file->getFileUri()),
+      'title[0][value]' => $this->randomMachineName(),
+    ];
+    $this->drupalPostAjaxForm(NULL, $edit, $field_name . '_0_upload_button');
+    $elements = $this->xpath('//div[contains(@class, :class)]', [
+      ':class' => 'messages--error',
+    ]);
+    $this->assertEqual(count($elements), 1, 'Ajax validation messages are displayed once.');
   }
 
 }

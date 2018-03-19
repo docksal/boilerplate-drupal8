@@ -83,7 +83,7 @@ function update_system_schema_requirements() {
     $requirements['minimum schema'] += [
       'value' => 'The installed schema version does not meet the minimum.',
       'severity' => REQUIREMENT_ERROR,
-      'description' => 'Your system schema version is ' . $system_schema . '. Updating directly from a schema version prior to 8000 is not supported. You must <a href="https://www.drupal.org/node/2179269">migrate your site to Drupal 8</a> first.',
+      'description' => 'Your system schema version is ' . $system_schema . '. Updating directly from a schema version prior to 8000 is not supported. You must upgrade your site to Drupal 8 first, see https://www.drupal.org/docs/8/upgrade.',
     ];
   }
 
@@ -323,8 +323,7 @@ function update_get_update_list() {
         continue;
       }
 
-      $updates = array_combine($updates, $updates);
-      foreach (array_keys($updates) as $update) {
+      foreach ($updates as $update) {
         if ($update == \Drupal::CORE_MINIMUM_SCHEMA_VERSION) {
           $ret[$module]['warning'] = '<em>' . $module . '</em> module cannot be updated. It contains an update numbered as ' . \Drupal::CORE_MINIMUM_SCHEMA_VERSION . ' which is reserved for the earliest installation of a module in Drupal ' . \Drupal::CORE_COMPATIBILITY . ', before any updates. In order to update <em>' . $module . '</em> module, you will need to install a version of the module with valid updates.';
           continue 2;
