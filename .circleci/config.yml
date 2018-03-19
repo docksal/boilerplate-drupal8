@@ -1,0 +1,13 @@
+# This is a temporary dummy config to stop CircleCI from building this branch with automatic v1.0 configuration for PHP
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: alpine
+    # Ignore all branches
+    branches:
+      ignore:
+        - /.*/
+    steps:
+      - run: echo 'Hello World'
