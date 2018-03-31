@@ -7,8 +7,8 @@ package: Testing
 dependencies:
   - contact
 
-# Information added by Drupal.org packaging script on 2018-03-07
-version: '8.5.0'
+# Information added by Drupal.org packaging script on 2018-03-28
+version: '8.5.1'
 core: '8.x'
 project: 'drupal'
-datestamp: 1520457826
+datestamp: 1522264150
