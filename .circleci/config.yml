@@ -1,13 +1,21 @@
-# This is a temporary dummy config to stop CircleCI from building this branch with automatic v1.0 configuration for PHP
-
 version: 2
+
 jobs:
   build:
+    # Override CIRCLE_WORKING_DIRECTORY (set to ~/project by default)
+    working_directory: /home/agent/build
     docker:
-      - image: alpine
-    # Ignore all branches
-    branches:
-      ignore:
-        - /.*/
+      - image: docksal/ci-agent:edge-php
     steps:
-      - run: echo 'Hello World'
+      # Code checkout in the build agent
+      - checkout
+      # Inject environment variables.
+      # Each run statement runs in its own isolated shell (exported variables are not preserved).
+      # $BASH_ENV can be used to pass environment variables between run statements.
+      - run:
+          name: Configure agent environment
+          command: echo 'source build-env' > $BASH_ENV
+      # Launch a sandbox on the sandbox server
+      - run:
+          name: Provision sandbox
+          command: sandbox-init
