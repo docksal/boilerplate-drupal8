@@ -26,8 +26,8 @@ regions:
   page_top: 'Page top' # Needed by Drupal Core
   page_bottom: 'Page bottom' # Needed by Drupal Core
 
-# Information added by Drupal.org packaging script on 2018-03-28
-version: '8.5.1'
+# Information added by Drupal.org packaging script on 2018-04-25
+version: '8.5.3'
 core: '8.x'
 project: 'drupal'
-datestamp: 1522264150
+datestamp: 1524673226
