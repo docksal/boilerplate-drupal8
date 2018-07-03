@@ -23,8 +23,8 @@ libraries-extend:
   core/drupal.progress:
     - classy/progress
 
-# Information added by Drupal.org packaging script on 2018-04-25
-version: '8.5.3'
+# Information added by Drupal.org packaging script on 2018-06-06
+version: '8.5.4'
 core: '8.x'
 project: 'drupal'
-datestamp: 1524673226
+datestamp: 1528319624
