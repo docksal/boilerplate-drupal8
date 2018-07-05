@@ -8,8 +8,8 @@ dependencies:
   - dblog
   - views
 
-# Information added by Drupal.org packaging script on 2018-06-06
-version: '8.5.4'
+# Information added by Drupal.org packaging script on 2018-07-04
+version: '8.5.5'
 core: '8.x'
 project: 'drupal'
-datestamp: 1528319624
+datestamp: 1530738955
