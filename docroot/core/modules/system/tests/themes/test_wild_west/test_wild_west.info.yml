@@ -5,8 +5,8 @@ description: A theme that doesn't use Stable as its base. It tests the wild west
 base theme: false
 # core: 8.x
 
-# Information added by Drupal.org packaging script on 2018-07-04
-version: '8.5.5'
+# Information added by Drupal.org packaging script on 2018-08-01
+version: '8.5.6'
 core: '8.x'
 project: 'drupal'
-datestamp: 1530738955
+datestamp: 1533156926
