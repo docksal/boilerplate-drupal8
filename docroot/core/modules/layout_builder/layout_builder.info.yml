@@ -5,13 +5,13 @@ package: Core (Experimental)
 # version: VERSION
 # core: 8.x
 dependencies:
-  - layout_discovery
-  - contextual
+  - drupal:layout_discovery
+  - drupal:contextual
   # @todo Discuss removing in https://www.drupal.org/project/drupal/issues/2935999.
-  - field_ui
+  - drupal:field_ui
 
-# Information added by Drupal.org packaging script on 2018-08-01
-version: '8.5.6'
+# Information added by Drupal.org packaging script on 2018-09-05
+version: '8.6.0'
 core: '8.x'
 project: 'drupal'
-datestamp: 1533156926
+datestamp: 1536186525

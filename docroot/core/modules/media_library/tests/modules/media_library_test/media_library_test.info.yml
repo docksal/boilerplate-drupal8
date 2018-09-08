@@ -1,0 +1,18 @@
+name: 'Media library test'
+type: module
+description: 'Test module for Media library.'
+package: Testing
+# core: 8.x
+dependencies:
+  - drupal:image
+  - drupal:media_library
+  - drupal:media_test_source
+  - drupal:menu_ui
+  - drupal:node
+  - drupal:path
+
+# Information added by Drupal.org packaging script on 2018-09-05
+version: '8.6.0'
+core: '8.x'
+project: 'drupal'
+datestamp: 1536186525

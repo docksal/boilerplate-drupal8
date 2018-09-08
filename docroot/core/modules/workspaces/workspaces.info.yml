@@ -1,0 +1,15 @@
+name: Workspaces
+type: module
+description: 'Provides the ability to have multiple workspaces on a single site to facilitate things like full-site preview and content staging.'
+# version: VERSION
+# core: 8.x
+package: Core (Experimental)
+configure: entity.workspace.collection
+dependencies:
+ - user
+
+# Information added by Drupal.org packaging script on 2018-09-05
+version: '8.6.0'
+core: '8.x'
+project: 'drupal'
+datestamp: 1536186525

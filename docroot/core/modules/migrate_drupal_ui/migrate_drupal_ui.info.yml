@@ -1,17 +1,17 @@
 name: 'Migrate Drupal UI'
 type: module
 description: 'Provides a user interface for migrating from older Drupal versions.'
-package: 'Core (Experimental)'
+package: Migration
 # version: VERSION
 # core: 8.x
 configure: migrate_drupal_ui.upgrade
 dependencies:
-  - migrate
-  - migrate_drupal
-  - dblog
+  - drupal:migrate
+  - drupal:migrate_drupal
+  - drupal:dblog
 
-# Information added by Drupal.org packaging script on 2018-08-01
-version: '8.5.6'
+# Information added by Drupal.org packaging script on 2018-09-05
+version: '8.6.0'
 core: '8.x'
 project: 'drupal'
-datestamp: 1533156926
+datestamp: 1536186525
