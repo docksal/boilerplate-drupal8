@@ -3,8 +3,7 @@ type: profile
 description: 'Install an example site that shows off some of Drupal’s capabilities.'
 # version: VERSION
 # core: 8.x
-hidden: true
-dependencies:
+install:
   - node
   - history
   - big_pipe
@@ -22,6 +21,7 @@ dependencies:
   - editor
   - help
   - image
+  - media
   - menu_ui
   - options
   - path
@@ -40,12 +40,14 @@ dependencies:
   - tour
   - automated_cron
   - responsive_image
+  - content_moderation
+  - workflows
 themes:
   - seven
   - umami
 
-# Information added by Drupal.org packaging script on 2018-08-01
-version: '8.5.6'
+# Information added by Drupal.org packaging script on 2018-09-05
+version: '8.6.0'
 core: '8.x'
 project: 'drupal'
-datestamp: 1533156926
+datestamp: 1536186525

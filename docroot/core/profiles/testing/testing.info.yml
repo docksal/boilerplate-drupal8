@@ -4,7 +4,7 @@ description: 'Minimal profile for running tests. Includes absolutely required mo
 # version: VERSION
 # core: 8.x
 hidden: true
-dependencies:
+install:
   # Enable page_cache and dynamic_page_cache in testing, to ensure that as many
   # tests as possible run with them enabled.
   - page_cache
@@ -13,8 +13,8 @@ dependencies:
 themes:
   - classy
 
-# Information added by Drupal.org packaging script on 2018-08-01
-version: '8.5.6'
+# Information added by Drupal.org packaging script on 2018-09-05
+version: '8.6.0'
 core: '8.x'
 project: 'drupal'
-datestamp: 1533156926
+datestamp: 1536186525

@@ -1,0 +1,12 @@
+name: 'Layout Builder test'
+type: module
+description: 'Support module for testing layout building.'
+package: Testing
+# version: VERSION
+# core: 8.x
+
+# Information added by Drupal.org packaging script on 2018-09-05
+version: '8.6.0'
+core: '8.x'
+project: 'drupal'
+datestamp: 1536186525
