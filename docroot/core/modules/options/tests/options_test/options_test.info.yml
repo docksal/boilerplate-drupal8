@@ -5,8 +5,8 @@ description: 'Support module for the Options module tests.'
 package: Testing
 # version: VERSION
 
-# Information added by Drupal.org packaging script on 2018-09-05
-version: '8.6.0'
+# Information added by Drupal.org packaging script on 2018-09-10
+version: '8.6.1'
 core: '8.x'
 project: 'drupal'
-datestamp: 1536186525
+datestamp: 1536585833
