@@ -61,7 +61,10 @@ site_install ()
 	cd $DOCROOT_PATH
 
 	# We disable email sending here so site-install does not return an error
-	php -d sendmail_path=/bin/true /usr/local/bin/drush site-install -y --site-name='My Drupal 8 Site'
+	# Credit: https://www.drupal.org/project/phpconfig/issues/1826652#comment-12071700
+	drush site-install standard -y \
+		install_configure_form.enable_update_status_module=NULL \
+		--site-name='My Drupal 8 Site'
 }
 
 #-------------------------- END: Functions --------------------------------
