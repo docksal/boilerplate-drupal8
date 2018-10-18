@@ -10,8 +10,8 @@ dependencies:
   # @todo Discuss removing in https://www.drupal.org/project/drupal/issues/2935999.
   - drupal:field_ui
 
-# Information added by Drupal.org packaging script on 2018-09-10
-version: '8.6.1'
+# Information added by Drupal.org packaging script on 2018-10-17
+version: '8.6.2'
 core: '8.x'
 project: 'drupal'
-datestamp: 1536585833
+datestamp: 1539816686
