@@ -5,12 +5,15 @@ description: 'Minimal profile for running a test when dependencies are listed bu
 # core: 8.x
 hidden: true
 install:
+  - block
+  - drupal:node
+  - drupal:fictional
   - missing_module1
   - missing_module2
 keep_english: true
 
-# Information added by Drupal.org packaging script on 2018-10-17
-version: '8.6.2'
+# Information added by Drupal.org packaging script on 2018-11-07
+version: '8.6.3'
 core: '8.x'
 project: 'drupal'
-datestamp: 1539816686
+datestamp: 1541602730

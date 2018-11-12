@@ -1,0 +1,12 @@
+name: 'Testing requirements'
+type: profile
+description: 'Profile for testing hook_requirements().'
+# version: VERSION
+# core: 8.x
+hidden: true
+
+# Information added by Drupal.org packaging script on 2018-11-07
+version: '8.6.3'
+core: '8.x'
+project: 'drupal'
+datestamp: 1541602730
