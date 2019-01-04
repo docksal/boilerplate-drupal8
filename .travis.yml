@@ -1,9 +1,6 @@
-sudo: required
+dist: xenial
 
-language: generic
-
-services:
-  - docker
+language: minimal
 
 install:
   - curl -fsSL get.docksal.io | sh
