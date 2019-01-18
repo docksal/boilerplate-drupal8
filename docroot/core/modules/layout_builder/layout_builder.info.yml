@@ -9,9 +9,11 @@ dependencies:
   - drupal:contextual
   # @todo Discuss removing in https://www.drupal.org/project/drupal/issues/2935999.
   - drupal:field_ui
+  # @todo Discuss removing in https://www.drupal.org/project/drupal/issues/3003610.
+  - drupal:block
 
-# Information added by Drupal.org packaging script on 2018-11-07
-version: '8.6.3'
+# Information added by Drupal.org packaging script on 2019-01-16
+version: '8.6.7'
 core: '8.x'
 project: 'drupal'
-datestamp: 1541602730
+datestamp: 1547682295
