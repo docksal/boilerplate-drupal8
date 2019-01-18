@@ -5,8 +5,8 @@ description: 'Places error messages adjacent to form inputs, for improved usabil
 # core: 8.x
 package: Core
 
-# Information added by Drupal.org packaging script on 2018-11-07
-version: '8.6.3'
+# Information added by Drupal.org packaging script on 2019-01-16
+version: '8.6.7'
 core: '8.x'
 project: 'drupal'
-datestamp: 1541602730
+datestamp: 1547682295
