@@ -6,8 +6,8 @@ package: 'Core (Experimental)'
 dependencies:
   - migrate_drupal
 
-# Information added by Drupal.org packaging script on 2019-01-16
-version: '8.6.7'
+# Information added by Drupal.org packaging script on 2019-02-20
+version: '8.6.10'
 core: '8.x'
 project: 'drupal'
-datestamp: 1547682295
+datestamp: 1550692191
