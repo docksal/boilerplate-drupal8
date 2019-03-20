@@ -23,7 +23,7 @@ Follow [Docksal environment setup instructions](https://docs.docksal.io/en/maste
 1. Clone this repo into your Projects directory
 
     ```
-    git clone https://github.com/docksal/drupal8.git drupal8
+    git clone https://github.com/docksal/boilerplate-drupal8.git drupal8
     cd drupal8
     ```
 
