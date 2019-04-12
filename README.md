@@ -16,7 +16,7 @@ Features:
 
 **This is a one time setup - skip this if you already have a working Docksal environment.**  
 
-Follow [Docksal environment setup instructions](https://docs.docksal.io/en/master/getting-started/env-setup)
+Follow [Docksal environment setup instructions](https://docs.docksal.io/getting-started/setup/)
 
 ### Step #2: Project setup
 
@@ -49,7 +49,7 @@ When the automated install is complete the command line output will display the 
 Site provisioning can be automated using `fin init`, which calls the shell script in [.docksal/commands/init](.docksal/commands/init).  
 This script is meant to be modified per project. The one in this repo will give you a good starting example.
 
-Some common tasks that can be handled by the init script (an other [custom commands](https://docs.docksal.io/en/master/fin/custom-commands/)):
+Some common tasks that can be handled by the init script (an other [custom commands](https://docs.docksal.io/fin/custom-commands/)):
 
 - initialize local settings files for Docker Compose, Drupal, Behat, etc.
 - import DB or perform a site install
