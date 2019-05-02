@@ -1,6 +1,6 @@
 name: 'Settings Tray'
 type: module
-description: 'Provides a sidebar to configure blocks on the page.'
+description: 'Allows users to directly edit the configuration of blocks on the current page.'
 package: Core
 # version: VERSION
 # core: 8.x
@@ -9,8 +9,8 @@ dependencies:
   - drupal:toolbar
   - drupal:contextual
 
-# Information added by Drupal.org packaging script on 2019-03-20
-version: '8.6.13'
+# Information added by Drupal.org packaging script on 2019-05-01
+version: '8.7.0'
 core: '8.x'
 project: 'drupal'
-datestamp: 1553100246
+datestamp: 1556737125

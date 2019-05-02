@@ -1,0 +1,14 @@
+name: 'Test install batch test'
+type: module
+description: 'Support module for functional tests.'
+package: Testing
+# version: VERSION
+# core: 8.x
+dependencies:
+  - drupal:entity_test
+
+# Information added by Drupal.org packaging script on 2019-05-01
+version: '8.7.0'
+core: '8.x'
+project: 'drupal'
+datestamp: 1556737125

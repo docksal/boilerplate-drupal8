@@ -1,14 +1,14 @@
 name: 'Field Layout'
 type: module
-description: 'Adds layout capabilities to the Field UI.'
+description: 'Allows users to configure the display and form display by arranging fields in several columns.'
 package: Core (Experimental)
 # version: VERSION
 # core: 8.x
 dependencies:
   - drupal:layout_discovery
 
-# Information added by Drupal.org packaging script on 2019-03-20
-version: '8.6.13'
+# Information added by Drupal.org packaging script on 2019-05-01
+version: '8.7.0'
 core: '8.x'
 project: 'drupal'
-datestamp: 1553100246
+datestamp: 1556737125

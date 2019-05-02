@@ -134,10 +134,24 @@ libraries-override:
       theme:
         css/language.admin.css: css/language/language.admin.css
 
+  layout_builder/drupal.layout_builder:
+    css:
+      theme:
+        css/layout-builder.css: css/layout_builder/layout-builder.css
+
   locale/drupal.locale.admin:
     css:
       component:
         css/locale.admin.css: css/locale/locale.admin.css
+
+  media/oembed.formatter:
+    css:
+      component:
+        css/oembed.formatter.css: css/media/oembed.formatter.css
+  media/oembed.frame:
+    css:
+      component:
+        css/oembed.frame.css: css/media/oembed.frame.css
 
   menu_ui/drupal.menu_ui.adminforms:
     css:
@@ -285,8 +299,8 @@ libraries-override:
         css/views_ui.admin.theme.css: css/views_ui/views_ui.admin.theme.css
         css/views_ui.contextual.css: css/views_ui/views_ui.contextual.css
 
-# Information added by Drupal.org packaging script on 2019-03-20
-version: '8.6.13'
+# Information added by Drupal.org packaging script on 2019-05-01
+version: '8.7.0'
 core: '8.x'
 project: 'drupal'
-datestamp: 1553100246
+datestamp: 1556737125
