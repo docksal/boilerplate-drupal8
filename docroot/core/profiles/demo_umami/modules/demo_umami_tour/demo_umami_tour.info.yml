@@ -1,0 +1,14 @@
+name: 'Umami demo: Tour'
+type: module
+description: 'A guide to the Umami food magazine Drupal demo.'
+# version: VERSION
+# core: 8.x
+dependencies:
+  - node
+  - tour
+
+# Information added by Drupal.org packaging script on 2019-05-01
+version: '8.7.0'
+core: '8.x'
+project: 'drupal'
+datestamp: 1556737125
