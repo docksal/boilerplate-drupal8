@@ -7,8 +7,8 @@ package: Testing
 dependencies:
   - drupal:views
 
-# Information added by Drupal.org packaging script on 2019-05-01
-version: '8.7.0'
+# Information added by Drupal.org packaging script on 2019-05-08
+version: '8.7.1'
 core: '8.x'
 project: 'drupal'
-datestamp: 1556737125
+datestamp: 1557336198
