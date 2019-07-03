@@ -905,4 +905,89 @@ class JsonApiRegressionTest extends JsonApiFunctionalTestBase {
     $this->assertSame(['foo' => 'bar'], $data['data'][0]['attributes']['data']);
   }
 
+  /**
+   * Tests that the response still has meaningful error messages.
+   */
+  public function testRecursionDetectedWhenResponseContainsViolationsFrom3042124() {
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+
+    // Set up default request.
+    $url = Url::fromUri('internal:/jsonapi/node/article');
+    $request_options = [
+      RequestOptions::HEADERS => [
+        'Content-Type' => 'application/vnd.api+json',
+        'Accept' => 'application/vnd.api+json',
+      ],
+      RequestOptions::JSON => [
+        'data' => [
+          'type' => 'node--article',
+          'attributes' => [],
+        ],
+      ],
+    ];
+
+    // Set up test users.
+    $user = $this->drupalCreateUser(['bypass node access'], 'Sam');
+    $admin = $this->drupalCreateUser([], 'Gandalf', TRUE);
+
+    // Make request as regular user.
+    $request_options[RequestOptions::AUTH] = [$user->getUsername(), $user->pass_raw];
+    $this->request('POST', $url, $request_options);
+    $response = $this->request('POST', $url, $request_options);
+
+    // Assert that the response has a body.
+    $data = Json::decode((string) $response->getBody());
+    $this->assertSame(422, $response->getStatusCode());
+    $this->assertNotNull($data);
+    $this->assertSame(sprintf('title: This value should not be null.'), $data['errors'][0]['detail']);
+
+    // Make request as regular user.
+    $request_options[RequestOptions::AUTH] = [$admin->getUsername(), $admin->pass_raw];
+    $this->request('POST', $url, $request_options);
+    $response = $this->request('POST', $url, $request_options);
+
+    // Assert that the response has a body.
+    $data = Json::decode((string) $response->getBody());
+    $this->assertSame(422, $response->getStatusCode());
+    $this->assertNotNull($data);
+    $this->assertSame(sprintf('title: This value should not be null.'), $data['errors'][0]['detail']);
+  }
+
+  /**
+   * Ensure that child comments can be retrieved via JSON:API.
+   */
+  public function testLeakedCacheMetadataViaRdfFromIssue3053827() {
+    $this->assertTrue($this->container->get('module_installer')->install(['comment', 'rdf'], TRUE), 'Installed modules.');
+    $this->addDefaultCommentField('node', 'article', 'comment', CommentItemInterface::OPEN, 'comment');
+    $this->rebuildAll();
+
+    // Create data.
+    Node::create([
+      'title' => 'Commented Node',
+      'type' => 'article',
+    ])->save();
+    $default_values = [
+      'entity_id' => 1,
+      'entity_type' => 'node',
+      'field_name' => 'comment',
+      'status' => 1,
+    ];
+    $parent = Comment::create(['subject' => 'Marlin'] + $default_values);
+    $parent->save();
+    $child = Comment::create(['subject' => 'Nemo', 'pid' => $parent->id()] + $default_values);
+    $child->save();
+
+    // Test.
+    $user = $this->drupalCreateUser(['access comments']);
+    $request_options = [
+      RequestOptions::AUTH => [
+        $user->getUsername(),
+        $user->pass_raw,
+      ],
+    ];
+    // Requesting the comment collection should succeed.
+    $response = $this->request('GET', Url::fromUri('internal:/jsonapi/comment/comment'), $request_options);
+    $this->assertSame(200, $response->getStatusCode());
+  }
+
 }
