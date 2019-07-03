@@ -201,7 +201,12 @@ function layout_builder_post_update_make_layout_untranslatable() {
     if (isset($field_infos[OverridesSectionStorage::FIELD_NAME]['bundles'])) {
       $non_translatable_bundle_count = 0;
       foreach ($field_infos[OverridesSectionStorage::FIELD_NAME]['bundles'] as $bundle) {
-        $field_config = FieldConfig::loadByName($entity_type_id, $bundle, OverridesSectionStorage::FIELD_NAME);
+        // The field map can contain stale information. If the field does not
+        // exist, ignore it. The field map will be rebuilt when the cache is
+        // cleared at the end of the update process.
+        if (!$field_config = FieldConfig::loadByName($entity_type_id, $bundle, OverridesSectionStorage::FIELD_NAME)) {
+          continue;
+        }
         if (!$field_config->isTranslatable()) {
           $non_translatable_bundle_count++;
           // The layout field is already configured to be non-translatable so it
@@ -241,10 +246,10 @@ function layout_builder_post_update_make_layout_untranslatable() {
  *   TRUE if there are zero layout overrides for the bundle, otherwise FALSE.
  */
 function _layout_builder_bundle_has_no_layouts($entity_type_id, $bundle) {
-  $entity_type_manager = \Drupal::entityTypeManager();
-  $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+  $entity_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $entity_update_manager->getEntityType($entity_type_id);
   $bundle_key = $entity_type->getKey('bundle');
-  $query = $entity_type_manager->getStorage($entity_type_id)->getQuery();
+  $query = \Drupal::entityTypeManager()->getStorage($entity_type_id)->getQuery();
   if ($bundle_key) {
     $query->condition($bundle_key, $bundle);
   }
@@ -270,12 +275,12 @@ function _layout_builder_bundle_has_no_layouts($entity_type_id, $bundle) {
  *   TRUE if there are zero translations for the bundle, otherwise FALSE.
  */
 function _layout_builder_bundle_has_no_translations($entity_type_id, $bundle) {
-  $entity_type_manager = \Drupal::entityTypeManager();
-  $entity_type = $entity_type_manager->getDefinition($entity_type_id);
+  $entity_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $entity_update_manager->getEntityType($entity_type_id);
   if (!$entity_type->isTranslatable()) {
     return TRUE;
   }
-  $query = $entity_type_manager->getStorage($entity_type_id)->getQuery();
+  $query = \Drupal::entityTypeManager()->getStorage($entity_type_id)->getQuery();
   $bundle_key = $entity_type->getKey('bundle');
   if ($entity_type->hasKey('default_langcode')) {
     if ($bundle_key) {
