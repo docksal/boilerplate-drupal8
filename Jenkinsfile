@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'docksal/ci-agent:1.7-base' }
+        docker { image 'docksal/ci-agent:edge-base' }
     }
 
     stages {
@@ -25,6 +25,9 @@ pipeline {
                 withCredentials([string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST'), string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST_SSH_KEY')]) {
                     sh '''#!/bin/bash
                         env
+                        source build-env
+                        env
+                        build-exec 'hostname'
                     '''
                 }
             }
@@ -33,7 +36,6 @@ pipeline {
         stage('Build sandbox') {
             steps {
                 sh '''#!/bin/bash
-                    source build-env
                     env
                 '''
             }
