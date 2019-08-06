@@ -20,6 +20,16 @@ pipeline {
             }
         }
 
+        stage('Secrets') {
+            steps {
+                withCredentials([string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST'), string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST_SSH_KEY')]) {
+                    sh '''#!/bin/bash
+                        env
+                    '''
+                }
+            }
+        }
+
         stage('Build sandbox') {
             steps {
                 sh '''#!/bin/bash
