@@ -3,6 +3,10 @@ pipeline {
         docker { image 'docksal/ci-agent:edge-base' }
     }
 
+    environment { 
+        DEBUG = 1
+    }
+    
     stages {
         stage('Checkout code') {
             steps {
