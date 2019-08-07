@@ -3,9 +3,9 @@ pipeline {
         docker { image 'docksal/ci-agent:edge-base' }
     }
 
-    parameters {
-        text(name: 'SSH_KEY', defaultValue: '', description: 'Sandbox server SSH private key (base64 encoded)')
-    }    
+    //parameters {
+    //    text(name: 'SSH_KEY', defaultValue: '', description: 'Sandbox server SSH private key (base64 encoded)')
+    //}    
     
     environment { 
         DEBUG = 1
@@ -28,29 +28,16 @@ pipeline {
             }
         }
 
-        stage('Secrets') {
-            steps {
-                withCredentials([string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST'), string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST_SSH_KEY')]) {
-                    sh '''#!/bin/bash
-                        export DOCKSAL_HOST_SSH_KEY=${SSH_KEY}
-                        env
-                        source build-env
-                        env
-                    '''
-                }
-            }
-        }
-
         stage('Sandbox build') {
             steps {
-                withCredentials([string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST'), string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST_SSH_KEY')]) {
+                //withCredentials([string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST'), string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST_SSH_KEY')]) {
                     sh '''#!/bin/bash
-                        export DOCKSAL_HOST_SSH_KEY=${SSH_KEY}
+                        #export DOCKSAL_HOST_SSH_KEY=${SSH_KEY}
                         source build-env
                         env
                         sandbox-init
                     '''
-                }
+                //}
             }
         }
     }
