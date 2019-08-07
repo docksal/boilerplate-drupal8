@@ -36,7 +36,6 @@ pipeline {
                         env
                         source build-env
                         env
-                        build-exec 'hostname'
                     '''
                 }
             }
@@ -46,6 +45,7 @@ pipeline {
             steps {
                 sh '''#!/bin/bash
                     env
+                    sandbox-init
                 '''
             }
         }
