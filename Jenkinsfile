@@ -1,6 +1,9 @@
 pipeline {
     agent {
-        docker { image 'docksal/ci-agent:edge-base' }
+        docker { 
+            image 'docksal/ci-agent:edge-base'
+            alwaysPull true
+        }
     }
 
     environment { 
