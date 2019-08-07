@@ -12,18 +12,21 @@ pipeline {
     }
     
     stages {
-        stage('Checkout code') {
-            steps {
-                checkout scm
-            }
-        }
+        //stage('Checkout code') {
+        //    steps {
+        //        checkout scm
+        //    }
+        //}
 
         stage('Test') {
             steps {
-                sh 'whoami'
-                sh 'pwd'
-                sh 'ls -la'
-                sh 'env'
+                sh '''#!/bin/bash
+                    whoami
+                    pwd
+                    ls -la
+                    env
+                    echo ${BRANCH_NAME}
+                '''
                 sh "echo ${env.BRANCH_NAME}"
             }
         }
