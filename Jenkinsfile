@@ -32,7 +32,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST'), string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST_SSH_KEY')]) {
                     sh '''#!/bin/bash
-                        export DOCKSAL_HOST_SSH_KEY=${params.SSH_KEY}
+                        export DOCKSAL_HOST_SSH_KEY=${SSH_KEY}
                         env
                         source build-env
                         env
