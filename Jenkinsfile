@@ -41,12 +41,16 @@ pipeline {
             }
         }
 
-        stage('Build sandbox') {
+        stage('Sandbox build') {
             steps {
-                sh '''#!/bin/bash
-                    env
-                    sandbox-init
-                '''
+                withCredentials([string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST'), string(credentialsId: 'DOCKSAL_HOST', variable: 'DOCKSAL_HOST_SSH_KEY')]) {
+                    sh '''#!/bin/bash
+                        export DOCKSAL_HOST_SSH_KEY=${SSH_KEY}
+                        source build-env
+                        env
+                        sandbox-init
+                    '''
+                }
             }
         }
     }
