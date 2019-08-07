@@ -3,6 +3,10 @@ pipeline {
         docker { image 'docksal/ci-agent:edge-base' }
     }
 
+    parameters {
+        text(name: 'SSH_KEY', defaultValue: '', description: 'Sandbox server SSH private key (base64 encoded)')
+    }    
+    
     environment { 
         DEBUG = 1
     }
