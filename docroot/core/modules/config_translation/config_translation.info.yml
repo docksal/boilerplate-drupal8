@@ -8,8 +8,8 @@ configure: config_translation.mapper_list
 dependencies:
   - drupal:locale
 
-# Information added by Drupal.org packaging script on 2019-06-05
-version: '8.7.3'
+# Information added by Drupal.org packaging script on 2019-08-07
+version: '8.7.6'
 core: '8.x'
 project: 'drupal'
-datestamp: 1559762708
+datestamp: 1565206425
