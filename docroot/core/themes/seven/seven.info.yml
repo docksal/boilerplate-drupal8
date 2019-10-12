@@ -18,7 +18,7 @@ description: 'The default administration theme for Drupal 8 was designed with cl
 alt text: 'Default administration theme for Drupal 8 with simple blocks and clean lines.'
 package: Core
 # version: VERSION
-# core: 8.x
+core: 8.x
 libraries:
  - seven/global-styling
 libraries-override:
@@ -71,8 +71,7 @@ regions:
 regions_hidden:
   - sidebar_first
 
-# Information added by Drupal.org packaging script on 2019-08-07
-version: '8.7.6'
-core: '8.x'
+# Information added by Drupal.org packaging script on 2019-10-02
+version: '8.7.8'
 project: 'drupal'
-datestamp: 1565206425
+datestamp: 1570044520

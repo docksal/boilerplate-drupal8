@@ -1,0 +1,10 @@
+name: 'Theme test with semver core version'
+type: theme
+description: 'Test theme which has semver core version.'
+# version: VERSION
+core_version_requirement: ^8 || ^9
+
+# Information added by Drupal.org packaging script on 2019-10-02
+version: '8.7.8'
+project: 'drupal'
+datestamp: 1570044520

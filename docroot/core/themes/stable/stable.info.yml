@@ -3,7 +3,7 @@ type: theme
 description: A default base theme using Drupal 8.0.0's core markup and CSS.
 package: Core
 # version: VERSION
-# core: 8.x
+core: 8.x
 base theme: false
 hidden: true
 
@@ -299,8 +299,7 @@ libraries-override:
         css/views_ui.admin.theme.css: css/views_ui/views_ui.admin.theme.css
         css/views_ui.contextual.css: css/views_ui/views_ui.contextual.css
 
-# Information added by Drupal.org packaging script on 2019-08-07
-version: '8.7.6'
-core: '8.x'
+# Information added by Drupal.org packaging script on 2019-10-02
+version: '8.7.8'
 project: 'drupal'
-datestamp: 1565206425
+datestamp: 1570044520
