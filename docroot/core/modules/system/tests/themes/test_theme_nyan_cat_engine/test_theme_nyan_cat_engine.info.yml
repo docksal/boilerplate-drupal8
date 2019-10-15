@@ -2,12 +2,11 @@ name: 'Test theme for Nyan Cat engine'
 type: theme
 description: 'Theme for testing the theme system with the Nyan Cat theme engine'
 # version: VERSION
-# core: 8.x
+core: 8.x
 engine: nyan_cat
 base theme: false
 
-# Information added by Drupal.org packaging script on 2019-08-07
-version: '8.7.6'
-core: '8.x'
+# Information added by Drupal.org packaging script on 2019-10-02
+version: '8.7.8'
 project: 'drupal'
-datestamp: 1565206425
+datestamp: 1570044520
