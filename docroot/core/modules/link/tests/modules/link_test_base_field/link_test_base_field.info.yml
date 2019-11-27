@@ -7,7 +7,7 @@ dependencies:
   - drupal:link
   - drupal:entity_test
 
-# Information added by Drupal.org packaging script on 2019-10-02
-version: '8.7.8'
+# Information added by Drupal.org packaging script on 2019-11-13
+version: '8.7.10'
 project: 'drupal'
-datestamp: 1570044520
+datestamp: 1573688104
