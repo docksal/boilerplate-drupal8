@@ -144,6 +144,11 @@ libraries-override:
       component:
         css/locale.admin.css: css/locale/locale.admin.css
 
+  media/filter.caption:
+    css:
+      component:
+        css/filter.caption.css: css/media/filter.caption.css
+
   media/oembed.formatter:
     css:
       component:
@@ -299,7 +304,13 @@ libraries-override:
         css/views_ui.admin.theme.css: css/views_ui/views_ui.admin.theme.css
         css/views_ui.contextual.css: css/views_ui/views_ui.contextual.css
 
-# Information added by Drupal.org packaging script on 2019-11-13
-version: '8.7.10'
+libraries-extend:
+  core/drupal.ajax:
+    - stable/drupal.ajax
+  user/drupal.user:
+    - stable/drupal.user
+
+# Information added by Drupal.org packaging script on 2019-12-04
+version: '8.8.0'
 project: 'drupal'
-datestamp: 1573688104
+datestamp: 1575450521

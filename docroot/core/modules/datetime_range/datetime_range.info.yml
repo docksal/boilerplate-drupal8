@@ -7,7 +7,7 @@ core: 8.x
 dependencies:
   - drupal:datetime
 
-# Information added by Drupal.org packaging script on 2019-11-13
-version: '8.7.10'
+# Information added by Drupal.org packaging script on 2019-12-04
+version: '8.8.0'
 project: 'drupal'
-datestamp: 1573688104
+datestamp: 1575450521

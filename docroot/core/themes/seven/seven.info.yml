@@ -46,6 +46,10 @@ libraries-override:
     css:
       component:
         css/components/details.css: false
+  classy/media_library:
+    css:
+      layout:
+        css/layout/media-library.css: false
 
 libraries-extend:
   core/ckeditor:
@@ -54,6 +58,10 @@ libraries-extend:
     - seven/vertical-tabs
   core/jquery.ui:
     - seven/seven.jquery.ui
+  media_library/view:
+    - seven/media_library
+  media_library/widget:
+    - seven/media_library
   tour/tour-styling:
     - seven/tour-styling
 quickedit_stylesheets:
@@ -71,7 +79,7 @@ regions:
 regions_hidden:
   - sidebar_first
 
-# Information added by Drupal.org packaging script on 2019-11-13
-version: '8.7.10'
+# Information added by Drupal.org packaging script on 2019-12-04
+version: '8.8.0'
 project: 'drupal'
-datestamp: 1573688104
+datestamp: 1575450521
