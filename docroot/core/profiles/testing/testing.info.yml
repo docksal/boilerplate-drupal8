@@ -9,11 +9,8 @@ install:
   # tests as possible run with them enabled.
   - drupal:page_cache
   - dynamic_page_cache
-# @todo: Remove this in https://www.drupal.org/node/2352949
-themes:
-  - classy
 
-# Information added by Drupal.org packaging script on 2019-11-13
-version: '8.7.10'
+# Information added by Drupal.org packaging script on 2019-12-04
+version: '8.8.0'
 project: 'drupal'
-datestamp: 1573688104
+datestamp: 1575450521
