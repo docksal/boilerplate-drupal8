@@ -1,11 +1,6 @@
 name: 'Theme test subtheme'
 type: theme
 description: 'Test theme which uses test_basetheme as the base theme.'
-# version: VERSION
+version: VERSION
 core: 8.x
 base theme: classy
-
-# Information added by Drupal.org packaging script on 2019-12-04
-version: '8.8.0'
-project: 'drupal'
-datestamp: 1575450521

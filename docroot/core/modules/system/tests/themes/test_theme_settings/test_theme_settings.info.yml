@@ -1,11 +1,6 @@
 name: 'Theme test theme-settings.php'
 type: theme
 description: 'Test theme that extends theme settings options via theme-settings.php file'
-# version: VERSION
+version: VERSION
 core: 8.x
 base theme: false
-
-# Information added by Drupal.org packaging script on 2019-12-04
-version: '8.8.0'
-project: 'drupal'
-datestamp: 1575450521

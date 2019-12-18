@@ -1,14 +1,9 @@
 name: Testing multilingual
 type: profile
 description: 'Minimal profile for running tests with a multilingual installer.'
-# version: VERSION
+version: VERSION
 core: 8.x
 hidden: true
 install:
   - locale
   - tour
-
-# Information added by Drupal.org packaging script on 2019-12-04
-version: '8.8.0'
-project: 'drupal'
-datestamp: 1575450521
