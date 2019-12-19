@@ -10,8 +10,3 @@ dependencies:
   - drupal:menu_ui
   - drupal:node
   - drupal:path
-
-# Information added by Drupal.org packaging script on 2019-12-04
-version: '8.8.0'
-project: 'drupal'
-datestamp: 1575450521
