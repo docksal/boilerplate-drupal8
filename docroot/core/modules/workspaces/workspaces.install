@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\workspaces\Entity\Workspace;
 
@@ -42,8 +43,7 @@ function workspaces_module_preinstall($module) {
   foreach ($entity_definition_update_manager->getEntityTypes() as $entity_type) {
     $revision_metadata_keys = $entity_type->get('revision_metadata_keys');
     if ($workspace_manager->isEntityTypeSupported($entity_type)) {
-      $revision_metadata_keys['workspace'] = 'workspace';
-      $entity_type->set('revision_metadata_keys', $revision_metadata_keys);
+      $entity_type->setRevisionMetadataKey('workspace', 'workspace');
       $entity_definition_update_manager->updateEntityType($entity_type);
     }
   }
@@ -134,14 +134,18 @@ function workspaces_update_8801() {
       $revision_metadata_keys = $entity_type->get('revision_metadata_keys');
 
       if (!isset($revision_metadata_keys['workspace'])) {
+        $revision_metadata_field_name = 'workspace';
+
         // Bail out if there's an existing field called 'workspace'.
-        if ($entity_definition_update_manager->getFieldStorageDefinition('workspace', $entity_type_id)) {
+        if ($entity_definition_update_manager->getFieldStorageDefinition($revision_metadata_field_name, $entity_type_id)) {
           throw new \RuntimeException("An existing 'workspace' field was found for the '$entity_type_id' entity type. Set the 'workspace' revision metadata key to use a different field name and run this update function again.");
         }
 
-        $revision_metadata_keys['workspace'] = 'workspace';
-        $entity_type->set('revision_metadata_keys', $revision_metadata_keys);
+        $entity_type->setRevisionMetadataKey('workspace', $revision_metadata_field_name);
         $entity_definition_update_manager->updateEntityType($entity_type);
+      }
+      else {
+        $revision_metadata_field_name = $revision_metadata_keys['workspace'];
       }
 
       $field_storage = BaseFieldDefinition::create('entity_reference')
@@ -152,7 +156,7 @@ function workspaces_update_8801() {
         ->setTranslatable(FALSE)
         ->setRevisionable(TRUE);
 
-      $entity_definition_update_manager->installFieldStorageDefinition($revision_metadata_keys['workspace'], $entity_type_id, 'workspaces', $field_storage);
+      $entity_definition_update_manager->installFieldStorageDefinition($revision_metadata_field_name, $entity_type_id, 'workspaces', $field_storage);
     }
   }
 
@@ -173,4 +177,24 @@ function workspaces_update_8802() {
     ->setReadOnly(TRUE);
 
   $entity_definition_update_manager->installFieldStorageDefinition('parent', 'workspace', 'workspaces', $storage_definition);
+}
+
+/**
+ * Remove the Workspace Association entity storage if necessary.
+ */
+function workspaces_update_8803() {
+  $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $entity_definition_update_manager->getEntityType('workspace_association');
+
+  // We can't migrate the workspace association data if the entity type is not
+  // using its default storage.
+  // @see workspaces_post_update_move_association_data()
+  if ($entity_type && $entity_type->getHandlerClasses()['storage'] === 'Drupal\workspaces\WorkspaceAssociationStorage') {
+    \Drupal::state()->set('workspaces_update_8803.tables', [
+      'base_table' => $entity_type->getBaseTable(),
+      'revision_table' => $entity_type->getRevisionTable(),
+    ]);
+    $entity_type->setStorageClass(ContentEntityNullStorage::class);
+    $entity_definition_update_manager->uninstallEntityType($entity_type);
+  }
 }
