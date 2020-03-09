@@ -20,8 +20,8 @@ use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Theme\ThemeSettings;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Utility\TableSort;
@@ -622,20 +622,22 @@ function template_preprocess_datetime_wrapper(&$variables) {
  *
  * @param array $variables
  *   An associative array containing:
- *   - links: An array of links to be themed. Each link should be itself an
- *     array, with the following elements:
+ *   - links: An array of links to be themed. Each link itself is an array, with
+ *     the following elements:
  *     - title: The link text.
- *     - url: (optional) The \Drupal\Core\Url object to link to. If omitted, no
- *       anchor tag is printed out.
+ *     - url: (optional) The \Drupal\Core\Url object to link to. If the 'url'
+ *       element is supplied, the 'title' and 'url' are used to generate a link
+ *       through \Drupal::linkGenerator()->generate(). All data from the link
+ *       array other than 'title' and 'url' are added as #options on
+ *       the URL object. See \Drupal\Core\Url::fromUri() for details on the
+ *       options. If no 'url' is supplied, the 'title' is printed as plain text.
  *     - attributes: (optional) Attributes for the anchor, or for the <span>
- *       tag used in its place if no 'href' is supplied. If element 'class' is
+ *       tag used in its place if no 'url' is supplied. If element 'class' is
  *       included, it must be an array of one or more class names.
- *     If the 'href' element is supplied, the entire link array is passed to
- *     l() as its $options parameter.
  *   - attributes: A keyed array of attributes for the <ul> containing the list
  *     of links.
  *   - set_active_class: (optional) Whether each link should compare the
- *     route_name + route_parameters or href (path), language and query options
+ *     route_name + route_parameters or url (path), language, and query options
  *     to the current URL, to determine whether the link is "active". If so,
  *     attributes will be added to the HTML elements for both the link and the
  *     list item that contains it, which will result in an "is-active" class
@@ -819,7 +821,7 @@ function template_preprocess_image(&$variables) {
     if (isset($variables[$key])) {
       // If the property has already been defined in the attributes,
       // do not override, including NULL.
-      if (array_key_exists($key, $variables['attributes'])) {
+      if (AttributeHelper::attributeExists($key, $variables['attributes'])) {
         continue;
       }
       $variables['attributes'][$key] = $variables[$key];
@@ -1128,7 +1130,7 @@ function template_preprocess_item_list(&$variables) {
             // \Drupal\Core\Render\Element::children(), which cannot be used
             // here, since it triggers an error on string values.
             foreach ($child as $child_key => $child_value) {
-              if ($child_key[0] !== '#') {
+              if (is_int($child_key) || $child_key === '' || $child_key[0] !== '#') {
                 $child['#items'][$child_key] = $child_value;
                 unset($child[$child_key]);
               }
@@ -1241,7 +1243,7 @@ function template_preprocess(&$variables, $hook, $info) {
   if (isset($info['render element'])) {
     $key = $info['render element'];
     if (isset($variables[$key]['#attributes'])) {
-      $variables['attributes'] = NestedArray::mergeDeep($variables['attributes'], $variables[$key]['#attributes']);
+      $variables['attributes'] = AttributeHelper::mergeCollections($variables['attributes'], $variables[$key]['#attributes']);
     }
   }
 }
@@ -1576,7 +1578,7 @@ function template_preprocess_field(&$variables, $hook) {
 
   // Merge attributes when a single-value field has a hidden label.
   if ($element['#label_display'] == 'hidden' && !$variables['multiple'] && !empty($element['#items'][0]->_attributes)) {
-    $variables['attributes'] = NestedArray::mergeDeep($variables['attributes'], (array) $element['#items'][0]->_attributes);
+    $variables['attributes'] = AttributeHelper::mergeCollections($variables['attributes'], (array) $element['#items'][0]->_attributes);
   }
 
   // We want other preprocess functions and the theme implementation to have
