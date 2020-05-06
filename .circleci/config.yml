@@ -2,7 +2,6 @@ version: 2
 jobs:
   build:
     machine: true
-      - image: ubuntu-1604:201903-01
     steps:
       - checkout
       - run: echo "A first hello"
