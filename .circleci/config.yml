@@ -16,7 +16,7 @@ jobs:
             - echo-output      
 workflows:
   version: 2
-  build-deploy:
+  build:
     jobs:
       - build:
           filters:
