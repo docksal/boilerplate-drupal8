@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  one:
-    docker:
-      - image: circleci/ruby:2.4.1
+  build:
+    machine:
+      - image: ubuntu-1604:202004-01
     steps:
       - checkout
       - run: echo "A first hello"
@@ -14,27 +14,13 @@ jobs:
           # Must be relative path from root
           paths:
             - echo-output      
-  two:
-    docker:
-      - image: circleci/ruby:2.4.1
-    steps:
-      - checkout
-      - run: echo "A more familiar hi"  
-      - attach_workspace:
-          # Must be absolute path or relative path from working_directory
-          at: my_workspace
-
-      - run: |
-          if [[ $(cat my_workspace/echo-output) == "Trying out workspaces" ]]; then
-            echo "It worked!";
-          else
-            echo "Nope!"; exit 1
-          fi
+  
 workflows:
   version: 2
-  one_and_two:
+  build-deploy:
     jobs:
-      - one
-      - two:
-          requires:
-            - one
+      - build
+          filters:
+            branches:
+              only:
+                - circleci-project-setup
