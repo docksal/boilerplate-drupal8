@@ -1,37 +1,40 @@
-version: 2 # use CircleCI 2.0
+version: 2
+jobs:
+  one:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - run: echo "A first hello"
+      - run: mkdir -p my_workspace
+      - run: echo "Trying out workspaces" > my_workspace/echo-output
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory
+          root: my_workspace
+          # Must be relative path from root
+          paths:
+            - echo-output      
+  two:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - run: echo "A more familiar hi"  
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: my_workspace
 
-jobs: # a collection of steps
-  build: # runs not using Workflows must have a `build` job as entry point
-    docker: # run the steps with Docker 
-      - image: circleci/php:7.1-node-browsers # ...with this image as the primary container; this is where all `steps` will run
-    working_directory: ~/laravel # directory where steps will run
-    steps: # a set of executable commands
-      - checkout # special step to check out source code to working directory
-      - run: sudo apt install -y libsqlite3-dev zlib1g-dev
-      - run: sudo docker-php-ext-install zip
-      - run: sudo composer self-update
-      - restore_cache: # special step to restore the dependency cache if `composer.lock` does not change
-          keys:
-            - composer-v1-{{ checksum "composer.lock" }}
-            # fallback to using the latest cache if no exact match is found (See https://circleci.com/docs/2.0/caching/)
-            - composer-v1-
-      - run: composer install -n --prefer-dist
-      - save_cache: # special step to save the dependency cache with the `composer.lock` cache key template
-          key: composer-v1-{{ checksum "composer.lock" }}
-          paths:
-            - vendor
-      - restore_cache: # special step to restore the dependency cache if `package-lock.json` does not change
-          keys:
-            - node-v1-{{ checksum "package-lock.json" }}
-            # fallback to using the latest cache if no exact match is found (See https://circleci.com/docs/2.0/caching/)
-            - node-v1-
-      - run: yarn install
-      - save_cache: # special step to save the dependency cache with the `package-lock.json` cache key template
-          key: node-v1-{{ checksum "package-lock.json" }}
-          paths:
-            - node_modules
-      - run: touch storage/testing.sqlite 
-      - run: php artisan migrate --env=testing --database=sqlite_testing --force
-      - run: ./vendor/bin/codecept build
-      - run: ./vendor/bin/codecept run
-      # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
+      - run: |
+          if [[ $(cat my_workspace/echo-output) == "Trying out workspaces" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi
+workflows:
+  version: 2
+  one_and_two:
+    jobs:
+      - one
+      - two:
+          requires:
+            - one
