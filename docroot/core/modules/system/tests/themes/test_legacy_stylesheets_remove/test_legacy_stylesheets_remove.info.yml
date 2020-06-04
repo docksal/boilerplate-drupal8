@@ -1,0 +1,14 @@
+name: 'Theme Legacy Test Stylesheets Remove'
+type: theme
+description: 'Test theme using legacy stylesheets-remove.'
+# version: VERSION
+core: 8.x
+base theme: classy
+libraries: { }
+stylesheets-remove:
+  - '@classy/css/components/action-links.css'
+
+# Information added by Drupal.org packaging script on 2020-06-03
+version: '8.9.0'
+project: 'drupal'
+datestamp: 1591204166

@@ -15,8 +15,6 @@ description: 'Theme for testing the theme system'
 base theme: classy
 core: 8.x
 logo: images/logo2.svg
-stylesheets-remove:
-  - '@stable/css/system/components/js.module.css'
 libraries:
   - test_theme/global-styling
 libraries-override:
@@ -37,6 +35,10 @@ libraries-override:
     css:
       component:
         css/components/dialog.css: false
+  system/base:
+    css:
+      component:
+        /core/themes/stable/css/system/components/js.module.css: false
   # It works for JS as well.
   core/jquery:
     js:
@@ -67,7 +69,7 @@ regions:
   left: Left
   right: Right
 
-# Information added by Drupal.org packaging script on 2020-05-20
-version: '8.8.6'
+# Information added by Drupal.org packaging script on 2020-06-03
+version: '8.9.0'
 project: 'drupal'
-datestamp: 1589989103
+datestamp: 1591204166
