@@ -132,7 +132,7 @@ regions_hidden:
 ckeditor_stylesheets:
   - css/classy/components/media-embed-error.css
 
-# Information added by Drupal.org packaging script on 2020-06-03
-version: '8.9.0'
+# Information added by Drupal.org packaging script on 2020-06-17
+version: '8.9.1'
 project: 'drupal'
-datestamp: 1591204166
+datestamp: 1592418285
