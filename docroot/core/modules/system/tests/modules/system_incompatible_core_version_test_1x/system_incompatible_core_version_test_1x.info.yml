@@ -5,7 +5,7 @@ package: Testing
 # version: 1.0.0
 core: 1.x
 
-# Information added by Drupal.org packaging script on 2020-06-03
-version: '8.9.0'
+# Information added by Drupal.org packaging script on 2020-06-17
+version: '8.9.1'
 project: 'drupal'
-datestamp: 1591204166
+datestamp: 1592418285
