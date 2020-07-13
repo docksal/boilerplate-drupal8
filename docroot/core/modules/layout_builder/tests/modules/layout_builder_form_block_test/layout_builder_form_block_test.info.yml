@@ -4,7 +4,7 @@ description: 'Support module for testing layout building using blocks with forms
 package: Testing
 # version: VERSION
 
-# Information added by Drupal.org packaging script on 2020-06-17
-version: '8.9.1'
+# Information added by Drupal.org packaging script on 2020-07-08
+version: '8.9.2'
 project: 'drupal'
-datestamp: 1592418285
+datestamp: 1594238019
