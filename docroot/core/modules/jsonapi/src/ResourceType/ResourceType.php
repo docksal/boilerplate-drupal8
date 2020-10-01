@@ -15,7 +15,7 @@ use Drupal\Core\TypedData\DataReferenceTargetDefinition;
  * @internal JSON:API maintains no PHP API since its API is the HTTP API. This
  *   class may change at any time and this will break any dependencies on it.
  *
- * @see https://www.drupal.org/project/jsonapi/issues/3032787
+ * @see https://www.drupal.org/project/drupal/issues/3032787
  * @see jsonapi.api.php
  *
  * @see \Drupal\jsonapi\ResourceType\ResourceTypeRepository
@@ -279,7 +279,7 @@ class ResourceType {
    * the HTTP API. For example, read-only data from an internal resource might
    * be embedded in a public resource using computed fields. Therefore,
    * including the internal resource as a relationship with distinct routes
-   * might uneccesarilly expose internal implementation details.
+   * might unnecessarily expose internal implementation details.
    *
    * @return bool
    *   TRUE if the resource type is internal. FALSE otherwise.

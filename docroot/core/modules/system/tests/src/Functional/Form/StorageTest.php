@@ -101,7 +101,8 @@ class StorageTest extends BrowserTestBase {
    */
   public function testValidation() {
     $this->drupalPostForm('form_test/form-storage', ['title' => '', 'value' => 'value_is_set'], 'Continue submit');
-    $this->assertPattern('/value_is_set/', 'The input values have been kept.');
+    // Ensure that the input values have been kept.
+    $this->assertPattern('/value_is_set/');
   }
 
   /**
@@ -188,7 +189,12 @@ class StorageTest extends BrowserTestBase {
 
     // Assert that a watchdog message was logged by
     // \Drupal::formBuilder()->setCache().
-    $status = (bool) Database::getConnection()->queryRange('SELECT 1 FROM {watchdog} WHERE message = :message', 0, 1, [':message' => 'Form build-id mismatch detected while attempting to store a form in the cache.']);
+    $status = (bool) Database::getConnection()->select('watchdog')
+      ->condition('message', 'Form build-id mismatch detected while attempting to store a form in the cache.')
+      ->range(0, 1)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
     $this->assertTrue($status, 'A watchdog message was logged by \Drupal::formBuilder()->setCache');
 
     // Ensure that the form state was not poisoned by the preceding call.

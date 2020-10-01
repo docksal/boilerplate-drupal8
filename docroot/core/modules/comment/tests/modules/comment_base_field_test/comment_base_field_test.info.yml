@@ -1,0 +1,13 @@
+name: 'Comment base field test'
+type: module
+description: 'Test comment as a base field'
+package: Testing
+# version: VERSION
+dependencies:
+  - drupal:comment
+  - drupal:entity_test
+
+# Information added by Drupal.org packaging script on 2020-09-16
+version: '8.9.6'
+project: 'drupal'
+datestamp: 1600276320

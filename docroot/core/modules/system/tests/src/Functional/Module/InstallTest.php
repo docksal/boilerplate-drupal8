@@ -31,7 +31,7 @@ class InstallTest extends BrowserTestBase {
    */
   public function testGetSchemaAtInstallTime() {
     // @see module_test_install()
-    $value = Database::getConnection()->query("SELECT data FROM {module_test}")->fetchField();
+    $value = Database::getConnection()->select('module_test', 'mt')->fields('mt', ['data'])->execute()->fetchField();
     $this->assertIdentical($value, 'varchar');
   }
 
@@ -82,8 +82,8 @@ class InstallTest extends BrowserTestBase {
       $this->container->get('module_installer')->install([$module_name]);
       $this->fail($message);
     }
-    catch (ExtensionNameLengthException $e) {
-      $this->pass($message);
+    catch (\Exception $e) {
+      $this->assertInstanceOf(ExtensionNameLengthException::class, $e);
     }
 
     // Since for the UI, the submit callback uses FALSE, test that too.
@@ -92,8 +92,8 @@ class InstallTest extends BrowserTestBase {
       $this->container->get('module_installer')->install([$module_name], FALSE);
       $this->fail($message);
     }
-    catch (ExtensionNameLengthException $e) {
-      $this->pass($message);
+    catch (\Exception $e) {
+      $this->assertInstanceOf(ExtensionNameLengthException::class, $e);
     }
   }
 
