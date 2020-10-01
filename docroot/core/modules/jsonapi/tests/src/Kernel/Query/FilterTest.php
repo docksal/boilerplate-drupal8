@@ -67,10 +67,10 @@ class FilterTest extends JsonapiKernelTestBase {
     $this->savePaintings([
       ['colors' => ['red'], 'shapes' => ['triangle'], 'title' => 'FIND'],
       ['colors' => ['orange'], 'shapes' => ['circle'], 'title' => 'FIND'],
-      ['colors' => ['orange'], 'shapes' => ['triangle'], 'title' => 'DONT_FIND'],
+      ['colors' => ['orange'], 'shapes' => ['triangle'], 'title' => 'DO_NOT_FIND'],
       ['colors' => ['yellow'], 'shapes' => ['square'], 'title' => 'FIND'],
-      ['colors' => ['yellow'], 'shapes' => ['triangle'], 'title' => 'DONT_FIND'],
-      ['colors' => ['orange'], 'shapes' => ['square'], 'title' => 'DONT_FIND'],
+      ['colors' => ['yellow'], 'shapes' => ['triangle'], 'title' => 'DO_NOT_FIND'],
+      ['colors' => ['orange'], 'shapes' => ['square'], 'title' => 'DO_NOT_FIND'],
     ]);
 
     $this->nodeStorage = $this->container->get('entity_type.manager')->getStorage('node');
@@ -413,7 +413,7 @@ class FilterTest extends JsonapiKernelTestBase {
    */
   protected function getFieldResolverMock(ResourceType $resource_type) {
     $field_resolver = $this->prophesize(FieldResolver::class);
-    $field_resolver->resolveInternalEntityQueryPath($resource_type, Argument::any())->willReturnArgument(1);
+    $field_resolver->resolveInternalEntityQueryPath($resource_type, Argument::any(), Argument::any())->willReturnArgument(1);
     return $field_resolver->reveal();
   }
 

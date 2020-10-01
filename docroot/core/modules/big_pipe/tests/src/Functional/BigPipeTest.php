@@ -153,7 +153,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertBigPipeNoJsCookieExists(FALSE);
 
     $connection = Database::getConnection();
-    $log_count = $connection->query('SELECT COUNT(*) FROM {watchdog}')->fetchField();
+    $log_count = $connection->select('watchdog')->countQuery()->execute()->fetchField();
 
     // By not calling performMetaRefresh() here, we simulate JavaScript being
     // enabled, because as far as the BigPipe module is concerned, JavaScript is
@@ -186,15 +186,16 @@ class BigPipeTest extends BrowserTestBase {
 
     $this->assertRaw('</body>', 'Closing body tag present.');
 
-    $this->pass('Verifying BigPipe assets are present…', 'Debug');
+    // Verifying BigPipe assets are present.
     $this->assertFalse(empty($this->getDrupalSettings()), 'drupalSettings present.');
     $this->assertContains('big_pipe/big_pipe', explode(',', $this->getDrupalSettings()['ajaxPageState']['libraries']), 'BigPipe asset library is present.');
 
     // Verify that the two expected exceptions are logged as errors.
-    $this->assertEqual($log_count + 2, $connection->query('SELECT COUNT(*) FROM {watchdog}')->fetchField(), 'Two new watchdog entries.');
-    // Using the method queryRange() allows contrib database drivers the ability
-    // to insert their own limit and offset functionality.
-    $records = $connection->queryRange('SELECT * FROM {watchdog} ORDER BY wid DESC', 0, 2)->fetchAll();
+    $this->assertEqual($log_count + 2, (int) $connection->select('watchdog')->countQuery()->execute()->fetchField(), 'Two new watchdog entries.');
+    // Using dynamic select queries with the method range() allows contrib
+    // database drivers the ability to insert their own limit and offset
+    // functionality.
+    $records = $connection->select('watchdog', 'w')->fields('w')->orderBy('wid', 'DESC')->range(0, 2)->execute()->fetchAll();
     $this->assertEqual(RfcLogLevel::ERROR, $records[0]->severity);
     $this->assertStringContainsString('Oh noes!', (string) unserialize($records[0]->variables)['@message']);
     $this->assertEqual(RfcLogLevel::ERROR, $records[1]->severity);
@@ -205,7 +206,8 @@ class BigPipeTest extends BrowserTestBase {
     $this->drupalGet(Url::fromUri('base:non-existing-path'));
 
     // Simulate development.
-    $this->pass('Verifying BigPipe provides useful error output when an error occurs while rendering a placeholder if verbose error logging is enabled.', 'Debug');
+    // Verifying BigPipe provides useful error output when an error occurs
+    // while rendering a placeholder if verbose error logging is enabled.
     $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     // The 'edge_case__html_exception' case throws an exception.
@@ -259,13 +261,13 @@ class BigPipeTest extends BrowserTestBase {
       $cases['exception__embedded_response']->bigPipePlaceholderId        => NULL,
     ]);
 
-    $this->pass('Verifying there are no BigPipe placeholders & replacements…', 'Debug');
+    // Verifying there are no BigPipe placeholders & replacements.
     $this->assertEqual('<none>', $this->drupalGetHeader('BigPipe-Test-Placeholders'));
-    $this->pass('Verifying BigPipe start/stop signals are absent…', 'Debug');
+    // Verifying BigPipe start/stop signals are absent.
     $this->assertNoRaw(BigPipe::START_SIGNAL, 'BigPipe start signal absent.');
     $this->assertNoRaw(BigPipe::STOP_SIGNAL, 'BigPipe stop signal absent.');
 
-    $this->pass('Verifying BigPipe assets are absent…', 'Debug');
+    // Verifying BigPipe assets are absent.
     $this->assertTrue(!isset($this->getDrupalSettings()['bigPipePlaceholderIds']) && empty($this->getDrupalSettings()['ajaxPageState']), 'BigPipe drupalSettings and BigPipe asset library absent.');
     $this->assertRaw('</body>', 'Closing body tag present.');
 
@@ -274,7 +276,8 @@ class BigPipeTest extends BrowserTestBase {
     $this->drupalGet(Url::fromUri('base:non-existing-path'));
 
     // Simulate development.
-    $this->pass('Verifying BigPipe provides useful error output when an error occurs while rendering a placeholder if verbose error logging is enabled.', 'Debug');
+    // Verifying BigPipe provides useful error output when an error occurs
+    // while rendering a placeholder if verbose error logging is enabled.
     $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     // The 'edge_case__html_exception' case throws an exception.
@@ -322,7 +325,6 @@ class BigPipeTest extends BrowserTestBase {
   }
 
   protected function assertBigPipeResponseHeadersPresent() {
-    $this->pass('Verifying BigPipe response headers…', 'Debug');
     // Check that Cache-Control header set to "private".
     $this->assertSession()->responseHeaderContains('Cache-Control', 'private');
     $this->assertEqual('no-store, content="BigPipe/1.0"', $this->drupalGetHeader('Surrogate-Control'));
@@ -337,10 +339,10 @@ class BigPipeTest extends BrowserTestBase {
    *   markup.
    */
   protected function assertBigPipeNoJsPlaceholders(array $expected_big_pipe_nojs_placeholders) {
-    $this->pass('Verifying BigPipe no-JS placeholders & replacements…', 'Debug');
     $this->assertSetsEqual(array_keys($expected_big_pipe_nojs_placeholders), array_map('rawurldecode', explode(' ', $this->drupalGetHeader('BigPipe-Test-No-Js-Placeholders'))));
     foreach ($expected_big_pipe_nojs_placeholders as $big_pipe_nojs_placeholder => $expected_replacement) {
-      $this->pass('Checking whether the replacement for the BigPipe no-JS placeholder "' . $big_pipe_nojs_placeholder . '" is present:');
+      // Checking whether the replacement for the BigPipe no-JS placeholder
+      // $big_pipe_nojs_placeholder is present.
       $this->assertNoRaw($big_pipe_nojs_placeholder);
       if ($expected_replacement !== NULL) {
         $this->assertRaw($expected_replacement);
@@ -358,12 +360,10 @@ class BigPipeTest extends BrowserTestBase {
    *   defined in the order that they are expected to be rendered & streamed.
    */
   protected function assertBigPipePlaceholders(array $expected_big_pipe_placeholders, array $expected_big_pipe_placeholder_stream_order) {
-    $this->pass('Verifying BigPipe placeholders & replacements…', 'Debug');
     $this->assertSetsEqual(array_keys($expected_big_pipe_placeholders), explode(' ', $this->drupalGetHeader('BigPipe-Test-Placeholders')));
     $placeholder_positions = [];
     $placeholder_replacement_positions = [];
     foreach ($expected_big_pipe_placeholders as $big_pipe_placeholder_id => $expected_ajax_response) {
-      $this->pass('BigPipe placeholder: ' . $big_pipe_placeholder_id, 'Debug');
       // Verify expected placeholder.
       $expected_placeholder_html = '<span data-big-pipe-placeholder-id="' . $big_pipe_placeholder_id . '"></span>';
       $this->assertRaw($expected_placeholder_html, 'BigPipe placeholder for placeholder ID "' . $big_pipe_placeholder_id . '" found.');
@@ -396,14 +396,15 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertSetsEqual(array_keys($expected_big_pipe_placeholders_with_replacements), array_values($placeholder_replacement_positions));
     $this->assertEqual(count($expected_big_pipe_placeholders_with_replacements), preg_match_all('/' . preg_quote('<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="', '/') . '/', $this->getSession()->getPage()->getContent()));
 
-    $this->pass('Verifying BigPipe start/stop signals…', 'Debug');
+    // Verifying BigPipe start/stop signals.
     $this->assertRaw(BigPipe::START_SIGNAL, 'BigPipe start signal present.');
     $this->assertRaw(BigPipe::STOP_SIGNAL, 'BigPipe stop signal present.');
     $start_signal_position = strpos($this->getSession()->getPage()->getContent(), BigPipe::START_SIGNAL);
     $stop_signal_position = strpos($this->getSession()->getPage()->getContent(), BigPipe::STOP_SIGNAL);
     $this->assertTrue($start_signal_position < $stop_signal_position, 'BigPipe start signal appears before stop signal.');
 
-    $this->pass('Verifying BigPipe placeholder replacements and start/stop signals were streamed in the correct order…', 'Debug');
+    // Verifying BigPipe placeholder replacements and start/stop signals were
+    // streamed in the correct order.
     $expected_stream_order = array_keys($expected_big_pipe_placeholders_with_replacements);
     array_unshift($expected_stream_order, BigPipe::START_SIGNAL);
     array_push($expected_stream_order, BigPipe::STOP_SIGNAL);
