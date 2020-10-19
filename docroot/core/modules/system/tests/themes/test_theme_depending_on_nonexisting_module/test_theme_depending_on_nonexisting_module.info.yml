@@ -5,7 +5,7 @@ base theme: stark
 dependencies:
   - test_module_non_existing
 
-# Information added by Drupal.org packaging script on 2020-09-16
-version: '8.9.6'
+# Information added by Drupal.org packaging script on 2020-10-07
+version: '8.9.7'
 project: 'drupal'
-datestamp: 1600276320
+datestamp: 1602100551

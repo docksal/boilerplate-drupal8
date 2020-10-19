@@ -1,0 +1,15 @@
+name: 'Media Library Form Overwrite test'
+type: module
+description: 'Test module for Media Library.'
+package: Testing
+dependencies:
+  - drupal:image
+  - drupal:media_library
+  - drupal:menu_ui
+  - drupal:node
+  - drupal:path
+
+# Information added by Drupal.org packaging script on 2020-10-07
+version: '8.9.7'
+project: 'drupal'
+datestamp: 1602100551
