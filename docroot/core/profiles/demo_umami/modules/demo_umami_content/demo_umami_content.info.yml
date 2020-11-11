@@ -16,7 +16,7 @@ dependencies:
   - text
   - user
 
-# Information added by Drupal.org packaging script on 2020-10-07
-version: '8.9.7'
+# Information added by Drupal.org packaging script on 2020-11-05
+version: '8.9.8'
 project: 'drupal'
-datestamp: 1602100551
+datestamp: 1604595321
