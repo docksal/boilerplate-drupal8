@@ -19,7 +19,7 @@ libraries-extend:
   classy/base:
     - test_subtheme/global-styling
 
-# Information added by Drupal.org packaging script on 2020-11-26
-version: '8.9.10'
+# Information added by Drupal.org packaging script on 2021-01-20
+version: '8.9.13'
 project: 'drupal'
-datestamp: 1606360355
+datestamp: 1611162326
