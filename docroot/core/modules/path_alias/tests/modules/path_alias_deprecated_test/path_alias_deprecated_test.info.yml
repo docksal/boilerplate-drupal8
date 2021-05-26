@@ -4,7 +4,7 @@ description: 'Support module for testing deprecated functionality for path alias
 package: Testing
 # version: VERSION
 
-# Information added by Drupal.org packaging script on 2021-05-05
-version: '8.9.15'
+# Information added by Drupal.org packaging script on 2021-05-26
+version: '8.9.16'
 project: 'drupal'
-datestamp: 1620217051
+datestamp: 1622058139
