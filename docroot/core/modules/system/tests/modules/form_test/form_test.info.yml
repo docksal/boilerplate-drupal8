@@ -8,7 +8,7 @@ dependencies:
   - file
   - filter
 
-# Information added by Drupal.org packaging script on 2021-05-26
-version: '8.9.16'
+# Information added by Drupal.org packaging script on 2021-08-12
+version: '8.9.18'
 project: 'drupal'
-datestamp: 1622058139
+datestamp: 1628792351
