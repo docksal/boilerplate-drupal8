@@ -4,7 +4,7 @@ description: 'Check that CSRF token is generated once.'
 package: Testing
 # version: VERSION
 
-# Information added by Drupal.org packaging script on 2021-08-12
-version: '8.9.18'
+# Information added by Drupal.org packaging script on 2021-09-15
+version: '8.9.19'
 project: 'drupal'
-datestamp: 1628792351
+datestamp: 1631722505
