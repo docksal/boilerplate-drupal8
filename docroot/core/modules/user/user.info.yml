@@ -9,7 +9,7 @@ configure: user.admin_index
 dependencies:
   - drupal:system
 
-# Information added by Drupal.org packaging script on 2021-09-15
-version: '8.9.19'
+# Information added by Drupal.org packaging script on 2021-11-17
+version: '8.9.20'
 project: 'drupal'
-datestamp: 1631722505
+datestamp: 1637186034
